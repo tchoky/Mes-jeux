@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Pendu magique">
+<meta name="theme-color" content="#a58bff">
+<title>Pendu magique</title>
+<style>
+:root{--ink:#3b2a6b;--pink:#ff5c9d;--mint:#4fdcae;--sun:#ffd84d;--lilac:#c9b6ff;--sky1:#a58bff;--sky2:#ffc7e3}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+input,select{-webkit-user-select:text;user-select:text}
+html,body{margin:0;height:100%;overflow:hidden;font-family:ui-rounded,"SF Pro Rounded","Nunito","Quicksand",system-ui,sans-serif;color:var(--ink)}
+body{background:linear-gradient(180deg,var(--sky1) 0%,#d9a8f0 48%,var(--sky2) 100%)}
+#app{height:100vh;height:100dvh;display:flex;flex-direction:column;gap:6px;max-width:520px;margin:0 auto;position:relative;
+  padding:max(8px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom))}
+button{font-family:inherit;color:inherit;border:0;cursor:pointer}
+.top{display:flex;align-items:center;gap:6px}
+.pill{background:rgba(255,255,255,.88);border-radius:999px;padding:6px 12px;font-weight:800;font-size:15px;display:flex;gap:6px;align-items:center;box-shadow:0 3px 0 rgba(59,42,107,.18);white-space:nowrap}
+.pill small{font-weight:700;opacity:.7;font-size:12px}
+.sp{flex:1}
+.round{width:38px;height:38px;border-radius:50%;background:#fff;font-size:19px;box-shadow:0 3px 0 rgba(59,42,107,.18);display:grid;place-items:center;flex:none}
+.round:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(59,42,107,.18)}
+#stage{position:relative;flex:1 1 auto;min-height:150px}
+#sky{width:100%;height:100%;display:block}
+#clue{position:absolute;right:4px;top:2px;width:62px;height:62px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:36px;box-shadow:0 4px 0 rgba(59,42,107,.2)}
+#clue.in{animation:clueIn .5s cubic-bezier(.3,1.6,.5,1)}
+@keyframes clueIn{from{transform:scale(0) rotate(-40deg)}to{transform:scale(1) rotate(0)}}
+.burst{font-size:20px;animation:burst .45s ease-out forwards}
+@keyframes burst{from{opacity:1;font-size:18px}to{opacity:0;font-size:58px}}
+#word{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;min-height:64px;align-content:center;perspective:500px}
+#word.shake{animation:shake .4s}
+@keyframes shake{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+.tile{width:var(--tw,40px);height:calc(var(--tw,40px)*1.25);border-radius:12px;background:rgba(255,255,255,.55);border-bottom:4px solid rgba(255,255,255,.9);
+  display:grid;place-items:center;font-weight:900;font-size:calc(var(--tw,40px)*.68);line-height:1}
+.tile.on{background:#fff;border-bottom-color:var(--mint);animation:flip .45s}
+.tile.miss{background:#ffe3ee;border-bottom-color:var(--pink);color:#d23a78}
+@keyframes flip{0%{transform:rotateX(90deg) scale(.8)}70%{transform:rotateX(-12deg) scale(1.12)}100%{transform:rotateX(0) scale(1)}}
+.acts{display:flex;gap:8px;justify-content:center}
+.btn{background:#fff;border-radius:999px;padding:9px 16px;font-weight:800;font-size:15px;box-shadow:0 4px 0 rgba(59,42,107,.2)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(59,42,107,.2)}
+.btn[disabled]{opacity:.45}
+#kb{display:flex;flex-direction:column;gap:6px}
+.row{display:flex;justify-content:center;gap:5px;width:100%}
+.key{flex:0 0 calc((100% - 45px)/10);height:clamp(40px,6.4dvh,54px);border-radius:12px;background:#fff;font-size:clamp(18px,3.2dvh,24px);font-weight:900;
+  box-shadow:0 4px 0 #b9a2ff;transition:transform .08s}
+.key:active{transform:translateY(3px);box-shadow:0 1px 0 #b9a2ff}
+.key.ok{background:var(--mint);box-shadow:0 4px 0 #1fae83;animation:hop .35s}
+.key.bad{background:#e4dcf5;color:#a99bd0;box-shadow:0 4px 0 #c2b5e6}
+.key.hint{background:var(--sun);box-shadow:0 4px 0 #d9a900}
+.key[disabled]{pointer-events:none}
+@keyframes hop{40%{transform:translateY(-8px) scale(1.12)}}
+.overlay{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;
+  background:linear-gradient(180deg,var(--sky1) 0%,#d9a8f0 48%,var(--sky2) 100%)}
+.overlay.hide{display:none}
+.title{font-size:42px;font-weight:900;line-height:1;margin:0;color:#fff;text-shadow:0 4px 0 rgba(59,42,107,.35)}
+.sub{margin:0;font-weight:700;font-size:17px}
+.uni{font-size:92px;animation:float 2.4s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-12px) rotate(-4deg)}}
+.lv{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:340px}
+.lvb{border-radius:22px;padding:14px 8px;font-weight:900;font-size:19px;box-shadow:0 6px 0 rgba(59,42,107,.25);display:flex;flex-direction:column;gap:2px;align-items:center}
+.lvb small{font-weight:700;font-size:12px;opacity:.8}
+.lvb:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(59,42,107,.25)}
+.lvb span{font-size:28px}
+#res{position:absolute;left:0;right:0;bottom:0;z-index:6;background:#fff;border-radius:28px 28px 0 0;padding:20px 20px max(22px,env(safe-area-inset-bottom));text-align:center;
+  transform:translateY(110%);transition:transform .45s cubic-bezier(.3,1.3,.5,1);box-shadow:0 -8px 30px rgba(59,42,107,.3);display:flex;flex-direction:column;gap:8px;align-items:center}
+#res.show{transform:none}
+#res .big{font-size:56px;line-height:1}
+#res h2{margin:0;font-size:26px;font-weight:900}
+#res .w{font-size:30px;font-weight:900;letter-spacing:2px;color:var(--pink)}
+#res .pts{font-size:20px;font-weight:800}
+#res .go{background:var(--pink);color:#fff;border-radius:999px;padding:12px 30px;font-size:19px;font-weight:900;box-shadow:0 5px 0 #c93b77;margin-top:4px}
+#res .go:active{transform:translateY(4px);box-shadow:0 1px 0 #c93b77}
+#res .bar{width:70%;height:7px;border-radius:9px;background:#eee;overflow:hidden}
+#res .bar i{display:block;height:100%;width:100%;background:var(--mint);transform-origin:left}
+/* réglages */
+#set{justify-content:flex-start;z-index:8;gap:8px;overflow-y:auto;text-align:left;align-items:stretch;padding-top:max(16px,env(safe-area-inset-top))}
+.shead{display:flex;align-items:center;justify-content:space-between}
+.shead h2{margin:0;font-size:26px;font-weight:900;color:#fff;text-shadow:0 3px 0 rgba(59,42,107,.35)}
+.lab{font-weight:800;font-size:14px;margin-top:6px}
+#set input,#set select{font:inherit;font-size:16px;font-weight:700;color:var(--ink);border:0;border-radius:14px;padding:10px 12px;background:#fff;min-width:0}
+#voiceSel{width:100%}
+.addrow{display:flex;gap:8px}
+.addrow input{flex:1}
+.addrow .emo{flex:0 0 64px;text-align:center}
+.msg{min-height:18px;font-size:13px;font-weight:700}
+#list{display:flex;flex-wrap:wrap;gap:6px;padding-bottom:20px}
+.chip{background:rgba(255,255,255,.85);border-radius:999px;padding:5px 11px;font-weight:700;font-size:14px;display:flex;gap:6px;align-items:center}
+.chip.mine{background:#fff;box-shadow:inset 0 0 0 2px var(--mint)}
+.chip .del{background:#ffe3ee;color:#d23a78;border-radius:50%;width:20px;height:20px;font-size:11px;font-weight:900;display:grid;place-items:center}
+canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:9;width:100%;height:100%}
+@media (prefers-reduced-motion:reduce){.uni,.tile.on,.key.ok,#clue.in{animation:none}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="top">
+    <div class="pill">⭐ <span id="score">0</span></div>
+    <div class="pill">🔥 <span id="streak">0</span></div>
+    <div class="pill"><small id="rank">Petite fée</small></div>
+    <div class="sp"></div>
+    <button class="round" id="mute" aria-label="Son">🔊</button>
+    <button class="round" id="gear" aria-label="Réglages">⚙️</button>
+    <button class="round" id="home" aria-label="Menu">🏠</button>
+  </div>
+
+  <div id="stage">
+    <svg id="sky" viewBox="0 0 320 240" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+      <g fill="#fff" opacity=".9"><ellipse cx="40" cy="226" rx="46" ry="16"/><ellipse cx="100" cy="232" rx="50" ry="16"/><ellipse cx="170" cy="230" rx="54" ry="16"/><ellipse cx="240" cy="232" rx="50" ry="16"/><ellipse cx="295" cy="226" rx="44" ry="16"/></g>
+      <g id="strings" stroke="#fff" stroke-width="1.6" stroke-linecap="round"></g>
+      <text id="uni" x="160" y="158" font-size="78" text-anchor="middle">🦄</text>
+      <g id="balloons"></g>
+      <g id="bursts"></g>
+    </svg>
+    <div id="clue" class="in">❔</div>
+  </div>
+
+  <div id="word"></div>
+  <div class="acts">
+    <button class="btn" id="hintBtn">💡 Indice</button>
+    <button class="btn" id="listenBtn">🔊 Écouter</button>
+  </div>
+  <div id="kb"></div>
+
+  <div id="menu" class="overlay">
+    <div class="uni">🦄</div>
+    <h1 class="title">Pendu magique</h1>
+    <p class="sub">Trouve le mot pour sauver la licorne !<br>Chaque erreur fait éclater un ballon 🎈</p>
+    <div class="lv">
+      <button class="lvb" style="background:#c8f5e1" data-lv="easy"><span>🌱</span>Facile<small>3 à 5 lettres</small></button>
+      <button class="lvb" style="background:#fff2b8" data-lv="mid"><span>🌼</span>Moyen<small>6 à 8 lettres</small></button>
+      <button class="lvb" style="background:#ffd3e6" data-lv="hard"><span>🌈</span>Difficile<small>9 lettres et +</small></button>
+      <button class="lvb" style="background:#fff" data-lv="all"><span>🎁</span>Surprise<small>tous les mots</small></button>
+    </div>
+    <button class="btn" id="gear2">⚙️ Réglages et mots</button>
+    <p class="sub" id="menuScore"></p>
+  </div>
+
+  <div id="set" class="overlay hide">
+    <div class="shead"><h2>⚙️ Réglages</h2><button class="round" id="setClose" aria-label="Fermer">✖</button></div>
+    <div class="lab">🗣️ Voix</div>
+    <select id="voiceSel"></select>
+    <div class="lab">➕ Ajouter un mot (et un emoji si tu veux)</div>
+    <div class="addrow">
+      <input id="nw" placeholder="mot" maxlength="14" autocapitalize="off" autocomplete="off" spellcheck="false">
+      <input id="ne" class="emo" placeholder="😀" maxlength="4">
+      <button class="btn" id="addBtn">Ajouter</button>
+    </div>
+    <div class="msg" id="addMsg"></div>
+    <div class="lab" id="cnt"></div>
+    <div id="list"></div>
+  </div>
+
+  <div id="res">
+    <div class="big" id="resEmoji">🎉</div>
+    <h2 id="resTitle">Bravo !</h2>
+    <div class="w" id="resWord"></div>
+    <div class="pts" id="resPts"></div>
+    <div class="bar"><i id="barI"></i></div>
+    <button class="go" id="next">▶ Mot suivant</button>
+  </div>
+</div>
+<canvas id="fx"></canvas>
+
+<script>
+const WORDS = [["eau", "💧"], ["feu", "🔥"], ["oie", ""], ["bleu", "🔵"], ["bois", "🪵"], ["brun", "🟤"], ["chat", "🐱"], ["gare", "🚉"], ["gris", "🩶"], ["jupe", "👗"], ["kiwi", "🥝"], ["lion", "🦁"], ["long", "📏"], ["loup", "🐺"], ["lune", "🌙"], ["mois", "📅"], ["noël", "🎄"], ["noir", "⚫"], ["ours", "🐻"], ["peur", "😱"], ["rose", "🌹"], ["taxi", "🚕"], ["tête", ""], ["vert", "🟢"], ["voir", "👀"], ["aller", "🚶"], ["arbre", "🌳"], ["avant", ""], ["blanc", "⚪"], ["boule", ""], ["chien", "🐶"], ["colle", "🧴"], ["école", "🏫"], ["forêt", "🌲"], ["image", "🖼️"], ["jaune", "🟡"], ["lampe", "💡"], ["lapin", "🐰"], ["livre", "📖"], ["magie", "✨"], ["maman", "👩"], ["mauve", "🟣"], ["poire", "🍐"], ["pomme", "🍎"], ["poule", "🐔"], ["prune", ""], ["rouge", "🔴"], ["sapin", "🎄"], ["singe", "🐵"], ["soupe", "🥣"], ["train", "🚆"], ["trois", "3️⃣"], ["usine", "🏭"], ["vache", "🐮"], ["zèbre", "🦓"], ["ananas", "🍍"], ["banane", "🍌"], ["bonnet", ""], ["bottes", "👢"], ["brique", "🧱"], ["bureau", ""], ["cadeau", "🎁"], ["cahier", "📓"], ["canard", "🦆"], ["chemin", ""], ["chèvre", "🐐"], ["citron", "🍋"], ["cochon", "🐷"], ["crayon", "✏️"], ["danser", "💃"], ["dehors", ""], ["girafe", "🦒"], ["madame", "👩"], ["maison", "🏠"], ["marron", "🟤"], ["masque", "🎭"], ["minute", "⏱️"], ["mouton", "🐑"], ["orange", "🍊"], ["poupée", ""], ["quatre", "4️⃣"], ["raisin", "🍇"], ["renard", "🦊"], ["sauter", "🤸"], ["timbre", ""], ["tomber", ""], ["trompe", ""], ["valise", "🧳"], ["yaourt", ""], ["affiche", "📰"], ["automne", "🍂"], ["chemise", "👔"], ["chevaux", "🐴"], ["ciseaux", "✂️"], ["couleur", "🌈"], ["écharpe", "🧣"], ["formule", ""], ["gorille", "🦍"], ["manteau", "🧥"], ["moufles", "🧤"], ["nouveau", "🆕"], ["parfois", ""], ["plumier", ""], ["potiron", "🎃"], ["pouvoir", ""], ["recette", ""], ["serpent", "🐍"], ["tempête", "⛈️"], ["voiture", "🚗"], ["araignée", "🕷️"], ["beaucoup", ""], ["carnaval", "🎭"], ["cartable", "🎒"], ["cheminée", ""], ["éléphant", "🐘"], ["hérisson", "🦔"], ["monsieur", "👨"], ["montagne", "⛰️"], ["peinture", "🎨"], ["pingouin", "🐧"], ["sorcière", "🧙‍♀️"], ["casserole", "🍲"], ["crocodile", "🐊"], ["fabriquer", "🔨"], ["guirlande", "🎉"], ["invisible", "👻"], ["kangourou", "🦘"], ["rhinocéros", "🦏"], ["déguisement", "🧙"], ["hippopotame", "🦛"], ["pamplemousse", ""]];
+const MAX = 8, UY0 = 158, UY1 = 226;
+const norm = s => s.toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+const $ = id => document.getElementById(id);
+const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- sauvegarde (si disponible) ---------- */
+const store = (() => { try { localStorage.setItem('t','1'); localStorage.removeItem('t'); return localStorage; } catch(e) { return null; } })();
+let save = { score: 0, found: 0, words: [], voice: '' };
+try { if (store) save = Object.assign(save, JSON.parse(store.getItem('pendu-magique') || '{}')); } catch(e) {}
+if (!Array.isArray(save.words)) save.words = [];
+const persist = () => { try { store && store.setItem('pendu-magique', JSON.stringify(save)); } catch(e) {} };
+const allWords = () => WORDS.concat(save.words);
+let streak = 0, muted = false, autoT = null;
+const rank = s => s < 50 ? 'Petite fée' : s < 150 ? 'Apprentie magicienne' : s < 300 ? 'Magicienne' : 'Reine du pendu';
+
+/* ---------- sons ---------- */
+let ac = null;
+function audio(){ if(!ac){ const C = window.AudioContext || window.webkitAudioContext; if(C) ac = new C(); } if(ac && ac.state === 'suspended') ac.resume(); return ac; }
+function tone(f, d = .15, type = 'sine', delay = 0, vol = .15){
+  if(muted) return; const a = audio(); if(!a) return;
+  const o = a.createOscillator(), g = a.createGain(), t = a.currentTime + delay;
+  o.type = type; o.frequency.value = f;
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + .01); g.gain.exponentialRampToValueAtTime(.001, t + d);
+  o.connect(g); g.connect(a.destination); o.start(t); o.stop(t + d + .02);
+}
+const sfx = {
+  ok:   () => { tone(660,.12,'triangle'); tone(880,.18,'triangle',.09); },
+  bad:  () => { tone(220,.25,'sawtooth',0,.07); tone(165,.3,'sawtooth',.1,.07); },
+  pop:  () => tone(520,.08,'square',0,.06),
+  win:  () => [523,659,784,1047].forEach((f,i) => tone(f,.28,'triangle',i*.12)),
+  lose: () => [392,330,262].forEach((f,i) => tone(f,.32,'sine',i*.18))
+};
+
+/* ---------- voix : choisit la voix française la plus naturelle ---------- */
+const hasTTS = 'speechSynthesis' in window;
+let voice = null, frVoices = [];
+const vScore = v => (/premium|enhanced|natural|neural|online/i.test(v.name) ? 4 : 0) + (/google|thomas|amélie|amelie|audrey|denise|henri|eloise|marie/i.test(v.name) ? 2 : 0) + (/fr[-_]FR/i.test(v.lang) ? 1 : 0);
+function pickVoice(){
+  if(!hasTTS) return;
+  frVoices = speechSynthesis.getVoices().filter(v => /^fr/i.test(v.lang)).sort((a, b) => vScore(b) - vScore(a));
+  voice = frVoices.find(v => v.name === save.voice) || frVoices[0] || null;
+  const sel = $('voiceSel'); sel.innerHTML = '';
+  if(!frVoices.length){ sel.innerHTML = '<option>Voix par défaut</option>'; return; }
+  frVoices.forEach(v => { const o = document.createElement('option'); o.value = v.name; o.textContent = v.name + ' (' + v.lang + ')'; if(voice && v.name === voice.name) o.selected = true; sel.appendChild(o); });
+}
+if(hasTTS){ speechSynthesis.onvoiceschanged = pickVoice; pickVoice(); }
+function speak(t, force){
+  if((muted && !force) || !hasTTS) return;
+  try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t); u.lang = voice ? voice.lang : 'fr-FR'; if(voice) u.voice = voice; u.rate = .85; u.pitch = 1; u.volume = 1; speechSynthesis.speak(u); } catch(e) {}
+}
+
+/* ---------- confettis ---------- */
+const cv = $('fx'), cx = cv.getContext('2d'); let parts = [];
+function fit(){ cv.width = innerWidth * devicePixelRatio; cv.height = innerHeight * devicePixelRatio; }
+addEventListener('resize', fit); fit();
+function confetti(){
+  const cols = ['#ff5c9d','#ffd84d','#4fdcae','#7aa7ff','#b27cff','#ff9a5c'];
+  for(let i = 0; i < 130; i++) parts.push({ x: Math.random()*innerWidth, y: -20 - Math.random()*innerHeight*.5, vx: (Math.random()-.5)*3, vy: 2 + Math.random()*4,
+    r: Math.random()*6.28, vr: (Math.random()-.5)*.3, w: 6 + Math.random()*6, h: 10 + Math.random()*8, c: cols[i % cols.length] });
+  if(parts.length === 130) loopFx();
+}
+function loopFx(){
+  cx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); cx.clearRect(0,0,innerWidth,innerHeight);
+  parts.forEach(p => { p.x += p.vx; p.y += p.vy; p.r += p.vr; cx.save(); cx.translate(p.x,p.y); cx.rotate(p.r); cx.fillStyle = p.c; cx.fillRect(-p.w/2,-p.h/2,p.w,p.h); cx.restore(); });
+  parts = parts.filter(p => p.y < innerHeight + 30);
+  if(parts.length) requestAnimationFrame(loopFx); else cx.clearRect(0,0,innerWidth,innerHeight);
+}
+
+/* ---------- scène : licorne + ballons ---------- */
+const NS = 'http://www.w3.org/2000/svg';
+const COLORS = ['#ff5c9d','#ffd84d','#4fdcae','#7aa7ff','#ff9a5c','#b27cff','#ff7b7b','#5fd3ff'];
+let balloons = [], uy = UY0, uyT = UY0, jumpT0 = -1e9, popOrder = [];
+function mk(tag, attrs, parent){ const e = document.createElementNS(NS, tag); for(const k in attrs) e.setAttribute(k, attrs[k]); parent && parent.appendChild(e); return e; }
+function buildBalloons(){
+  $('balloons').innerHTML = ''; $('strings').innerHTML = ''; $('bursts').innerHTML = ''; balloons = [];
+  for(let i = 0; i < MAX; i++){
+    const g = mk('g', {}, $('balloons'));
+    mk('ellipse', { rx: 17, ry: 21, fill: COLORS[i] }, g);
+    mk('ellipse', { cx: -6, cy: -8, rx: 4, ry: 6, fill: '#fff', opacity: .55 }, g);
+    mk('polygon', { points: '-3,21 3,21 0,26', fill: COLORS[i] }, g);
+    const line = mk('line', {}, $('strings'));
+    balloons.push({ g, line, x: 44 + i*33.14, y: 30 + 22*Math.pow((i-3.5)/3.5, 2), state: 'on', t0: 0 });
+  }
+  popOrder = [...Array(MAX).keys()].sort(() => Math.random() - .5);
+}
+function popBalloon(){
+  const b = balloons[popOrder[G.wrong - 1]]; if(!b || b.state !== 'on') return;
+  b.state = 'pop'; b.t0 = performance.now(); sfx.pop();
+  const t = mk('text', { x: b.x, y: b.y + 8, 'text-anchor': 'middle', class: 'burst' }, $('bursts')); t.textContent = '💥';
+  setTimeout(() => t.remove(), 500);
+}
+function frame(t){
+  const s = t/1000;
+  uy += (uyT - uy) * .12;
+  let bob = reduce ? 0 : Math.sin(s*2) * 3;
+  const jt = t - jumpT0; if(jt < 900) bob -= Math.abs(Math.sin(jt/140)) * 22 * (1 - jt/900);
+  $('uni').setAttribute('y', uy + bob);
+  balloons.forEach((b, i) => {
+    if(b.state === 'gone') return;
+    let sc = 1, op = 1;
+    if(b.state === 'pop'){ const k = (t - b.t0)/180; if(k >= 1){ b.state = 'gone'; b.g.style.display = 'none'; b.line.style.display = 'none'; return; } sc = 1 + .6*k; op = 1 - k; b.line.style.display = 'none'; }
+    const x = b.x + (reduce ? 0 : Math.sin(s*1.6 + i)*2.5), y = b.y + (reduce ? 0 : Math.sin(s*1.3 + i*1.7)*2);
+    b.g.setAttribute('transform', `translate(${x} ${y}) scale(${sc})`); b.g.setAttribute('opacity', op);
+    if(b.state === 'on'){ b.line.setAttribute('x1', x); b.line.setAttribute('y1', y + 26); b.line.setAttribute('x2', 160); b.line.setAttribute('y2', uy + bob - 56); }
+  });
+  requestAnimationFrame(frame);
+}
+
+/* ---------- jeu ---------- */
+let bags = {};
+function pool(lv){ return allWords().filter(([w]) => lv === 'easy' ? w.length <= 5 : lv === 'mid' ? (w.length >= 6 && w.length <= 8) : lv === 'hard' ? w.length >= 9 : true); }
+function nextWord(lv){
+  if(!bags[lv] || !bags[lv].length) bags[lv] = pool(lv).sort(() => Math.random() - .5);
+  if(!bags[lv].length) bags[lv] = allWords().sort(() => Math.random() - .5);
+  return bags[lv].pop();
+}
+let G = null, level = 'all';
+const KB = ['AZERTYUIOP', 'QSDFGHJKLM', 'WXCVBN'];
+function buildKeyboard(){
+  $('kb').innerHTML = '';
+  KB.forEach(r => { const row = document.createElement('div'); row.className = 'row';
+    [...r].forEach(ch => { const k = document.createElement('button'); k.className = 'key'; k.textContent = ch; k.dataset.k = ch.toLowerCase(); k.addEventListener('pointerdown', e => { e.preventDefault(); press(ch.toLowerCase()); }); row.appendChild(k); });
+    $('kb').appendChild(row); });
+}
+function newGame(){
+  clearTimeout(autoT);
+  const [w, e] = nextWord(level);
+  G = { w, e, n: norm(w), guessed: new Set(), wrong: 0, hint: false, over: false };
+  buildBalloons(); uy = uyT = UY0;
+  buildKeyboard(); $('res').classList.remove('show');
+  $('clue').textContent = e || '❔'; $('clue').classList.remove('in'); void $('clue').offsetWidth; $('clue').classList.add('in');
+  const box = $('word'); box.innerHTML = '';
+  const per = Math.min(w.length, 8), tw = Math.max(26, Math.min(48, Math.floor((Math.min(innerWidth, 500) - 40) / per) - 6));
+  box.style.setProperty('--tw', tw + 'px');
+  [...w].forEach(() => { const t = document.createElement('div'); t.className = 'tile'; box.appendChild(t); });
+  $('hintBtn').disabled = false;
+  stats();
+  const g = G; // lecture à voix haute au début du mot
+  setTimeout(() => { if(G === g && !g.over && $('menu').classList.contains('hide') && $('set').classList.contains('hide')) speak(g.w); }, 500);
+}
+function stats(){ $('score').textContent = save.score; $('streak').textContent = streak; $('rank').textContent = rank(save.score); }
+function reveal(letter){
+  [...G.n].forEach((c, i) => { if(c === letter){ const t = $('word').children[i]; t.textContent = G.w[i].toUpperCase(); t.classList.add('on'); } });
+}
+function press(letter, viaHint = false){
+  if(!G || G.over || G.guessed.has(letter)) return;
+  audio();
+  G.guessed.add(letter);
+  const key = document.querySelector(`.key[data-k="${letter}"]`);
+  if(G.n.includes(letter)){
+    reveal(letter); key.classList.add(viaHint ? 'hint' : 'ok'); key.disabled = true; if(!viaHint) sfx.ok();
+    if([...G.n].every(c => G.guessed.has(c))) win();
+  } else {
+    G.wrong++; key.classList.add('bad'); key.disabled = true; sfx.bad(); popBalloon();
+    uyT = UY0 + (UY1 - UY0) * G.wrong / MAX;
+    const b = $('word'); b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake');
+    if(G.wrong >= MAX) lose();
+  }
+}
+/* affiche le résultat, puis passe au mot suivant tout seul après une petite pause */
+function showRes(emoji, title, pts, pause){
+  $('resEmoji').textContent = emoji; $('resTitle').textContent = title; $('resWord').textContent = G.w.toUpperCase(); $('resPts').textContent = pts;
+  clearTimeout(autoT);
+  autoT = setTimeout(() => {
+    $('res').classList.add('show');
+    const i = $('barI'); i.style.transition = 'none'; i.style.transform = 'scaleX(1)'; void i.offsetWidth;
+    i.style.transition = 'transform ' + pause + 'ms linear'; i.style.transform = 'scaleX(0)';
+    autoT = setTimeout(newGame, pause);
+  }, 650);
+}
+const praise = ['Bravo !', 'Super !', 'Génial !', 'Magique !', 'Trop forte !'];
+function win(){
+  G.over = true;
+  const pts = 10 + (MAX - G.wrong) - (G.hint ? 3 : 0);
+  save.score += pts; save.found++; streak++; persist(); stats();
+  uyT = UY0 - 20; jumpT0 = performance.now();
+  sfx.win(); confetti(); setTimeout(() => speak(G.w), 500);
+  showRes('🎉', praise[Math.floor(Math.random()*praise.length)] + (streak >= 3 ? ' 🔥 ' + streak + ' de suite' : ''), '+' + pts + ' ⭐', 3000);
+}
+function lose(){
+  G.over = true; streak = 0; stats(); uyT = UY1; sfx.lose();
+  [...G.w].forEach((ch, i) => { const t = $('word').children[i]; if(!t.classList.contains('on')){ t.textContent = ch.toUpperCase(); t.classList.add('miss'); } });
+  setTimeout(() => speak(G.w), 500);
+  showRes('☁️', 'Oups ! La licorne se pose sur un nuage', 'Essaie encore, tu vas y arriver !', 3800);
+}
+function hint(){
+  if(!G || G.over || G.hint) return;
+  const left = [...new Set([...G.n].filter(c => !G.guessed.has(c)))]; if(!left.length) return;
+  G.hint = true; $('hintBtn').disabled = true; press(left[Math.floor(Math.random()*left.length)], true);
+}
+function start(lv){ level = lv; $('menu').classList.add('hide'); audio(); newGame(); }
+function openMenu(){ clearTimeout(autoT); $('res').classList.remove('show'); $('menuScore').textContent = save.score ? `⭐ ${save.score} · ${rank(save.score)} · ${save.found} mots trouvés` : ''; $('menu').classList.remove('hide'); }
+
+/* ---------- réglages : liste des mots + ajout ---------- */
+function renderList(){
+  const L = $('list'); L.innerHTML = '';
+  const chip = (w, e, i) => { const c = document.createElement('span'); c.className = 'chip' + (i >= 0 ? ' mine' : ''); c.dataset.w = w;
+    c.textContent = (e ? e + ' ' : '') + w; if(i >= 0){ const d = document.createElement('button'); d.className = 'del'; d.textContent = '✕'; d.dataset.i = i; d.setAttribute('aria-label', 'Supprimer'); c.appendChild(d); } return c; };
+  save.words.forEach(([w, e], i) => L.appendChild(chip(w, e, i)));
+  WORDS.forEach(([w, e]) => L.appendChild(chip(w, e, -1)));
+  $('cnt').textContent = `📚 ${allWords().length} mots (dont ${save.words.length} ajoutés par toi) · touche un mot pour l’écouter`;
+}
+function openSet(){ clearTimeout(autoT); if(hasTTS) speechSynthesis.cancel(); $('addMsg').textContent = ''; renderList(); $('set').classList.remove('hide'); }
+function closeSet(){ $('set').classList.add('hide'); if($('menu').classList.contains('hide') && G && G.over) newGame(); }
+function addWord(){
+  const w = $('nw').value.trim().toLowerCase(), e = $('ne').value.trim(), m = $('addMsg');
+  if(!/^[a-zàâäçéèêëîïôöœùûüÿ]{2,14}$/.test(w)){ m.textContent = 'Lettres seulement (2 à 14), sans espace ni tiret.'; return; }
+  if(allWords().some(x => norm(x[0]) === norm(w))){ m.textContent = 'Ce mot existe déjà.'; return; }
+  save.words.unshift([w, e]); persist(); bags = {}; renderList();
+  $('nw').value = ''; $('ne').value = ''; m.textContent = '✅ « ' + w + ' » ajouté !'; speak(w, true);
+}
+$('gear').addEventListener('click', openSet);
+$('gear2').addEventListener('click', openSet);
+$('setClose').addEventListener('click', closeSet);
+$('addBtn').addEventListener('click', addWord);
+$('nw').addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); addWord(); } });
+$('voiceSel').addEventListener('change', e => { voice = frVoices.find(v => v.name === e.target.value) || voice; save.voice = voice ? voice.name : ''; persist(); speak('Bonjour, je suis ta nouvelle voix', true); });
+$('list').addEventListener('click', e => {
+  const d = e.target.closest('.del');
+  if(d){ save.words.splice(+d.dataset.i, 1); persist(); bags = {}; renderList(); return; }
+  const c = e.target.closest('.chip'); if(c) speak(c.dataset.w, true);
+});
+
+document.querySelectorAll('.lvb').forEach(b => b.addEventListener('click', () => start(b.dataset.lv)));
+$('next').addEventListener('click', () => { audio(); newGame(); });
+$('home').addEventListener('click', openMenu);
+$('hintBtn').addEventListener('click', hint);
+$('listenBtn').addEventListener('click', () => { if(G) speak(G.w, true); });
+$('mute').addEventListener('click', () => { muted = !muted; $('mute').textContent = muted ? '🔇' : '🔊'; if(muted && hasTTS) speechSynthesis.cancel(); });
+addEventListener('keydown', e => { if(/^[a-z]$/i.test(e.key) && e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT' && $('menu').classList.contains('hide') && $('set').classList.contains('hide')) press(e.key.toLowerCase()); });
+
+buildBalloons(); buildKeyboard(); stats(); openMenu(); requestAnimationFrame(frame);
+</script>
+</body>
+</html>
