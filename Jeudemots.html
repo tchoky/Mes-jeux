@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Jeu de mots</title>
+<style>
+:root{--ink:#16356b;--muted:#5d7bb0;--card:#ffffff;--key:#e3f0ff;--line:#b9d6fb;--accent:#2f80ed;--accent2:#ff7eb6;--good:#12a150;--good-bg:#d9f8e5;--bad:#e5484d;--bad-bg:#ffe3e4;--sun:#ffe08a}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#eaf3ff;--muted:#9dbbe8;--card:#17305e;--key:#24437d;--line:#35599c;--good-bg:#12432b;--bad-bg:#4a1f26;--good:#5ee59a;--bad:#ff8b8f;--sun:#6b5a1f}}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{font-family:"Baloo 2","Comic Sans MS","Chalkboard SE",system-ui,sans-serif;color:var(--ink);
+ background:radial-gradient(circle at 15% 10%,#bfe3ff 0,transparent 35%),radial-gradient(circle at 85% 90%,#8fd0ff 0,transparent 40%),linear-gradient(180deg,#4aa8ff,#7fd0ff 60%,#bfeaff);
+ background-attachment:fixed;display:flex;justify-content:center;padding:max(14px,env(safe-area-inset-top)) 12px max(14px,env(safe-area-inset-bottom));overflow-x:hidden}
+.deco{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.deco i{position:absolute;font-style:normal;opacity:.85;animation:float 6s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-14px) rotate(8deg)}}
+main{position:relative;z-index:1;width:100%;max-width:580px;background:var(--card);border-radius:28px;border:4px solid #fff;box-shadow:0 12px 34px rgba(20,80,160,.35);padding:16px 16px 20px;display:flex;flex-direction:column;gap:12px;align-self:flex-start}
+header{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+h1{margin:0;font-size:26px;line-height:1.1}
+.tools{display:flex;gap:8px}
+button{font:inherit;cursor:pointer}
+.tbtn{background:var(--key);color:var(--ink);border:0;border-radius:999px;padding:8px 14px;font-weight:800;font-size:15px;box-shadow:0 3px 0 var(--line)}
+.tbtn:active{transform:translateY(2px);box-shadow:none}
+.tabs{display:flex;gap:8px}
+.tab{flex:1;background:var(--key);color:var(--ink);border:0;border-radius:16px;padding:10px 8px;font-weight:800;font-size:15px;box-shadow:0 3px 0 var(--line)}
+.tab.on{background:var(--accent);color:#fff;box-shadow:0 3px 0 #1c5fb8}
+.chip{background:var(--key);border-radius:999px;padding:4px 12px;font-weight:800;font-size:14px;align-self:flex-start}
+#grid{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:4px;touch-action:manipulation}
+.c{aspect-ratio:1;border:0;border-radius:10px;background:var(--key);color:var(--ink);font-weight:800;font-size:clamp(16px,5.4vw,26px);padding:0;box-shadow:0 2px 0 var(--line)}
+.c.start{background:var(--accent2);color:#fff}
+.c.found{background:var(--good-bg);color:var(--good);box-shadow:0 2px 0 var(--good)}
+.c.hint,.key.hint{background:var(--sun);animation:pulse .6s 3}
+@keyframes pulse{50%{transform:scale(1.15)}}
+#todo{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+#todo span{background:var(--key);border-radius:999px;padding:6px 14px;font-weight:800;font-size:17px;text-transform:uppercase}
+#todo span.done{background:var(--good-bg);color:var(--good);text-decoration:line-through}
+#fill{display:flex;flex-direction:column;gap:10px;align-items:center}
+#word{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;padding:4px 0;min-height:60px}
+#word span{width:clamp(26px,9vw,44px);height:clamp(38px,11vw,54px);display:flex;align-items:center;justify-content:center;font-size:clamp(26px,8vw,38px);font-weight:800;background:var(--key);border-bottom:4px solid var(--accent);border-radius:10px 10px 4px 4px;text-transform:uppercase}
+#word span.blank{background:var(--sun);border-bottom-color:var(--accent2)}
+#word span.on{animation:pop .3s ease-out}
+#word span.miss{color:var(--bad);background:var(--bad-bg);border-color:var(--bad)}
+#word span.sep{background:none;border:0;width:clamp(10px,3vw,16px)}
+@keyframes pop{from{transform:translateY(-10px) scale(.6);opacity:0}to{transform:none;opacity:1}}
+.lives{font-size:22px;letter-spacing:3px}
+.wrong{min-height:22px;font-weight:800;color:var(--bad);letter-spacing:.1em}
+#msg{min-height:56px;border-radius:16px;padding:10px 14px;font-weight:800;font-size:17px;text-align:center;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;background:var(--key)}
+#msg.win{background:var(--good-bg);color:var(--good)}
+#msg.lose{background:var(--bad-bg);color:var(--bad)}
+#next{background:var(--accent2);color:#fff;border:0;border-radius:14px;padding:9px 18px;font-weight:800;box-shadow:0 3px 0 #d6538f}
+.row2{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+[hidden]{display:none!important}
+#kb{display:flex;flex-direction:column;gap:7px}
+.row{display:flex;justify-content:center;gap:6px}
+.key{flex:1 1 0;max-width:46px;min-width:0;height:clamp(42px,11.5vw,52px);border:0;border-radius:12px;background:var(--key);color:var(--ink);font-weight:800;font-size:clamp(16px,4.6vw,20px);box-shadow:0 3px 0 var(--line)}
+.key:active:not(:disabled){transform:translateY(2px);box-shadow:none}
+.key.ok{background:var(--good-bg);color:var(--good);box-shadow:0 3px 0 var(--good)}
+.key.no{background:var(--bad-bg);color:var(--bad);box-shadow:0 3px 0 var(--bad);opacity:.7}
+button:focus-visible{outline:3px solid var(--accent2);outline-offset:2px}
+#dict{position:fixed;inset:0;z-index:5;background:rgba(10,40,90,.6);display:none;align-items:center;justify-content:center;padding:14px}
+#dict.open{display:flex}
+.panel{background:var(--card);color:var(--ink);border-radius:24px;border:4px solid #fff;width:100%;max-width:520px;max-height:86vh;display:flex;flex-direction:column;overflow:hidden}
+.panel h2{margin:0;font-size:22px}
+.phead{display:flex;justify-content:space-between;align-items:center;padding:14px 16px 8px}
+.panel input{margin:0 16px 8px;padding:10px 14px;border-radius:999px;border:2px solid var(--line);font:inherit;background:var(--key);color:var(--ink)}
+.panel p{margin:0 16px 8px;font-size:14px;color:var(--muted)}
+.add{display:flex;gap:8px;margin:0 16px 6px}
+.add input{margin:0;flex:1;min-width:0}
+#addMsg{min-height:18px;font-size:13px;font-weight:700;margin:0 16px 4px}
+#reset{margin:0 16px 8px;align-self:flex-start;font-size:13px;padding:6px 12px}
+#list{overflow:auto;padding:4px 16px 16px;display:flex;flex-wrap:wrap;gap:8px}
+.wi{display:flex;align-items:center;gap:3px}
+.w{border:0;background:var(--key);color:var(--ink);border-radius:999px;padding:7px 14px;font-weight:700;font-size:16px;box-shadow:0 2px 0 var(--line)}
+.w.found{background:var(--good-bg);color:var(--good)}
+.del{border:0;background:var(--bad-bg);color:var(--bad);border-radius:50%;width:26px;height:26px;font-weight:800;line-height:1;padding:0}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="deco" aria-hidden="true"><i style="left:6%;top:8%;font-size:34px">⭐</i><i style="left:86%;top:12%;font-size:30px;animation-delay:1s">🦋</i><i style="left:10%;top:70%;font-size:36px;animation-delay:2s">🐳</i><i style="left:88%;top:62%;font-size:32px;animation-delay:.5s">✨</i><i style="left:46%;top:92%;font-size:34px;animation-delay:1.5s">🐠</i><i style="left:70%;top:4%;font-size:30px;animation-delay:2.5s">☁️</i></div>
+<main>
+ <header>
+  <h1>🔤 Jeu de mots</h1>
+  <div class="tools"><button class="tbtn" id="dictBtn">📖 Dictionnaire</button><button class="tbtn" id="sndBtn" aria-label="Son">🔊</button></div>
+ </header>
+ <div class="tabs"><button class="tab on" id="tabGrid">🔍 Mots cachés</button><button class="tab" id="tabFill">✏️ Compléter</button></div>
+ <span class="chip">⭐ Étoiles <b id="stars">0</b></span>
+
+ <section id="gridMode">
+  <div id="grid" aria-label="Tableau de lettres"></div>
+  <p style="margin:8px 0 6px;text-align:center;font-weight:700;color:var(--muted);font-size:14px">Touche la première lettre, puis la dernière lettre du mot.</p>
+  <div id="todo"></div>
+ </section>
+
+ <section id="fill" hidden>
+  <div class="lives" id="lives" aria-label="Vies"></div>
+  <div id="word" aria-live="polite"></div>
+  <div class="wrong" id="wrong"></div>
+  <div class="row2"><button class="tbtn" id="listen">🔈 Écouter le mot</button></div>
+  <div id="kb"></div>
+ </section>
+
+ <div id="msg" role="status"><span id="msgText"></span><button id="next" hidden>Suivant ➡️</button></div>
+ <div class="row2"><button class="tbtn" id="hintBtn">💡 Un indice</button><button class="tbtn" id="newBtn">🔄 Nouveau jeu</button></div>
+</main>
+
+<div id="dict" role="dialog" aria-modal="true" aria-label="Dictionnaire">
+ <div class="panel">
+  <div class="phead"><h2>📖 Mon dictionnaire</h2><button class="tbtn" id="closeDict">✖ Fermer</button></div>
+  <div class="add"><input id="newWord" placeholder="Ajouter un mot…" autocomplete="off" maxlength="30"><button class="tbtn" id="addBtn">➕ Ajouter</button></div>
+  <div id="addMsg" role="status"></div>
+  <input id="search" type="search" placeholder="Chercher un mot…" autocomplete="off">
+  <p>Touche un mot pour l’écouter, ou ✖ pour l’effacer. Les mots verts sont ceux que tu as trouvés ! ✅ <b id="count"></b></p>
+  <button class="tbtn" id="reset">↩ Liste de départ</button>
+  <div id="list"></div>
+ </div>
+</div>
+
+<script>
+const DEFAULTS="affiche|ananas|araignée|arbre|automne|avant|banane|beaucoup|blanc|blanche|bleu|bleue|bois|bonnet|bottes|brique|brun|bureau|cadeau|cahier|canard|carnaval|cartable|casserole|chat|chemin|cheminée|chemise|chevaux|chèvre|chien|ciseaux|citron|cochon|colle|couleur|crayon|crocodile|danser|dehors|déguisement|des moufles|des plantes|eau|écharpe|école|éléphant|être allongé|fabriquer|feu|formule|gare|girafe|gorille|gris|grise|guirlande|hérisson|hippopotame|image|invisible|jaune|jupe|kangourou|kiwi|la terre|lampe|lapin|le monde|les|les enfants|les jouets|les mots cachés|lion|livre|long|loup|lune|madame|magie|maison|maman|manteau|marron|masque|mauve|minute|mois|monsieur|montagne|mouton|nœud|noël|noir|noire|nouveau|oie|orange|ours|aller|forêt|pamplemousse|parfois|peinture|peur|pingouin|plumier|poire|pomme|potiron|poule|poupée|pouvoir|prune|quatre|raisin|recette|renard|rhinocéros|rose|rouge|saint nicolas|s'amuser|sapin|sauter|serpent|singe|sorcière|soupe|taxi|tempête|tête|timbre|tomber|train|trois|trompe|un chevalier|usine|vacances|vache|valise|vert|verte|voir|voiture|vous prenez|vous reposez|yaourt|zèbre".split("|");
+const norm=s=>s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/œ/g,"o").replace(/æ/g,"a").toLowerCase();
+const isL=ch=>/[a-z]/.test(norm(ch));
+const $=id=>document.getElementById(id);
+const rnd=n=>Math.floor(Math.random()*n);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
+const NAMES={a:"a",b:"bé",c:"cé",d:"dé",e:"eu",f:"effe",g:"gé",h:"hache",i:"i",j:"gi",k:"ka",l:"elle",m:"emme",n:"enne",o:"o",p:"pé",q:"ku",r:"erre",s:"esse",t:"té",u:"u",v:"vé",w:"double vé",x:"ixe",y:"i grec",z:"zède"};
+let words=DEFAULTS.slice(),found=new Set(),sound=true,stars=0,mode="grid";
+try{
+ const w=JSON.parse(localStorage.getItem("pendu-words")||"null");if(Array.isArray(w)&&w.length)words=w;
+ found=new Set(JSON.parse(localStorage.getItem("pendu-found")||"[]"));sound=localStorage.getItem("pendu-sound")!=="off";
+}catch(e){}
+function save(){try{localStorage.setItem("pendu-words",JSON.stringify(words));localStorage.setItem("pendu-found",JSON.stringify([...found]));localStorage.setItem("pendu-sound",sound?"on":"off")}catch(e){}}
+
+/* Sons */
+let ac;
+function tone(f,d,type="sine",delay=0,vol=.18){
+ if(!sound)return;
+ try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume();
+  const o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime+delay;
+  o.type=type;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+d);
+  o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+d+.02);}catch(e){}
+}
+const sfx={
+ click:()=>tone(600,.06,"triangle"),
+ good:()=>{tone(660,.12);tone(880,.18,"sine",.1)},
+ bad:()=>{tone(220,.25,"sawtooth",0,.12);tone(165,.3,"sawtooth",.12,.12)},
+ win:()=>[523,659,784,1047,1319].forEach((f,i)=>tone(f,.25,"triangle",i*.11)),
+ lose:()=>[392,349,311,262].forEach((f,i)=>tone(f,.35,"sine",i*.2))
+};
+function speak(t){
+ if(!sound||!("speechSynthesis" in window))return;
+ try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="fr-FR";u.rate=.85;speechSynthesis.speak(u)}catch(e){}
+}
+const say=c=>speak(NAMES[c]||c);
+function setSnd(){$("sndBtn").textContent=sound?"🔊":"🔇";$("sndBtn").setAttribute("aria-pressed",sound)}
+$("sndBtn").onclick=()=>{sound=!sound;setSnd();save();sfx.click()};
+function msg(t,cls=""){$("msgText").textContent=t;$("msg").className=cls}
+function addStar(){stars++;$("stars").textContent=stars}
+
+/* ===== Mots cachés ===== */
+const N=8;let G=[],P=[],sel=null,cellsFound=new Set(),gdone=false;
+function makeGrid(){
+ const pool=words.filter(w=>/^[a-zàâäçéèêëîïôöœùûüÿ]+$/.test(w)&&norm(w).length>=3&&norm(w).length<=N);
+ G=Array(N*N).fill("");P=[];sel=null;cellsFound=new Set();gdone=false;$("next").hidden=true;
+ if(!pool.length){render();msg("Ajoute des mots (sans espace) dans le dictionnaire 📖");return}
+ const dirs=[[0,1],[1,0],[1,1]];
+ for(const w of shuffle(pool).slice(0,5)){
+  const L=norm(w).toUpperCase();
+  for(let t=0;t<100;t++){
+   const [dr,dc]=dirs[rnd(3)],r=rnd(N),c=rnd(N);
+   if(r+dr*(L.length-1)>=N||c+dc*(L.length-1)>=N)continue;
+   let ok=true;for(let i=0;i<L.length;i++){const x=G[(r+dr*i)*N+c+dc*i];if(x&&x!==L[i]){ok=false;break}}
+   if(!ok)continue;
+   for(let i=0;i<L.length;i++)G[(r+dr*i)*N+c+dc*i]=L[i];
+   P.push({w,L,r,c,dr,dc,done:false});break;
+  }
+ }
+ const A="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+ G=G.map(x=>x||A[rnd(26)]);
+ msg("Trouve les mots cachés ! 🔍");renderGrid();
+}
+function renderGrid(){
+ const g=$("grid");g.style.setProperty("--n",N);g.innerHTML="";
+ G.forEach((ch,i)=>{const b=document.createElement("button");b.className="c"+(cellsFound.has(i)?" found":"")+(sel===i?" start":"");b.textContent=ch;b.setAttribute("aria-label","Lettre "+ch);b.onclick=()=>pick(i);g.appendChild(b)});
+ $("todo").innerHTML="";P.forEach(p=>{const s=document.createElement("span");s.textContent=p.w;if(p.done)s.className="done";$("todo").appendChild(s)});
+}
+function pick(i){
+ if(gdone)return;
+ const ch=G[i];say(ch.toLowerCase());
+ if(sel===null){sel=i;renderGrid();return}
+ if(sel===i){sel=null;renderGrid();return}
+ const r1=Math.floor(sel/N),c1=sel%N,r2=Math.floor(i/N),c2=i%N,dr=Math.sign(r2-r1),dc=Math.sign(c2-c1);
+ const len=Math.max(Math.abs(r2-r1),Math.abs(c2-c1))+1;
+ const straight=dr===0||dc===0||Math.abs(r2-r1)===Math.abs(c2-c1);
+ let idx=[],s="";
+ if(straight)for(let k=0;k<len;k++){const j=(r1+dr*k)*N+c1+dc*k;idx.push(j);s+=G[j]}
+ const rev=[...s].reverse().join("");
+ const hit=P.find(p=>!p.done&&(p.L===s||p.L===rev));
+ sel=null;
+ if(hit){
+  hit.done=true;idx.forEach(j=>cellsFound.add(j));found.add(hit.w);save();addStar();sfx.good();
+  if(P.every(p=>p.done)){gdone=true;setTimeout(sfx.win,300);msg("🎉 Bravo ! Tu as tout trouvé !","win");$("next").hidden=false;setTimeout(()=>speak(hit.w),1300)}
+  else{msg("Trouvé : "+hit.w.toUpperCase()+" ! ⭐");setTimeout(()=>speak(hit.w),250)}
+ }else{sfx.bad();msg("Ce n’est pas un mot de la liste… essaie encore 💧")}
+ renderGrid();
+}
+function hintGrid(){
+ const p=P.find(x=>!x.done);if(!p||gdone)return;
+ const i=p.r*N+p.c;const b=$("grid").children[i];b.classList.add("hint");sfx.click();
+ setTimeout(()=>b.classList.remove("hint"),1900);msg("Le mot « "+p.w.toUpperCase()+" » commence sur la case jaune 💡");
+}
+
+/* ===== Compléter ===== */
+let word="",hidden=new Set(),filled=new Set(),lives=5,wrongL=new Set(),fdone=false;
+const rows=["abcdefghij","klmnopqrs","tuvwxyz"];
+rows.forEach(r=>{const d=document.createElement("div");d.className="row";
+ [...r].forEach(c=>{const b=document.createElement("button");b.className="key";b.textContent=c.toUpperCase();b.dataset.k=c;b.onclick=()=>typeLetter(c);d.appendChild(b)});
+ $("kb").appendChild(d)});
+function newFill(){
+ const pool=words.filter(w=>[...w].filter(isL).length>=3);
+ wrongL=new Set();filled=new Set();hidden=new Set();lives=5;fdone=false;$("next").hidden=true;
+ if(!pool.length){word="";renderFill();msg("Ajoute des mots dans le dictionnaire 📖");return}
+ word=pool[rnd(pool.length)];
+ const pos=[];[...word].forEach((ch,i)=>{if(isL(ch))pos.push(i)});
+ const k=Math.max(1,Math.min(4,Math.round(pos.length*.4)));
+ shuffle(pos).slice(0,k).forEach(i=>hidden.add(i));
+ msg("Quelles lettres manquent ? ✏️");renderFill();
+}
+function renderFill(){
+ const w=$("word");w.innerHTML="";
+ [...word].forEach((ch,i)=>{const s=document.createElement("span");
+  if(!isL(ch)){s.className="sep";s.textContent=ch===" "?"":ch}
+  else if(!hidden.has(i)){s.textContent=ch}
+  else if(filled.has(i)){s.textContent=ch;s.className="on"}
+  else if(fdone){s.textContent=ch;s.className="miss"}
+  else s.className="blank";
+  w.appendChild(s)});
+ $("lives").textContent="❤️".repeat(lives)+"🤍".repeat(5-lives);
+ $("wrong").textContent=[...wrongL].join(" ").toUpperCase();
+ const miss=new Set([...hidden].map(i=>norm(word[i])));
+ document.querySelectorAll(".key").forEach(k=>{const c=k.dataset.k;
+  const okL=[...hidden].some(i=>filled.has(i)&&norm(word[i])===c);
+  k.disabled=fdone||wrongL.has(c)||okL;k.classList.toggle("ok",okL);k.classList.toggle("no",wrongL.has(c))});
+}
+function typeLetter(c){
+ if(fdone||!word||wrongL.has(c))return;
+ say(c);
+ const hit=[...hidden].filter(i=>!filled.has(i)&&norm(word[i])===c);
+ if(hit.length){hit.forEach(i=>filled.add(i));sfx.good();msg("Bravo, bonne lettre ! ⭐")}
+ else if(![...hidden].some(i=>norm(word[i])===c)){wrongL.add(c);lives--;sfx.bad();msg("Oups, cette lettre ne manque pas 💧")}
+ else return;
+ if([...hidden].every(i=>filled.has(i))){fdone=true;addStar();found.add(word);save();setTimeout(sfx.win,300);msg("🎉 Hourra ! « "+word.toUpperCase()+" »","win");$("next").hidden=false;setTimeout(()=>speak(word),1300)}
+ else if(lives<=0){fdone=true;setTimeout(sfx.lose,300);msg("Dommage ! Le mot était « "+word.toUpperCase()+" » 💙","lose");$("next").hidden=false;setTimeout(()=>speak(word),1500)}
+ renderFill();
+}
+function hintFill(){
+ if(fdone||!word)return;
+ const i=[...hidden].find(i=>!filled.has(i));if(i===undefined)return;
+ sfx.click();const c=norm(word[i]);const k=document.querySelector('.key[data-k="'+c+'"]');
+ if(k){k.classList.add("hint");setTimeout(()=>k.classList.remove("hint"),1900)}
+ msg("Essaie la lettre "+c.toUpperCase()+" 💡");speak(NAMES[c]);
+}
+$("listen").onclick=()=>{if(word){sfx.click();speak(word)}};
+
+/* ===== Navigation ===== */
+function setMode(m){
+ mode=m;$("tabGrid").classList.toggle("on",m==="grid");$("tabFill").classList.toggle("on",m==="fill");
+ $("gridMode").hidden=m!=="grid";$("fill").hidden=m!=="fill";sfx.click();
+ m==="grid"?makeGrid():newFill();
+}
+$("tabGrid").onclick=()=>setMode("grid");$("tabFill").onclick=()=>setMode("fill");
+$("next").onclick=()=>{sfx.click();mode==="grid"?makeGrid():newFill()};
+$("newBtn").onclick=()=>{sfx.click();mode==="grid"?makeGrid():newFill()};
+$("hintBtn").onclick=()=>mode==="grid"?hintGrid():hintFill();
+document.addEventListener("keydown",e=>{
+ if($("dict").classList.contains("open")){if(e.key==="Escape")closeDict();return}
+ if(e.ctrlKey||e.metaKey||e.altKey||mode!=="fill")return;
+ const c=norm(e.key);if(c.length===1&&c>="a"&&c<="z")typeLetter(c);
+ else if(e.key==="Enter"&&fdone)newFill();
+});
+
+/* ===== Dictionnaire modifiable ===== */
+const sortFr=(a,b)=>norm(a).localeCompare(norm(b));
+function fillList(){
+ const q=norm($("search").value.trim());const l=$("list");l.innerHTML="";
+ [...words].sort(sortFr).filter(w=>norm(w).includes(q)).forEach(w=>{
+  const d=document.createElement("div");d.className="wi";
+  const b=document.createElement("button");b.className="w"+(found.has(w)?" found":"");b.textContent=(found.has(w)?"✅ ":"🔈 ")+w;
+  b.onclick=()=>{sfx.click();speak(w)};
+  const x=document.createElement("button");x.className="del";x.textContent="✖";x.setAttribute("aria-label","Effacer "+w);
+  x.onclick=()=>removeWord(w);
+  d.append(b,x);l.appendChild(d)});
+ $("count").textContent=words.filter(w=>found.has(w)).length+" / "+words.length+" trouvés";
+}
+function addMsg(t,ok){$("addMsg").textContent=t;$("addMsg").style.color=ok?"var(--good)":"var(--bad)"}
+function addWord(){
+ const w=$("newWord").value.replace(/[’‘]/g,"'").trim().replace(/\s+/g," ").toLowerCase();
+ if(!w)return;
+ if(!/^[a-zàâäçéèêëîïôöœùûüÿ' -]+$/.test(w)||!/[a-z]/.test(norm(w))){addMsg("Utilise seulement des lettres, s’il te plaît 🙂");return}
+ if(words.includes(w)){addMsg("Ce mot est déjà dans le dictionnaire !");return}
+ words.push(w);save();$("newWord").value="";addMsg("« "+w+" » ajouté ! 🎉",true);sfx.good();fillList();
+}
+function removeWord(w){
+ if(words.length<=1){addMsg("Il faut garder au moins un mot !");return}
+ words=words.filter(x=>x!==w);found.delete(w);save();sfx.click();addMsg("« "+w+" » effacé.",true);fillList();
+}
+let armed=false;
+$("reset").onclick=()=>{
+ if(!armed){armed=true;$("reset").textContent="Sûr ? Touche encore";setTimeout(()=>{armed=false;$("reset").textContent="↩ Liste de départ"},3000);return}
+ armed=false;words=DEFAULTS.slice();save();$("reset").textContent="↩ Liste de départ";addMsg("Liste de départ remise !",true);fillList();
+};
+$("addBtn").onclick=addWord;
+$("newWord").addEventListener("keydown",e=>{if(e.key==="Enter")addWord()});
+function openDict(){sfx.click();addMsg("");fillList();$("dict").classList.add("open")}
+function closeDict(){
+ $("dict").classList.remove("open");try{speechSynthesis.cancel()}catch(e){}
+ mode==="grid"?makeGrid():newFill();
+}
+$("dictBtn").onclick=openDict;$("closeDict").onclick=closeDict;
+$("dict").addEventListener("click",e=>{if(e.target.id==="dict")closeDict()});
+$("search").oninput=fillList;
+
+setSnd();makeGrid();
+</script>
+</body>
+</html>
