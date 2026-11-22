@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Le Pendu des Étoiles</title>
+<style>
+:root{--ink:#16356b;--muted:#5d7bb0;--card:#ffffff;--key:#e3f0ff;--line:#b9d6fb;--accent:#2f80ed;--accent2:#ff7eb6;--good:#12a150;--good-bg:#d9f8e5;--bad:#e5484d;--bad-bg:#ffe3e4}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#eaf3ff;--muted:#9dbbe8;--card:#17305e;--key:#24437d;--line:#35599c;--good-bg:#12432b;--bad-bg:#4a1f26;--good:#5ee59a;--bad:#ff8b8f}}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{font-family:"Baloo 2","Comic Sans MS","Chalkboard SE",system-ui,sans-serif;color:var(--ink);
+ background:radial-gradient(circle at 15% 10%,#bfe3ff 0,transparent 35%),radial-gradient(circle at 85% 90%,#8fd0ff 0,transparent 40%),linear-gradient(180deg,#4aa8ff,#7fd0ff 60%,#bfeaff);
+ background-attachment:fixed;display:flex;justify-content:center;padding:max(14px,env(safe-area-inset-top)) 12px max(14px,env(safe-area-inset-bottom));overflow-x:hidden}
+.deco{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.deco i{position:absolute;font-style:normal;opacity:.85;animation:float 6s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-14px) rotate(8deg)}}
+main{position:relative;z-index:1;width:100%;max-width:580px;background:var(--card);border-radius:28px;border:4px solid #fff;box-shadow:0 12px 34px rgba(20,80,160,.35);padding:16px 16px 20px;display:flex;flex-direction:column;gap:12px;align-self:flex-start}
+header{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+h1{margin:0;font-size:26px;line-height:1.1}
+.tools{display:flex;gap:8px}
+button{font:inherit;cursor:pointer}
+.tbtn{background:var(--key);color:var(--ink);border:0;border-radius:999px;padding:8px 14px;font-weight:800;font-size:15px;box-shadow:0 3px 0 var(--line)}
+.tbtn:active{transform:translateY(2px);box-shadow:none}
+.score{display:flex;gap:8px;font-weight:800;font-size:14px}
+.chip{background:var(--key);border-radius:999px;padding:4px 12px}
+.stage{display:flex;gap:12px;align-items:center}
+svg{width:44%;max-width:200px;flex:none;background:linear-gradient(180deg,#eaf6ff,#cfe9ff);border-radius:20px}
+.part{fill:none;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .4s}
+.part.on{stroke-dashoffset:0}
+.gal{stroke:#7a5c3a}.man{stroke:#16356b}
+.info{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+.errors{font-weight:800;color:var(--muted);font-size:14px}
+.errors strong{display:block;font-size:34px;color:var(--ink);line-height:1.1}
+.bar{height:12px;background:var(--key);border-radius:999px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#4ade80,#facc15,#fb7185);border-radius:999px;transition:width .3s}
+.wrong{min-height:24px;font-weight:800;color:var(--bad);letter-spacing:.1em;word-break:break-all}
+#word{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;padding:4px 0;min-height:60px}
+#word span{width:clamp(26px,9vw,44px);height:clamp(38px,11vw,54px);display:flex;align-items:center;justify-content:center;font-size:clamp(26px,8vw,38px);font-weight:800;color:var(--ink);background:var(--key);border-bottom:4px solid var(--accent);border-radius:10px 10px 4px 4px;text-transform:uppercase}
+#word span.on{animation:pop .3s ease-out}
+#word span.miss{color:var(--bad);background:var(--bad-bg);border-color:var(--bad)}
+@keyframes pop{from{transform:translateY(-10px) scale(.6);opacity:0}to{transform:none;opacity:1}}
+#msg{min-height:56px;border-radius:16px;padding:10px 14px;font-weight:800;font-size:17px;text-align:center;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;background:var(--key)}
+#msg.win{background:var(--good-bg);color:var(--good)}
+#msg.lose{background:var(--bad-bg);color:var(--bad)}
+#again{background:var(--accent2);color:#fff;border:0;border-radius:14px;padding:9px 18px;font-weight:800;box-shadow:0 3px 0 #d6538f}
+#again[hidden]{display:none}
+#kb{display:flex;flex-direction:column;gap:7px}
+.row{display:flex;justify-content:center;gap:6px}
+.key{flex:1 1 0;max-width:46px;min-width:0;height:clamp(42px,11.5vw,52px);border:0;border-radius:12px;background:var(--key);color:var(--ink);font-weight:800;font-size:clamp(16px,4.6vw,20px);box-shadow:0 3px 0 var(--line);transition:transform .08s}
+.key:active:not(:disabled){transform:translateY(2px);box-shadow:none}
+.key.ok{background:var(--good-bg);color:var(--good);box-shadow:0 3px 0 var(--good)}
+.key.no{background:var(--bad-bg);color:var(--bad);box-shadow:0 3px 0 var(--bad);opacity:.7}
+.key:focus-visible,.tbtn:focus-visible,#again:focus-visible{outline:3px solid var(--accent2);outline-offset:2px}
+#dict{position:fixed;inset:0;z-index:5;background:rgba(10,40,90,.6);display:none;align-items:center;justify-content:center;padding:14px}
+#dict.open{display:flex}
+.panel{background:var(--card);color:var(--ink);border-radius:24px;border:4px solid #fff;width:100%;max-width:520px;max-height:86vh;display:flex;flex-direction:column;overflow:hidden}
+.panel h2{margin:0;font-size:22px}
+.phead{display:flex;justify-content:space-between;align-items:center;padding:14px 16px 8px}
+.panel input{margin:0 16px 8px;padding:10px 14px;border-radius:999px;border:2px solid var(--line);font:inherit;background:var(--key);color:var(--ink)}
+.panel p{margin:0 16px 8px;font-size:14px;color:var(--muted)}
+#list{overflow:auto;padding:4px 16px 16px;display:flex;flex-wrap:wrap;gap:8px}
+.w{border:0;background:var(--key);color:var(--ink);border-radius:999px;padding:7px 14px;font-weight:700;font-size:16px;box-shadow:0 2px 0 var(--line)}
+.w.found{background:var(--good-bg);color:var(--good)}
+.w:active{transform:translateY(1px)}
+.wi{display:flex;align-items:center;gap:3px}
+.del{border:0;background:var(--bad-bg);color:var(--bad);border-radius:50%;width:26px;height:26px;font-weight:800;line-height:1;padding:0}
+.add{display:flex;gap:8px;margin:0 16px 6px}
+.add input{margin:0;flex:1;min-width:0}
+#addMsg{min-height:18px;font-size:13px;font-weight:700;color:var(--bad);margin:0 16px 4px}
+#reset{margin:0 16px 8px;align-self:flex-start;font-size:13px;padding:6px 12px}
+#word span.sep{background:none;border:0;width:clamp(10px,3vw,16px);color:var(--ink)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="deco" aria-hidden="true"><i style="left:6%;top:8%;font-size:34px">⭐</i><i style="left:86%;top:12%;font-size:30px;animation-delay:1s">🦋</i><i style="left:10%;top:70%;font-size:36px;animation-delay:2s">🐳</i><i style="left:88%;top:62%;font-size:32px;animation-delay:.5s">✨</i><i style="left:46%;top:92%;font-size:34px;animation-delay:1.5s">🐠</i><i style="left:70%;top:4%;font-size:30px;animation-delay:2.5s">☁️</i></div>
+<main id="game">
+ <header>
+  <h1>🌟 Le Pendu</h1>
+  <div class="tools"><button class="tbtn" id="dictBtn">📖 Dictionnaire</button><button class="tbtn" id="sndBtn" aria-label="Son">🔊</button></div>
+ </header>
+ <div class="score"><span class="chip">🏆 Victoires <b id="wins">0</b></span><span class="chip">💧 Défaites <b id="losses">0</b></span></div>
+ <section class="stage">
+  <svg viewBox="0 0 240 260" role="img" aria-label="Dessin du pendu">
+   <line class="part gal" id="p1" pathLength="1" x1="22" y1="240" x2="150" y2="240"/>
+   <line class="part gal" id="p2" pathLength="1" x1="54" y1="240" x2="54" y2="28"/>
+   <line class="part gal" id="p3" pathLength="1" x1="54" y1="28" x2="172" y2="28"/>
+   <line class="part gal" id="p4" pathLength="1" x1="172" y1="28" x2="172" y2="58"/>
+   <circle class="part man" id="p5" pathLength="1" cx="172" cy="80" r="22"/>
+   <line class="part man" id="p6" pathLength="1" x1="172" y1="102" x2="172" y2="166"/>
+   <line class="part man" id="p7" pathLength="1" x1="172" y1="120" x2="142" y2="150"/>
+   <line class="part man" id="p8" pathLength="1" x1="172" y1="120" x2="202" y2="150"/>
+   <line class="part man" id="p9" pathLength="1" x1="172" y1="166" x2="146" y2="214"/>
+   <line class="part man" id="p10" pathLength="1" x1="172" y1="166" x2="198" y2="214"/>
+  </svg>
+  <div class="info">
+   <div class="errors">Erreurs<strong><span id="nerr">0</span> / 10</strong></div>
+   <div class="bar"><i id="bar"></i></div>
+   <div class="wrong" id="wrong"></div>
+  </div>
+ </section>
+ <div id="word" aria-live="polite"></div>
+ <div id="msg" role="status"><span id="msgText">Choisis une lettre pour commencer ! 🎈</span><button id="again" hidden>Rejouer 🔁</button></div>
+ <div id="kb"></div>
+</main>
+
+<div id="dict" role="dialog" aria-modal="true" aria-label="Dictionnaire">
+ <div class="panel">
+  <div class="phead"><h2>📖 Mon dictionnaire</h2><button class="tbtn" id="closeDict">✖ Fermer</button></div>
+  <div class="add"><input id="newWord" placeholder="Ajouter un mot…" autocomplete="off" maxlength="30"><button class="tbtn" id="addBtn">➕ Ajouter</button></div>
+  <div id="addMsg" role="status"></div>
+  <input id="search" type="search" placeholder="Chercher un mot…" autocomplete="off">
+  <p>Touche un mot pour l’écouter, ou ✖ pour l’effacer. Les mots verts sont ceux que tu as trouvés ! ✅ <b id="count"></b></p>
+  <button class="tbtn" id="reset">↩ Liste de départ</button>
+  <div id="list"></div>
+ </div>
+</div>
+
+<script>
+const DEFAULTS="affiche|ananas|araignée|arbre|automne|avant|banane|beaucoup|blanc|blanche|bleu|bleue|bois|bonnet|bottes|brique|brun|bureau|cadeau|cahier|canard|carnaval|cartable|casserole|chat|chemin|cheminée|chemise|chevaux|chèvre|chien|ciseaux|citron|cochon|colle|couleur|crayon|crocodile|danser|dehors|déguisement|des moufles|des plantes|eau|écharpe|école|éléphant|être allongé|fabriquer|feu|formule|gare|girafe|gorille|gris|grise|guirlande|hérisson|hippopotame|image|invisible|jaune|jupe|kangourou|kiwi|la terre|lampe|lapin|le monde|les|les enfants|les jouets|les mots cachés|lion|livre|long|loup|lune|madame|magie|maison|maman|manteau|marron|masque|mauve|minute|mois|monsieur|montagne|mouton|nœud|noël|noir|noire|nouveau|oie|orange|ours|aller|forêt|pamplemousse|parfois|peinture|peur|pingouin|plumier|poire|pomme|potiron|poule|poupée|pouvoir|prune|quatre|raisin|recette|renard|rhinocéros|rose|rouge|saint nicolas|s'amuser|sapin|sauter|serpent|singe|sorcière|soupe|taxi|tempête|tête|timbre|tomber|train|trois|trompe|un chevalier|usine|vacances|vache|valise|vert|verte|voir|voiture|vous prenez|vous reposez|yaourt|zèbre".split("|");
+const MAX=10;
+const norm=s=>s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/œ/g,"o").replace(/æ/g,"a").toLowerCase();
+const isL=ch=>/[a-z]/.test(norm(ch));
+const $=id=>document.getElementById(id);
+const NAMES={a:"a",b:"bé",c:"cé",d:"dé",e:"eu",f:"effe",g:"gé",h:"hache",i:"i",j:"gi",k:"ka",l:"elle",m:"emme",n:"enne",o:"o",p:"pé",q:"ku",r:"erre",s:"esse",t:"té",u:"u",v:"vé",w:"double vé",x:"ixe",y:"i grec",z:"zède"};
+let words=DEFAULTS.slice(),found=new Set(),sound=true,wins=0,losses=0,word="",guessed=new Set(),errs=0,over=false;
+try{
+ const w=JSON.parse(localStorage.getItem("pendu-words")||"null");if(Array.isArray(w)&&w.length)words=w;
+ found=new Set(JSON.parse(localStorage.getItem("pendu-found")||"[]"));sound=localStorage.getItem("pendu-sound")!=="off";
+}catch(e){}
+function save(){try{localStorage.setItem("pendu-words",JSON.stringify(words));localStorage.setItem("pendu-found",JSON.stringify([...found]));localStorage.setItem("pendu-sound",sound?"on":"off")}catch(e){}}
+
+let ac;
+function tone(f,d,type="sine",delay=0,vol=.18){
+ if(!sound)return;
+ try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume();
+  const o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime+delay;
+  o.type=type;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+d);
+  o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+d+.02);}catch(e){}
+}
+const sfx={
+ click:()=>tone(600,.06,"triangle"),
+ good:()=>{tone(660,.12,"sine");tone(880,.18,"sine",.1)},
+ bad:()=>{tone(220,.25,"sawtooth",0,.12);tone(165,.3,"sawtooth",.12,.12)},
+ win:()=>[523,659,784,1047,1319].forEach((f,i)=>tone(f,.25,"triangle",i*.11)),
+ lose:()=>[392,349,311,262].forEach((f,i)=>tone(f,.35,"sine",i*.2))
+};
+function speak(t){
+ if(!sound||!("speechSynthesis" in window))return;
+ try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="fr-FR";u.rate=.85;speechSynthesis.speak(u)}catch(e){}
+}
+function setSnd(){$("sndBtn").textContent=sound?"🔊":"🔇";$("sndBtn").setAttribute("aria-pressed",sound)}
+$("sndBtn").onclick=()=>{sound=!sound;setSnd();save();sfx.click()};
+
+const rows=["abcdefghij","klmnopqrs","tuvwxyz"];
+rows.forEach(r=>{const d=document.createElement("div");d.className="row";
+ [...r].forEach(c=>{const b=document.createElement("button");b.className="key";b.textContent=c.toUpperCase();b.dataset.k=c;b.onclick=()=>guess(c);d.appendChild(b)});
+ $("kb").appendChild(d)});
+
+function render(){
+ const w=$("word");w.innerHTML="";const n=norm(word);
+ [...word].forEach(ch=>{const s=document.createElement("span");
+  if(!isL(ch)){s.className="sep";s.textContent=ch===" "?"":ch}
+  else if(guessed.has(norm(ch))){s.textContent=ch;s.className="on"}
+  else if(over){s.textContent=ch;s.className="miss"}
+  w.appendChild(s)});
+ $("nerr").textContent=errs;$("bar").style.width=errs/MAX*100+"%";
+ for(let i=1;i<=10;i++)$("p"+i).classList.toggle("on",i<=errs);
+ $("wrong").textContent=[...guessed].filter(c=>!n.includes(c)).join(" ").toUpperCase();
+ document.querySelectorAll(".key").forEach(k=>{const c=k.dataset.k;const g=guessed.has(c);
+  k.disabled=g||over;k.classList.toggle("ok",g&&n.includes(c));k.classList.toggle("no",g&&!n.includes(c))});
+}
+function msg(t,cls=""){$("msgText").textContent=t;$("msg").className=cls}
+function start(){
+ word=words[Math.floor(Math.random()*words.length)];guessed=new Set();errs=0;over=false;
+ $("again").hidden=true;$("game").className="";msg("Choisis une lettre pour commencer ! 🎈");render();
+}
+function guess(c){
+ if(over||guessed.has(c))return;
+ guessed.add(c);speak(NAMES[c]||c);
+ const n=norm(word);
+ if(n.includes(c)){sfx.good();msg("Bravo, bien joué ! ⭐")}
+ else{errs++;sfx.bad();msg("Oups, pas cette lettre… 💧")}
+ const done=[...n].filter(ch=>/[a-z]/.test(ch)).every(ch=>guessed.has(ch));
+ if(done){over=true;wins++;$("wins").textContent=wins;found.add(word);save();
+  setTimeout(sfx.win,250);msg("🎉 Hourra ! Tu as trouvé « "+word.toUpperCase()+" » !","win");$("again").hidden=false;setTimeout(()=>speak(word),1400)}
+ else if(errs>=MAX){over=true;losses++;$("losses").textContent=losses;
+  setTimeout(sfx.lose,250);msg("Dommage ! Le mot était « "+word.toUpperCase()+" » 💙","lose");$("again").hidden=false;setTimeout(()=>speak(word),1600)}
+ render();
+}
+$("again").onclick=()=>{sfx.click();start()};
+document.addEventListener("keydown",e=>{
+ if($("dict").classList.contains("open")){if(e.key==="Escape")closeDict();return}
+ if(e.ctrlKey||e.metaKey||e.altKey)return;
+ const c=norm(e.key);if(c.length===1&&c>="a"&&c<="z")guess(c);
+ else if(e.key==="Enter"&&over)start();
+});
+
+/* Dictionnaire modifiable */
+const sortFr=(a,b)=>norm(a).localeCompare(norm(b));
+function fillList(){
+ const q=norm($("search").value.trim());const l=$("list");l.innerHTML="";
+ [...words].sort(sortFr).filter(w=>norm(w).includes(q)).forEach(w=>{
+  const d=document.createElement("div");d.className="wi";
+  const b=document.createElement("button");b.className="w"+(found.has(w)?" found":"");b.textContent=(found.has(w)?"✅ ":"🔈 ")+w;
+  b.onclick=()=>{sfx.click();speak(w)};
+  const x=document.createElement("button");x.className="del";x.textContent="✖";x.setAttribute("aria-label","Effacer "+w);
+  x.onclick=()=>removeWord(w);
+  d.append(b,x);l.appendChild(d)});
+ $("count").textContent=words.filter(w=>found.has(w)).length+" / "+words.length+" trouvés";
+}
+function addMsg(t,ok){$("addMsg").textContent=t;$("addMsg").style.color=ok?"var(--good)":"var(--bad)"}
+function addWord(){
+ const w=$("newWord").value.replace(/[’‘]/g,"'").trim().replace(/\s+/g," ").toLowerCase();
+ if(!w)return;
+ if(!/^[a-zàâäçéèêëîïôöœùûüÿ' -]+$/.test(w)||!/[a-zœ]/.test(norm(w))){addMsg("Utilise seulement des lettres, s’il te plaît 🙂");return}
+ if(words.includes(w)){addMsg("Ce mot est déjà dans le dictionnaire !");return}
+ words.push(w);save();$("newWord").value="";addMsg("« "+w+" » ajouté ! 🎉",true);sfx.good();fillList();
+}
+function removeWord(w){
+ if(words.length<=1){addMsg("Il faut garder au moins un mot !");return}
+ words=words.filter(x=>x!==w);found.delete(w);save();sfx.click();addMsg("« "+w+" » effacé.",true);fillList();
+}
+let resetArmed=false;
+$("reset").onclick=()=>{
+ if(!resetArmed){resetArmed=true;$("reset").textContent="Sûr ? Touche encore";setTimeout(()=>{resetArmed=false;$("reset").textContent="↩ Liste de départ"},3000);return}
+ resetArmed=false;words=DEFAULTS.slice();save();$("reset").textContent="↩ Liste de départ";addMsg("Liste de départ remise !",true);fillList();
+};
+$("addBtn").onclick=addWord;
+$("newWord").addEventListener("keydown",e=>{if(e.key==="Enter")addWord()});
+function openDict(){sfx.click();addMsg("");fillList();$("dict").classList.add("open")}
+function closeDict(){$("dict").classList.remove("open");try{speechSynthesis.cancel()}catch(e){}}
+$("dictBtn").onclick=openDict;$("closeDict").onclick=closeDict;
+$("dict").addEventListener("click",e=>{if(e.target.id==="dict")closeDict()});
+$("search").oninput=fillList;
+
+setSnd();start();
+</script>
+</body>
+</html>
