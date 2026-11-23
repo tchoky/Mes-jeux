@@ -11,8 +11,8 @@
       --ds-red-dark: #8b0d13;
       --ds-silver: #cbd5e1;
       --ds-yellow: #facc15;
-      --card-bg: rgba(20, 20, 26, 0.88);
-      --border-color: rgba(255, 255, 255, 0.14);
+      --card-bg: rgba(20, 20, 26, 0.9);
+      --border-color: rgba(255, 255, 255, 0.15);
     }
 
     * {
@@ -21,10 +21,13 @@
       padding: 0;
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
       user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
       -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
 
-    body {
+    html, body {
       background-color: var(--bg-black);
       color: #f8fafc;
       min-height: 100vh;
@@ -33,9 +36,9 @@
       align-items: center;
       overflow-x: hidden;
       position: relative;
+      overscroll-behavior: none;
     }
 
-    /* Fond inspiré du logo Navette DS */
     .bg-watermark {
       position: fixed;
       inset: 0;
@@ -44,11 +47,11 @@
       justify-content: center;
       pointer-events: none;
       z-index: 0;
-      opacity: 0.22;
+      opacity: 0.2;
     }
 
     .bg-watermark svg {
-      width: min(92vw, 680px);
+      width: min(94vw, 760px);
       height: auto;
       filter: drop-shadow(0 0 40px rgba(217, 27, 36, 0.35));
     }
@@ -57,24 +60,25 @@
       position: relative;
       z-index: 1;
       width: 100%;
-      max-width: 820px;
-      padding: 16px;
+      max-width: 1020px;
+      padding: 14px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
       min-height: 100vh;
     }
 
-    /* En-tête Navette DS */
     .brand-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: linear-gradient(135deg, rgba(24, 24, 32, 0.95), rgba(12, 12, 16, 0.95));
+      gap: 10px;
+      flex-wrap: wrap;
+      background: linear-gradient(135deg, rgba(24, 24, 32, 0.96), rgba(12, 12, 16, 0.96));
       border: 1px solid var(--border-color);
       border-bottom: 3px solid var(--ds-red);
       border-radius: 16px;
-      padding: 10px 18px;
+      padding: 10px 16px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
     }
 
@@ -85,7 +89,7 @@
     }
 
     .brand-title {
-      font-size: 1.5rem;
+      font-size: 1.45rem;
       font-weight: 900;
       font-style: italic;
       letter-spacing: 1px;
@@ -104,27 +108,35 @@
     .brand-subtitle {
       font-size: 0.78rem;
       color: #cbd5e1;
-      letter-spacing: 0.5px;
     }
 
-    .btn-home {
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-top {
       background: rgba(255, 255, 255, 0.1);
       color: #fff;
       border: 1px solid rgba(255, 255, 255, 0.2);
-      padding: 8px 14px;
+      padding: 8px 12px;
       border-radius: 10px;
       font-weight: 700;
+      font-size: 0.85rem;
       cursor: pointer;
-      display: none;
       transition: 0.2s;
     }
 
-    .btn-home:hover {
+    .btn-top:hover {
       background: var(--ds-red);
       border-color: var(--ds-red);
     }
 
-    /* Mascotte + bulle de bienvenue */
+    .btn-home {
+      display: none;
+    }
+
     .mascot-banner {
       display: flex;
       align-items: center;
@@ -137,13 +149,13 @@
     }
 
     .mascot-avatar {
-      width: 78px;
-      height: 78px;
+      width: 74px;
+      height: 74px;
       flex-shrink: 0;
     }
 
     .mascot-speech h2 {
-      font-size: 1.08rem;
+      font-size: 1.06rem;
       color: #fff;
       margin-bottom: 4px;
     }
@@ -154,16 +166,14 @@
       line-height: 1.35;
     }
 
-    /* Menu de sélection des 3 jeux */
     .menu-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
       gap: 16px;
-      margin-top: 4px;
     }
 
     .game-card {
-      background: linear-gradient(160deg, rgba(30, 32, 42, 0.92), rgba(15, 16, 22, 0.96));
+      background: linear-gradient(160deg, rgba(30, 32, 42, 0.94), rgba(15, 16, 22, 0.98));
       border: 1px solid var(--border-color);
       border-radius: 18px;
       padding: 20px 18px;
@@ -194,7 +204,7 @@
     }
 
     .game-icon {
-      font-size: 2.3rem;
+      font-size: 2.2rem;
     }
 
     .game-card h3 {
@@ -218,11 +228,9 @@
       font-weight: 700;
       font-size: 0.92rem;
       cursor: pointer;
-      text-align: center;
       width: 100%;
     }
 
-    /* Écrans de jeu */
     .screen {
       display: none;
       flex-direction: column;
@@ -237,7 +245,7 @@
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       border-radius: 18px;
-      padding: 16px;
+      padding: 14px;
       backdrop-filter: blur(8px);
       display: flex;
       flex-direction: column;
@@ -249,8 +257,8 @@
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 8px;
-      background: rgba(9, 9, 11, 0.75);
+      gap: 10px;
+      background: rgba(9, 9, 11, 0.8);
       padding: 10px 14px;
       border-radius: 12px;
       border: 1px solid rgba(255, 255, 255, 0.08);
@@ -262,9 +270,8 @@
       color: var(--ds-yellow);
     }
 
-    /* JEU 1 : PRÉPARE TA VALISE */
     .mission-box {
-      background: linear-gradient(90deg, rgba(217, 27, 36, 0.25), rgba(30, 41, 59, 0.6));
+      background: linear-gradient(90deg, rgba(217, 27, 36, 0.25), rgba(30, 41, 59, 0.65));
       border-left: 4px solid var(--ds-yellow);
       padding: 12px;
       border-radius: 10px;
@@ -279,19 +286,14 @@
       border: 2px dashed var(--ds-yellow);
       background: rgba(250, 204, 21, 0.06);
       border-radius: 16px;
-      min-height: 125px;
+      min-height: 130px;
       padding: 12px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      transition: 0.2s;
-    }
-
-    .suitcase-zone.drag-over {
-      background: rgba(250, 204, 21, 0.18);
-      transform: scale(1.01);
+      touch-action: none;
     }
 
     .packed-items {
@@ -303,7 +305,7 @@
 
     .items-pool {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
       gap: 10px;
     }
 
@@ -313,32 +315,16 @@
       border-radius: 12px;
       padding: 10px 8px;
       text-align: center;
-      cursor: grab;
-      transition: 0.15s;
+      cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 4px;
     }
 
-    .item-chip:active {
-      cursor: grabbing;
-      transform: scale(0.96);
-    }
-
-    .item-chip .emoji {
-      font-size: 1.7rem;
-    }
-
-    .item-chip .name {
-      font-size: 0.82rem;
-      font-weight: 600;
-    }
-
-    .item-chip .weight {
-      font-size: 0.72rem;
-      color: #94a3b8;
-    }
+    .item-chip .emoji { font-size: 1.65rem; }
+    .item-chip .name { font-size: 0.82rem; font-weight: 600; }
+    .item-chip .weight { font-size: 0.72rem; color: #94a3b8; }
 
     .feedback-msg {
       text-align: center;
@@ -347,14 +333,14 @@
       font-size: 0.92rem;
     }
 
-    /* CANVAS POUR JEUX 2 ET 3 */
     canvas {
       width: 100%;
-      max-width: 760px;
+      max-width: 960px;
+      max-height: 70vh;
       height: auto;
       border-radius: 14px;
-      background: #0f172a;
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: #0b1324;
+      border: 1px solid rgba(255, 255, 255, 0.16);
       display: block;
       margin: 0 auto;
       touch-action: none;
@@ -363,19 +349,19 @@
     .touch-controls {
       display: flex;
       justify-content: center;
-      gap: 14px;
-      margin-top: 6px;
+      gap: 16px;
     }
 
     .touch-btn {
       background: rgba(255, 255, 255, 0.12);
       border: 1px solid rgba(255, 255, 255, 0.25);
       color: #fff;
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       font-weight: 800;
-      padding: 12px 28px;
+      padding: 12px 32px;
       border-radius: 12px;
       cursor: pointer;
+      touch-action: none;
     }
 
     .touch-btn:active {
@@ -390,7 +376,6 @@
       border-radius: 10px;
       font-weight: 700;
       cursor: pointer;
-      align-self: center;
     }
 
     footer {
@@ -398,13 +383,12 @@
       text-align: center;
       font-size: 0.78rem;
       color: #64748b;
-      padding: 10px 0;
+      padding: 8px 0;
     }
   </style>
 </head>
 <body>
 
-  <!-- FOND VECTORIEL INSPIRÉ DE L'IMAGE 1 (NAVETTE DS) -->
   <div class="bg-watermark" aria-hidden="true">
     <svg viewBox="0 0 600 420" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -419,25 +403,18 @@
           <stop offset="100%" stop-color="#475569"/>
         </linearGradient>
       </defs>
-      <!-- Texte NAVETTE -->
       <text x="300" y="95" text-anchor="middle" font-size="82" font-weight="900" font-style="italic" fill="url(#silverGrad)" letter-spacing="4">NAVETTE</text>
-      <!-- Bloc D rouge -->
       <path d="M95 115 H275 C355 115 390 175 375 260 C360 345 305 390 220 390 H50 Z" fill="url(#redGrad)"/>
-      <!-- Lettre S argentée -->
       <path d="M355 115 H545 L535 170 H415 C395 170 390 195 415 210 L485 245 C530 270 520 390 420 390 H275 L290 335 H405 C435 335 445 305 415 290 L350 255 C305 230 315 115 355 115 Z" fill="url(#silverGrad)"/>
-      <!-- Avion blanc -->
       <path d="M210 155 C218 155 224 168 224 190 V225 L345 275 V292 L224 268 V315 L258 335 V348 L210 338 L162 348 V335 L196 315 V268 L75 292 V275 L196 225 V190 C196 168 202 155 210 155 Z" fill="#ffffff"/>
-      <!-- Lignes jaunes vitesse -->
       <rect x="65" y="348" width="220" height="7" rx="3" fill="#facc15"/>
       <path d="M62 362 H305 C318 362 325 372 308 372 H60 Z" fill="#facc15"/>
     </svg>
   </div>
 
   <div class="app-container">
-    <!-- EN-TÊTE -->
     <header class="brand-header">
       <div class="brand-logo-wrap">
-        <!-- Mini emblème DS -->
         <svg width="44" height="44" viewBox="0 0 100 100">
           <rect x="4" y="4" width="92" height="92" rx="18" fill="#111115" stroke="#d91b24" stroke-width="3"/>
           <path d="M18 22 H52 C70 22 76 38 72 56 C68 74 54 82 36 82 H12 Z" fill="#d91b24"/>
@@ -449,36 +426,30 @@
           <div class="brand-subtitle">Votre transfert aéroport • Espace Détente</div>
         </div>
       </div>
-      <button id="btnHome" class="btn-home" onclick="showMenu()">⬅ Menu des jeux</button>
+
+      <div class="header-actions">
+        <button id="btnSound" class="btn-top" onclick="toggleSound()">🔊 Son ON</button>
+        <button id="btnHome" class="btn-top btn-home" onclick="showMenu()">⬅ Menu</button>
+      </div>
     </header>
 
-    <!-- BANNIÈRE MASCOTTE (BONHOMME PILOTE NAVETTE DS - IMAGE 2) -->
     <div class="mascot-banner">
-      <!-- Illustration SVG inspirée du personnage de la photo 2 -->
       <svg class="mascot-avatar" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
         <circle cx="70" cy="70" r="66" fill="#18181f" stroke="#d91b24" stroke-width="3"/>
-        <!-- Cheveux bruns -->
         <path d="M36 62 C32 42 48 28 70 28 C92 28 108 42 104 62 C100 52 92 48 70 48 C48 48 40 52 36 62 Z" fill="#231715"/>
-        <!-- Casquette rouge & bande argentée -->
         <path d="M36 48 C38 22 102 22 104 48 Z" fill="#d91b24"/>
         <rect x="64" y="23" width="12" height="24" rx="3" fill="#cbd5e1"/>
         <path d="M34 48 Q70 55 106 48 L102 53 Q70 59 38 53 Z" fill="#991b1b"/>
-        <!-- Lunettes d'aviateur sur la casquette -->
         <rect x="41" y="34" width="24" height="15" rx="6" fill="#334155" stroke="#e2e8f0" stroke-width="3"/>
         <rect x="75" y="34" width="24" height="15" rx="6" fill="#334155" stroke="#e2e8f0" stroke-width="3"/>
         <line x1="65" y1="41" x2="75" y2="41" stroke="#e2e8f0" stroke-width="3"/>
-        <!-- Visage -->
         <path d="M43 54 C43 78 54 88 70 88 C86 88 97 78 97 54 Z" fill="#fbd3b6"/>
-        <!-- Mèches de cheveux frontales -->
         <path d="M42 54 L49 63 L55 54 L63 64 L70 53 L78 63 L85 54 L92 62 L97 53 C92 46 48 46 42 54 Z" fill="#231715"/>
-        <!-- Yeux expressifs -->
         <ellipse cx="56" cy="67" rx="4.5" ry="5.5" fill="#1e1b18"/>
         <circle cx="57.5" cy="65" r="1.6" fill="#ffffff"/>
         <ellipse cx="84" cy="67" rx="4.5" ry="5.5" fill="#1e1b18"/>
         <circle cx="85.5" cy="65" r="1.6" fill="#ffffff"/>
-        <!-- Sourire -->
         <path d="M62 77 Q70 83 78 77" fill="none" stroke="#9a3412" stroke-width="2.5" stroke-linecap="round"/>
-        <!-- T-shirt rouge NAVETTE + Veste argentée -->
         <path d="M36 126 C38 100 50 92 70 92 C90 92 102 100 104 126 Z" fill="#d91b24"/>
         <path d="M36 126 C38 100 48 93 56 93 L54 126 Z" fill="#cbd5e1"/>
         <path d="M104 126 C102 100 92 93 84 93 L86 126 Z" fill="#cbd5e1"/>
@@ -488,181 +459,235 @@
 
       <div class="mascot-speech">
         <h2 id="mascotTitle">Bienvenue à bord de Navette DS !</h2>
-        <p id="mascotText">Installez-vous confortablement pendant le trajet. Choisissez l'un de nos 3 mini-jeux voyage pour passer le temps !</p>
+        <p id="mascotText">Grande surface de jeu, défis progressifs et records à battre pendant tout votre trajet !</p>
       </div>
     </div>
 
-    <!-- ==================== ÉCRAN MENU PRINCIPAL ==================== -->
+    <!-- MENU -->
     <section id="menuScreen" class="screen active">
       <div class="menu-grid">
-        <!-- Carte Jeu 1 -->
         <div class="game-card" onclick="startGame('suitcase')">
           <div>
             <div class="game-icon">🧳</div>
             <h3>Prépare ta valise</h3>
-            <p>Glisse ou touche les bons objets selon la destination et la météo avant l'embarquement, sans dépasser le poids limite ni prendre d'objets interdits !</p>
+            <p>Enchaîne les missions météo et destinations avec des limites de poids plus exigeantes pour battre ton record.</p>
           </div>
           <button class="btn-play">Jouer maintenant</button>
         </div>
 
-        <!-- Carte Jeu 2 -->
         <div class="game-card" onclick="startGame('atc')">
           <div>
             <div class="game-icon">🗼</div>
-            <h3>Contrôle aérien</h3>
-            <p>Dirige les avions rouges et jaunes vers la bonne piste d'atterrissage en évitant les collisions et les rafales de vent.</p>
+            <h3>Contrôle aérien (Grand Radar)</h3>
+            <p>Guide des avions détaillés sur un grand espace aérien : vagues plus rapides, rafales de vent et trafic dense.</p>
           </div>
           <button class="btn-play">Jouer maintenant</button>
         </div>
 
-        <!-- Carte Jeu 3 -->
         <div class="game-card" onclick="startGame('shuttle')">
           <div>
             <div class="game-icon">🚐</div>
-            <h3>Course vers l'aéroport</h3>
-            <p>Faufile ta Navette DS entre les travaux et les plots tout en ramassant des bonus « café » et « coupe-file » pour arriver à l'heure au terminal !</p>
+            <h3>Course vers l'aéroport (2 500 m)</h3>
+            <p>Un long trajet de 2 500 m où la vitesse augmente progressivement : évite les travaux et cumule les bonus !</p>
           </div>
           <button class="btn-play">Jouer maintenant</button>
         </div>
       </div>
     </section>
 
-    <!-- ==================== JEU 1 : PRÉPARE TA VALISE ==================== -->
+    <!-- JEU 1 : VALISE -->
     <section id="suitcaseScreen" class="screen">
       <div class="game-panel">
         <div class="hud-bar">
           <div>Destination : <span id="destLabel" class="hud-badge">Soleil & Plage ☀️</span></div>
           <div>Poids : <span id="weightLabel" class="hud-badge">0 / 12 kg</span></div>
           <div>Score : <span id="suitcaseScore" class="hud-badge">0</span></div>
+          <div>Record : <span id="suitcaseBest" class="hud-badge">0</span></div>
         </div>
 
         <div class="mission-box">
-          <div id="missionHint" style="font-size:0.9rem;">Consigne : Prends <strong>4 objets adaptés</strong> + ton passeport, sans objets interdits !</div>
+          <div id="missionHint" style="font-size:0.9rem;"></div>
           <button class="action-btn" onclick="validateSuitcase()">Fermer la valise ✔</button>
         </div>
 
-        <div id="suitcaseDrop" class="suitcase-zone" ondragover="event.preventDefault(); this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handleDrop(event)">
-          <div style="font-size:0.85rem; color:#facc15; font-weight:700;">🧳 TA VALISE (Glisse les objets ici ou touche-les)</div>
+        <div id="suitcaseDrop" class="suitcase-zone" ondragover="event.preventDefault()" ondrop="handleDrop(event)">
+          <div style="font-size:0.86rem; color:#facc15; font-weight:700;">🧳 TA VALISE (Glisse ou touche un objet)</div>
           <div id="packedItems" class="packed-items"></div>
         </div>
 
         <div id="suitcaseFeedback" class="feedback-msg"></div>
-
         <div id="itemsPool" class="items-pool"></div>
       </div>
     </section>
 
-    <!-- ==================== JEU 2 : CONTRÔLE AÉRIEN ==================== -->
+    <!-- JEU 2 : CONTRÔLE AÉRIEN -->
     <section id="atcScreen" class="screen">
       <div class="game-panel">
         <div class="hud-bar">
+          <div>Vague : <span id="atcWave" class="hud-badge">1</span></div>
           <div>Avions posés : <span id="atcScore" class="hud-badge">0</span></div>
+          <div>Record : <span id="atcBest" class="hud-badge">0</span></div>
           <div>Vent : <span id="atcWind" class="hud-badge">Calme 🍃</span></div>
           <div>Vies : <span id="atcLives" class="hud-badge">❤️❤️❤️</span></div>
         </div>
-        <canvas id="atcCanvas" width="760" height="420"></canvas>
+        <canvas id="atcCanvas" width="960" height="560"></canvas>
         <div style="text-align:center; font-size:0.85rem; color:#cbd5e1;">
-          <strong>Comment jouer :</strong> Touche ou clique sur un avion pour le sélectionner, puis clique sur la <strong>piste de sa couleur</strong> (Rouge à gauche, Jaune à droite) pour l'y diriger !
+          Sélectionne un avion puis clique sur sa piste (<strong>Rouge</strong> ou <strong>Jaune</strong>) ou sur un point de guidage.
         </div>
       </div>
     </section>
 
-    <!-- ==================== JEU 3 : COURSE VERS L'AÉROPORT ==================== -->
+    <!-- JEU 3 : COURSE NAVETTE -->
     <section id="shuttleScreen" class="screen">
       <div class="game-panel">
         <div class="hud-bar">
-          <div>Distance Terminal : <span id="shuttleDist" class="hud-badge">1000 m</span></div>
-          <div>Bonus : <span id="shuttleScore" class="hud-badge">0</span></div>
+          <div>Terminal : <span id="shuttleDist" class="hud-badge">2500 m</span></div>
+          <div>Vitesse : <span id="shuttleSpeed" class="hud-badge">1.0x</span></div>
+          <div>Score : <span id="shuttleScore" class="hud-badge">0</span></div>
+          <div>Record : <span id="shuttleBest" class="hud-badge">0</span></div>
           <div>Bouclier : <span id="shuttleShield" class="hud-badge">100%</span></div>
         </div>
-        <canvas id="shuttleCanvas" width="760" height="420"></canvas>
+        <canvas id="shuttleCanvas" width="960" height="560"></canvas>
         <div class="touch-controls">
-          <button class="touch-btn" onclick="moveShuttle(-1)">⬅ Gauche</button>
-          <button class="touch-btn" onclick="moveShuttle(1)">Droite ➡</button>
-        </div>
-        <div style="text-align:center; font-size:0.84rem; color:#cbd5e1;">
-          Évite les <strong>plots 🚧</strong> et les <strong>travaux</strong>, attrape les <strong>cafés ☕</strong> et les <strong>coupe-files ⚡</strong> ! (Flèches clavier ou boutons)
+          <button class="touch-btn" onpointerdown="moveShuttle(-1)">⬅ Gauche</button>
+          <button class="touch-btn" onpointerdown="moveShuttle(1)">Droite ➡</button>
         </div>
       </div>
     </section>
 
     <footer>
-      Bon voyage avec <strong>NAVETTE DS</strong> • Jeu gratuit sans publicité
+      Bon voyage avec <strong>NAVETTE DS</strong> • Défis progressifs & records locaux
     </footer>
   </div>
 
   <script>
-    /* ==================== NAVIGATION & MASCOTTE ==================== */
+    document.addEventListener("dblclick", e => e.preventDefault(), { passive: false });
+    document.addEventListener("gesturestart", e => e.preventDefault(), { passive: false });
+
+    /* ==================== RECORDS LOCAUX ==================== */
+    const storage = {
+      get(key, def = 0) {
+        try {
+          const v = localStorage.getItem("navette_ds_" + key);
+          return v ? Number(v) : def;
+        } catch { return def; }
+      },
+      set(key, val) {
+        try { localStorage.setItem("navette_ds_" + key, String(val)); } catch {}
+      }
+    };
+
+    /* ==================== AUDIO ==================== */
+    let audioCtx = null;
+    let soundEnabled = true;
+
+    function ensureAudio() {
+      if (!soundEnabled) return null;
+      if (!audioCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (AC) audioCtx = new AC();
+      }
+      if (audioCtx && audioCtx.state === "suspended") audioCtx.resume().catch(() => {});
+      return audioCtx;
+    }
+
+    function playTone(freq, duration = 0.12, type = "sine", delay = 0, volume = 0.14) {
+      const ctx = ensureAudio();
+      if (!ctx) return;
+      const now = ctx.currentTime + delay;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, now);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(volume, now + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + duration + 0.02);
+    }
+
+    const sfx = {
+      click() { playTone(520, 0.07, "triangle", 0, 0.1); },
+      pack(added = true) {
+        if (added) { playTone(580, 0.08, "sine", 0, 0.12); playTone(760, 0.09, "sine", 0.06, 0.12); }
+        else { playTone(420, 0.09, "sine", 0, 0.1); }
+      },
+      success() {
+        playTone(523.25, 0.11, "triangle", 0, 0.15);
+        playTone(659.25, 0.11, "triangle", 0.1, 0.15);
+        playTone(783.99, 0.22, "triangle", 0.2, 0.16);
+      },
+      error() {
+        playTone(220, 0.14, "sawtooth", 0, 0.12);
+        playTone(175, 0.18, "sawtooth", 0.11, 0.12);
+      },
+      lane() { playTone(380, 0.06, "square", 0, 0.06); },
+      bonus() { playTone(660, 0.08, "sine", 0, 0.14); playTone(990, 0.14, "sine", 0.07, 0.14); },
+      crash() { playTone(150, 0.22, "sawtooth", 0, 0.16); playTone(95, 0.25, "square", 0.08, 0.14); }
+    };
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      document.getElementById("btnSound").textContent = soundEnabled ? "🔊 Son ON" : "🔇 Son OFF";
+      if (soundEnabled) { ensureAudio(); sfx.click(); }
+    }
+
+    /* ==================== NAVIGATION ==================== */
     const screens = {
       menu: document.getElementById("menuScreen"),
       suitcase: document.getElementById("suitcaseScreen"),
       atc: document.getElementById("atcScreen"),
       shuttle: document.getElementById("shuttleScreen")
     };
-
     const mascotTitle = document.getElementById("mascotTitle");
     const mascotText = document.getElementById("mascotText");
     const btnHome = document.getElementById("btnHome");
-
     let activeLoopId = null;
 
     function stopLoops() {
-      if (activeLoopId) {
-        cancelAnimationFrame(activeLoopId);
-        activeLoopId = null;
-      }
+      if (activeLoopId) { cancelAnimationFrame(activeLoopId); activeLoopId = null; }
     }
 
     function showMenu() {
+      sfx.click();
       stopLoops();
       Object.values(screens).forEach(s => s.classList.remove("active"));
       screens.menu.classList.add("active");
       btnHome.style.display = "none";
       mascotTitle.textContent = "Bienvenue à bord de Navette DS !";
-      mascotText.textContent = "Installez-vous confortablement pendant le trajet. Choisissez l'un de nos 3 mini-jeux voyage pour passer le temps !";
+      mascotText.textContent = "Grande surface de jeu, défis progressifs et records à battre pendant tout votre trajet !";
     }
 
-    function startGame(gameKey) {
+    function startGame(key) {
+      ensureAudio();
+      sfx.click();
       stopLoops();
       Object.values(screens).forEach(s => s.classList.remove("active"));
-      screens[gameKey].classList.add("active");
+      screens[key].classList.add("active");
       btnHome.style.display = "inline-block";
 
-      if (gameKey === "suitcase") {
-        mascotTitle.textContent = "Mission : Prépare ta valise !";
-        mascotText.textContent = "Vérifie bien la météo de destination et attention aux objets interdits en cabine !";
+      if (key === "suitcase") {
+        mascotTitle.textContent = "Défi Valise Express";
+        mascotText.textContent = "Plus tu avances, plus le poids limite est serré ! Évite tout objet interdit.";
         initSuitcaseGame();
-      } else if (gameKey === "atc") {
-        mascotTitle.textContent = "Tour de contrôle Navette DS";
-        mascotText.textContent = "Clique sur un avion puis sur la piste de même couleur. Attention aux rafales de vent !";
+      } else if (key === "atc") {
+        mascotTitle.textContent = "Tour de Contrôle — Grand Radar";
+        mascotText.textContent = "Les vagues s'accélèrent et le trafic augmente : jusqu'où tiendras-tu ?";
         initATCGame();
-      } else if (gameKey === "shuttle") {
-        mascotTitle.textContent = "En route vers le terminal !";
-        mascotText.textContent = "Slalome entre les travaux et attrape les cafés pour garder le rythme jusqu'à l'aéroport !";
+      } else if (key === "shuttle") {
+        mascotTitle.textContent = "Course Longue Distance (2 500 m)";
+        mascotText.textContent = "La vitesse grimpe régulièrement jusqu'au terminal. Vise le meilleur score !";
         initShuttleGame();
       }
     }
 
-    /* ==================== JEU 1 : PRÉPARE TA VALISE ==================== */
+    /* ==================== JEU 1 : VALISE ==================== */
     const destinations = [
-      {
-        name: "Soleil & Plage ☀️",
-        maxWeight: 12,
-        hint: "Prends ton Passeport + 3 objets pour le soleil/plage (max 12 kg, 0 interdit).",
-        goodIds: ["passport", "sunglasses", "sunscreen", "swimsuit", "charger"]
-      },
-      {
-        name: "Séjour au Ski ❄️",
-        maxWeight: 15,
-        hint: "Prends ton Passeport + 3 objets contre le froid (max 15 kg, 0 interdit).",
-        goodIds: ["passport", "coat", "gloves", "beanie", "charger"]
-      },
-      {
-        name: "City-Trip Pluvieux 🌧️",
-        maxWeight: 11,
-        hint: "Prends ton Passeport + 3 objets pratiques sous la pluie (max 11 kg, 0 interdit).",
-        goodIds: ["passport", "umbrella", "raincoat", "charger", "sneakers"]
-      }
+      { name: "Soleil & Plage ☀️", baseWeight: 12, hint: "Passeport + 3 objets soleil/plage, sans interdit.", goodIds: ["passport", "sunglasses", "sunscreen", "swimsuit", "charger"] },
+      { name: "Séjour au Ski ❄️", baseWeight: 15, hint: "Passeport + 3 objets grand froid, sans interdit.", goodIds: ["passport", "coat", "gloves", "beanie", "charger"] },
+      { name: "City-Trip Pluvieux 🌧️", baseWeight: 11, hint: "Passeport + 3 objets pluie/ville, sans interdit.", goodIds: ["passport", "umbrella", "raincoat", "charger", "sneakers"] }
     ];
 
     const allItems = [
@@ -682,44 +707,50 @@
       { id: "anvil", name: "Haltère 10kg", emoji: "🏋️", weight: 10, forbidden: false }
     ];
 
-    let currentDestIndex = 0;
-    let suitcaseScore = 0;
-    let packed = [];
+    let currentDestIndex = 0, suitcaseScore = 0, packed = [];
+
+    function getMaxWeight() {
+      const base = destinations[currentDestIndex % destinations.length].baseWeight;
+      const tightness = Math.floor(currentDestIndex / 3);
+      return Math.max(7, base - tightness);
+    }
 
     function initSuitcaseGame() {
       suitcaseScore = 0;
       currentDestIndex = 0;
+      document.getElementById("suitcaseBest").textContent = storage.get("suitcase_best", 0);
       loadSuitcaseRound();
     }
 
     function loadSuitcaseRound() {
       packed = [];
       const dest = destinations[currentDestIndex % destinations.length];
+      const maxW = getMaxWeight();
       document.getElementById("destLabel").textContent = dest.name;
-      document.getElementById("missionHint").innerHTML = `Consigne : <strong>${dest.hint}</strong>`;
+      document.getElementById("missionHint").innerHTML = `Manche ${currentDestIndex + 1} — <strong>${dest.hint}</strong> (Max <strong>${maxW} kg</strong>)`;
       document.getElementById("suitcaseFeedback").textContent = "";
       renderSuitcase();
     }
 
     function renderSuitcase() {
-      const dest = destinations[currentDestIndex % destinations.length];
+      const maxW = getMaxWeight();
       const totalWeight = packed.reduce((sum, item) => sum + item.weight, 0);
-      document.getElementById("weightLabel").textContent = `${totalWeight} / ${dest.maxWeight} kg`;
+      document.getElementById("weightLabel").textContent = `${totalWeight} / ${maxW} kg`;
       document.getElementById("suitcaseScore").textContent = suitcaseScore;
 
-      const packedContainer = document.getElementById("packedItems");
-      packedContainer.innerHTML = "";
+      const packedEl = document.getElementById("packedItems");
+      packedEl.innerHTML = "";
       packed.forEach(item => {
         const div = document.createElement("div");
         div.className = "item-chip";
         div.style.borderColor = "#facc15";
         div.innerHTML = `<span class="emoji">${item.emoji}</span><span class="name">${item.name}</span><span class="weight">${item.weight} kg (retirer)</span>`;
         div.onclick = () => toggleItem(item.id);
-        packedContainer.appendChild(div);
+        packedEl.appendChild(div);
       });
 
-      const poolContainer = document.getElementById("itemsPool");
-      poolContainer.innerHTML = "";
+      const poolEl = document.getElementById("itemsPool");
+      poolEl.innerHTML = "";
       allItems.forEach(item => {
         if (!packed.some(p => p.id === item.id)) {
           const div = document.createElement("div");
@@ -728,216 +759,285 @@
           div.ondragstart = e => e.dataTransfer.setData("text/plain", item.id);
           div.onclick = () => toggleItem(item.id);
           div.innerHTML = `<span class="emoji">${item.emoji}</span><span class="name">${item.name}</span><span class="weight">${item.weight} kg</span>`;
-          poolContainer.appendChild(div);
+          poolEl.appendChild(div);
         }
       });
     }
 
     function toggleItem(id) {
       const idx = packed.findIndex(i => i.id === id);
-      if (idx >= 0) {
-        packed.splice(idx, 1);
-      } else {
+      if (idx >= 0) { packed.splice(idx, 1); sfx.pack(false); }
+      else {
         const item = allItems.find(i => i.id === id);
-        if (item) packed.push(item);
+        if (item) { packed.push(item); sfx.pack(true); }
       }
       renderSuitcase();
     }
 
     function handleDrop(e) {
       e.preventDefault();
-      document.getElementById("suitcaseDrop").classList.remove("drag-over");
       const id = e.dataTransfer.getData("text/plain");
-      if (!packed.some(i => i.id === id)) {
-        toggleItem(id);
-      }
+      if (!packed.some(i => i.id === id)) toggleItem(id);
     }
 
     function validateSuitcase() {
       const dest = destinations[currentDestIndex % destinations.length];
+      const maxW = getMaxWeight();
       const fb = document.getElementById("suitcaseFeedback");
       const totalWeight = packed.reduce((s, i) => s + i.weight, 0);
 
       if (packed.some(i => i.forbidden)) {
-        fb.style.color = "#f87171";
-        fb.textContent = "❌ Sécurité aéroport : objet interdit détecté dans la valise !";
-        return;
+        sfx.error(); fb.style.color = "#f87171";
+        fb.textContent = "❌ Objet interdit détecté !"; return;
       }
-      if (totalWeight > dest.maxWeight) {
-        fb.style.color = "#f87171";
-        fb.textContent = `❌ Surpoids ! Ta valise fait ${totalWeight} kg (max ${dest.maxWeight} kg).`;
-        return;
+      if (totalWeight > maxW) {
+        sfx.error(); fb.style.color = "#f87171";
+        fb.textContent = `❌ Surpoids : ${totalWeight} kg > ${maxW} kg !`; return;
       }
       if (!packed.some(i => i.id === "passport")) {
-        fb.style.color = "#f87171";
-        fb.textContent = "❌ Impossible d'embarquer sans ton passeport !";
-        return;
+        sfx.error(); fb.style.color = "#f87171";
+        fb.textContent = "❌ Passeport obligatoire !"; return;
       }
-      const adaptedCount = packed.filter(i => dest.goodIds.includes(i.id)).length;
-      if (adaptedCount < 4) {
-        fb.style.color = "#facc15";
-        fb.textContent = "⚠️ Il manque encore des affaires adaptées à cette destination !";
-        return;
+      if (packed.filter(i => dest.goodIds.includes(i.id)).length < 4) {
+        sfx.error(); fb.style.color = "#facc15";
+        fb.textContent = "⚠️ Il manque des affaires adaptées à la destination !"; return;
       }
 
-      suitcaseScore += 100;
+      sfx.success();
+      suitcaseScore += 100 + currentDestIndex * 25;
+      const best = Math.max(storage.get("suitcase_best", 0), suitcaseScore);
+      storage.set("suitcase_best", best);
+      document.getElementById("suitcaseBest").textContent = best;
+
       fb.style.color = "#4ade80";
-      fb.textContent = "✅ Valise parfaite ! Embarquement immédiat ! +100 pts";
+      fb.textContent = `✅ Manche réussie ! Score : ${suitcaseScore}`;
       currentDestIndex++;
-      setTimeout(loadSuitcaseRound, 1300);
+      setTimeout(loadSuitcaseRound, 1100);
     }
 
-    /* ==================== JEU 2 : CONTRÔLE AÉRIEN ==================== */
+    /* ==================== JEU 2 : CONTRÔLE AÉRIEN RÉALISTE ==================== */
+    function drawRealisticPlane(ctx, p, selected, time) {
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.angle + Math.PI / 2);
+
+      if (selected) {
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(0, 0, 28, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // Ombre portée
+      ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
+      ctx.beginPath();
+      ctx.ellipse(4, 6, 9, 22, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Ailes en flèche
+      ctx.fillStyle = "#e2e8f0";
+      ctx.beginPath();
+      ctx.moveTo(0, -6);
+      ctx.lineTo(28, 10);
+      ctx.lineTo(28, 15);
+      ctx.lineTo(4, 9);
+      ctx.lineTo(-4, 9);
+      ctx.lineTo(-28, 15);
+      ctx.lineTo(-28, 10);
+      ctx.closePath();
+      ctx.fill();
+
+      // Empennage arrière (dérive horizontale)
+      ctx.beginPath();
+      ctx.moveTo(0, 14);
+      ctx.lineTo(13, 23);
+      ctx.lineTo(13, 26);
+      ctx.lineTo(0, 22);
+      ctx.lineTo(-13, 26);
+      ctx.lineTo(-13, 23);
+      ctx.closePath();
+      ctx.fill();
+
+      // Fuselage
+      ctx.fillStyle = "#f8fafc";
+      ctx.beginPath();
+      ctx.moveTo(0, -24);
+      ctx.quadraticCurveTo(7, -14, 6, 22);
+      ctx.lineTo(-6, 22);
+      ctx.quadraticCurveTo(-7, -14, 0, -24);
+      ctx.fill();
+
+      // Bande de livrée couleur (Rouge ou Jaune)
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-5.5, -4, 11, 14);
+      ctx.fillRect(-24, 10, 6, 4);
+      ctx.fillRect(18, 10, 6, 4);
+
+      // Cockpit
+      ctx.fillStyle = "#0f172a";
+      ctx.beginPath();
+      ctx.ellipse(0, -14, 3.5, 5, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Feux clignotants en bout d'aile
+      const blink = Math.sin(time * 0.015 + p.phase) > 0.4;
+      if (blink) {
+        ctx.fillStyle = "#22c55e";
+        ctx.beginPath();
+        ctx.arc(28, 12, 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#ef4444";
+        ctx.beginPath();
+        ctx.arc(-28, 12, 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+    }
+
     function initATCGame() {
       const canvas = document.getElementById("atcCanvas");
       const ctx = canvas.getContext("2d");
 
-      let planes = [];
-      let selectedPlane = null;
-      let score = 0;
-      let lives = 3;
-      let windX = 0;
-      let spawnTimer = 0;
-      let windTimer = 0;
-      let gameOver = false;
+      let planes = [], selectedPlane = null, score = 0, lives = 3;
+      let windX = 0, spawnTimer = 0, windTimer = 0, gameOver = false;
+      let best = storage.get("atc_best", 0);
+      document.getElementById("atcBest").textContent = best;
 
       const runways = [
-        { color: "#ef4444", label: "PISTE ROUGE", x: 130, y: 345, w: 150, h: 34 },
-        { color: "#facc15", label: "PISTE JAUNE", x: 480, y: 345, w: 150, h: 34 }
+        { color: "#ef4444", label: "PISTE 09L • ROUGE", x: 140, y: 465, w: 220, h: 46 },
+        { color: "#facc15", label: "PISTE 27R • JAUNE", x: 600, y: 465, w: 220, h: 46 }
       ];
 
+      function getWave() { return 1 + Math.floor(score / 5); }
+
       function updateHUD() {
+        const wave = getWave();
+        document.getElementById("atcWave").textContent = wave;
         document.getElementById("atcScore").textContent = score;
+        document.getElementById("atcBest").textContent = best;
         document.getElementById("atcLives").textContent = "❤️".repeat(Math.max(0, lives)) || "💀";
-        if (Math.abs(windX) < 0.05) {
-          document.getElementById("atcWind").textContent = "Calme 🍃";
-        } else if (windX > 0) {
-          document.getElementById("atcWind").textContent = "Rafale Est 💨➡";
-        } else {
-          document.getElementById("atcWind").textContent = "⬅💨 Rafale Ouest";
-        }
+        if (Math.abs(windX) < 0.05) document.getElementById("atcWind").textContent = "Calme 🍃";
+        else if (windX > 0) document.getElementById("atcWind").textContent = `Rafale Est (${windX.toFixed(1)}) 💨➡`;
+        else document.getElementById("atcWind").textContent = `⬅💨 Rafale Ouest (${Math.abs(windX).toFixed(1)})`;
       }
 
       function spawnPlane() {
+        const wave = getWave();
         const isRed = Math.random() < 0.5;
         const side = Math.floor(Math.random() * 3);
-        let x = 380, y = 25;
-        if (side === 0) { x = 80 + Math.random() * 600; y = 25; }
-        if (side === 1) { x = 25; y = 50 + Math.random() * 140; }
-        if (side === 2) { x = 735; y = 50 + Math.random() * 140; }
+        let x = 480, y = 30;
+        if (side === 0) { x = 100 + Math.random() * 760; y = 30; }
+        if (side === 1) { x = 30; y = 60 + Math.random() * 200; }
+        if (side === 2) { x = 930; y = 60 + Math.random() * 200; }
 
-        const angleToCenter = Math.atan2(210 - y, 380 - x);
+        const angleToCenter = Math.atan2(260 - y, 480 - x);
         planes.push({
           x, y,
           color: isRed ? "#ef4444" : "#facc15",
           angle: angleToCenter,
-          speed: 1.25 + Math.min(1.2, score * 0.05),
-          target: null
+          speed: Math.min(2.6, 1.15 + wave * 0.14),
+          target: null,
+          phase: Math.random() * 10
         });
       }
 
-      function handlePointer(clientX, clientY) {
-        if (gameOver) {
-          initATCGame();
-          return;
-        }
+      canvas.onpointerdown = e => {
+        e.preventDefault();
+        if (gameOver) { sfx.click(); initATCGame(); return; }
         const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-        const px = (clientX - rect.left) * scaleX;
-        const py = (clientY - rect.top) * scaleY;
+        const px = (e.clientX - rect.left) * (canvas.width / rect.width);
+        const py = (e.clientY - rect.top) * (canvas.height / rect.height);
 
-        // Vérifier clic sur un avion
         for (const p of planes) {
-          if (Math.hypot(p.x - px, p.y - py) < 28) {
-            selectedPlane = p;
-            return;
+          if (Math.hypot(p.x - px, p.y - py) < 34) {
+            selectedPlane = p; sfx.click(); return;
           }
         }
 
-        // Vérifier clic sur une piste si un avion est sélectionné
         if (selectedPlane) {
           for (const r of runways) {
-            if (px >= r.x - 15 && px <= r.x + r.w + 15 && py >= r.y - 25 && py <= r.y + r.h + 25) {
+            if (px >= r.x - 20 && px <= r.x + r.w + 20 && py >= r.y - 30 && py <= r.y + r.h + 30) {
               selectedPlane.target = { x: r.x + r.w / 2, y: r.y + r.h / 2, color: r.color };
-              selectedPlane = null;
-              return;
+              selectedPlane = null; sfx.pack(true); return;
             }
           }
-          // Sinon diriger vers le point cliqué
           selectedPlane.target = { x: px, y: py, color: null };
+          sfx.lane();
         }
-      }
+      };
 
-      canvas.onclick = e => handlePointer(e.clientX, e.clientY);
-
+      spawnPlane();
       spawnPlane();
       updateHUD();
 
-      function loop() {
+      function loop(now = 0) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Fond radar aéroport
-        ctx.fillStyle = "#0b1324";
+        // Radar élargi
+        ctx.fillStyle = "#081224";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.strokeStyle = "rgba(148, 163, 184, 0.12)";
-        ctx.beginPath();
-        ctx.arc(380, 210, 120, 0, Math.PI * 2);
-        ctx.arc(380, 210, 230, 0, Math.PI * 2);
-        ctx.stroke();
+        ctx.strokeStyle = "rgba(56, 189, 248, 0.14)";
+        ctx.lineWidth = 1.5;
+        [110, 220, 330].forEach(rad => {
+          ctx.beginPath(); ctx.arc(480, 250, rad, 0, Math.PI * 2); ctx.stroke();
+        });
 
         // Pistes d'atterrissage
         for (const r of runways) {
+          ctx.fillStyle = "#1e293b";
+          ctx.fillRect(r.x - 6, r.y - 6, r.w + 12, r.h + 12);
           ctx.fillStyle = r.color;
           ctx.fillRect(r.x, r.y, r.w, r.h);
           ctx.strokeStyle = "#ffffff";
-          ctx.setLineDash([10, 8]);
+          ctx.lineWidth = 2.5;
+          ctx.setLineDash([14, 10]);
           ctx.beginPath();
-          ctx.moveTo(r.x + 12, r.y + r.h / 2);
-          ctx.lineTo(r.x + r.w - 12, r.y + r.h / 2);
+          ctx.moveTo(r.x + 16, r.y + r.h / 2);
+          ctx.lineTo(r.x + r.w - 16, r.y + r.h / 2);
           ctx.stroke();
           ctx.setLineDash([]);
           ctx.fillStyle = "#09090b";
-          ctx.font = "bold 12px sans-serif";
+          ctx.font = "bold 13px sans-serif";
           ctx.textAlign = "center";
-          ctx.fillText(r.label, r.x + r.w / 2, r.y + 21);
+          ctx.fillText(r.label, r.x + r.w / 2, r.y + 27);
         }
 
         if (!gameOver) {
+          const wave = getWave();
           spawnTimer++;
-          if (spawnTimer > Math.max(130, 240 - score * 6)) {
-            spawnPlane();
-            spawnTimer = 0;
-          }
+          const interval = Math.max(75, 210 - wave * 16);
+          if (spawnTimer > interval) { spawnPlane(); spawnTimer = 0; }
 
           windTimer++;
-          if (windTimer > 360) {
-            const choices = [0, 0.28, -0.28];
+          if (windTimer > 320) {
+            const amp = Math.min(0.65, 0.25 + wave * 0.05);
+            const choices = [0, amp, -amp];
             windX = choices[Math.floor(Math.random() * choices.length)];
             windTimer = 0;
             updateHUD();
           }
 
-          // Mise à jour avions
           for (let i = planes.length - 1; i >= 0; i--) {
             const p = planes[i];
-            if (p.target) {
-              p.angle = Math.atan2(p.target.y - p.y, p.target.x - p.x);
-            }
+            if (p.target) p.angle = Math.atan2(p.target.y - p.y, p.target.x - p.x);
             p.x += Math.cos(p.angle) * p.speed + windX;
             p.y += Math.sin(p.angle) * p.speed;
 
-            // Rebond doux sur les bords
-            if (p.x < 18 || p.x > canvas.width - 18) p.angle = Math.PI - p.angle;
-            if (p.y < 18 || p.y > canvas.height - 18) p.angle = -p.angle;
+            if (p.x < 24 || p.x > canvas.width - 24) p.angle = Math.PI - p.angle;
+            if (p.y < 24 || p.y > canvas.height - 24) p.angle = -p.angle;
 
-            // Atterrissage sur piste
             for (const r of runways) {
               if (p.x > r.x && p.x < r.x + r.w && p.y > r.y && p.y < r.y + r.h) {
                 if (p.color === r.color) {
                   score++;
+                  best = Math.max(best, score);
+                  storage.set("atc_best", best);
+                  sfx.bonus();
                 } else {
-                  lives--;
+                  lives--; sfx.error();
                 }
                 if (selectedPlane === p) selectedPlane = null;
                 planes.splice(i, 1);
@@ -947,13 +1047,11 @@
             }
           }
 
-          // Collisions entre avions
           for (let i = 0; i < planes.length; i++) {
             for (let j = i + 1; j < planes.length; j++) {
-              if (Math.hypot(planes[i].x - planes[j].x, planes[i].y - planes[j].y) < 26) {
-                lives--;
-                planes.splice(j, 1);
-                planes.splice(i, 1);
+              if (Math.hypot(planes[i].x - planes[j].x, planes[i].y - planes[j].y) < 32) {
+                lives--; sfx.crash();
+                planes.splice(j, 1); planes.splice(i, 1);
                 selectedPlane = null;
                 updateHUD();
                 break;
@@ -961,53 +1059,29 @@
             }
           }
 
-          if (lives <= 0) gameOver = true;
+          if (lives <= 0) { gameOver = true; sfx.error(); }
         }
 
-        // Dessin trajectoires et avions
         for (const p of planes) {
           if (p.target) {
             ctx.strokeStyle = p.color;
-            ctx.setLineDash([5, 5]);
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(p.target.x, p.target.y);
-            ctx.stroke();
+            ctx.setLineDash([6, 6]);
+            ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.target.x, p.target.y); ctx.stroke();
             ctx.setLineDash([]);
           }
-
-          if (selectedPlane === p) {
-            ctx.strokeStyle = "#ffffff";
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, 22, 0, Math.PI * 2);
-            ctx.stroke();
-          }
-
-          ctx.save();
-          ctx.translate(p.x, p.y);
-          ctx.rotate(p.angle + Math.PI / 2);
-          ctx.fillStyle = p.color;
-          ctx.beginPath();
-          ctx.moveTo(0, -14);
-          ctx.lineTo(13, 8);
-          ctx.lineTo(0, 4);
-          ctx.lineTo(-13, 8);
-          ctx.closePath();
-          ctx.fill();
-          ctx.restore();
+          drawRealisticPlane(ctx, p, selectedPlane === p, now);
         }
 
         if (gameOver) {
-          ctx.fillStyle = "rgba(9, 9, 11, 0.82)";
+          ctx.fillStyle = "rgba(9, 9, 11, 0.85)";
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           ctx.fillStyle = "#fff";
           ctx.textAlign = "center";
-          ctx.font = "bold 30px sans-serif";
-          ctx.fillText(`Fin de service ! ${score} avion(s) posé(s)`, canvas.width / 2, 190);
-          ctx.font = "18px sans-serif";
+          ctx.font = "bold 34px sans-serif";
+          ctx.fillText(`Fin de service — Vague ${getWave()} (${score} posés)`, canvas.width / 2, 245);
+          ctx.font = "20px sans-serif";
           ctx.fillStyle = "#facc15";
-          ctx.fillText("Clique ou touche l'écran pour rejouer", canvas.width / 2, 235);
+          ctx.fillText(`Record : ${best} • Touche ou clique pour rejouer`, canvas.width / 2, 295);
         }
 
         activeLoopId = requestAnimationFrame(loop);
@@ -1016,34 +1090,25 @@
       loop();
     }
 
-    /* ==================== JEU 3 : COURSE VERS L'AÉROPORT ==================== */
+    /* ==================== JEU 3 : COURSE LONGUE DISTANCE ==================== */
     let shuttleMoveFn = null;
-    function moveShuttle(dir) {
-      if (shuttleMoveFn) shuttleMoveFn(dir);
-    }
+    function moveShuttle(dir) { if (shuttleMoveFn) shuttleMoveFn(dir); }
 
     function initShuttleGame() {
       const canvas = document.getElementById("shuttleCanvas");
       const ctx = canvas.getContext("2d");
 
-      const lanes = [210, 325, 435, 550];
-      let currentLane = 1;
-      let distance = 1000;
-      let score = 0;
-      let shield = 100;
-      let speed = 4.5;
-      let turboTimer = 0;
-      let roadOffset = 0;
-      let items = [];
-      let spawnTimer = 0;
-      let state = "playing"; // playing | won | lost
+      const lanes = [270, 405, 555, 690];
+      let currentLane = 1, distance = 2500, score = 0, shield = 100;
+      let baseSpeed = 4.6, turboTimer = 0, roadOffset = 0, items = [], spawnTimer = 0;
+      let state = "playing";
+      let best = storage.get("shuttle_best", 0);
+      document.getElementById("shuttleBest").textContent = best;
 
       shuttleMoveFn = dir => {
-        if (state !== "playing") {
-          initShuttleGame();
-          return;
-        }
-        currentLane = Math.max(0, Math.min(lanes.length - 1, currentLane + dir));
+        if (state !== "playing") { sfx.click(); initShuttleGame(); return; }
+        const next = Math.max(0, Math.min(lanes.length - 1, currentLane + dir));
+        if (next !== currentLane) { currentLane = next; sfx.lane(); }
       };
 
       window.onkeydown = e => {
@@ -1051,88 +1116,94 @@
         if (e.key === "ArrowRight" || e.key === "d") moveShuttle(1);
       };
 
-      canvas.onclick = e => {
-        if (state !== "playing") {
-          initShuttleGame();
-          return;
-        }
+      canvas.onpointerdown = e => {
+        e.preventDefault();
+        if (state !== "playing") { sfx.click(); initShuttleGame(); return; }
         const rect = canvas.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-        moveShuttle(clickX < rect.width / 2 ? -1 : 1);
+        const clickX = (e.clientX - rect.left) * (canvas.width / rect.width);
+        moveShuttle(clickX < canvas.width / 2 ? -1 : 1);
       };
 
       function updateHUD() {
+        const progress = 1 - Math.max(0, distance) / 2500;
+        const speedMult = (1 + progress * 0.85).toFixed(1);
         document.getElementById("shuttleDist").textContent = `${Math.max(0, Math.ceil(distance))} m`;
+        document.getElementById("shuttleSpeed").textContent = `${speedMult}x`;
         document.getElementById("shuttleScore").textContent = score;
+        document.getElementById("shuttleBest").textContent = best;
         document.getElementById("shuttleShield").textContent = `${Math.max(0, shield)}%`;
       }
 
       function loop() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Décor bord de route
         ctx.fillStyle = "#14532d";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Autoroute 4 voies
         ctx.fillStyle = "#1e293b";
-        ctx.fillRect(150, 0, 460, canvas.height);
+        ctx.fillRect(200, 0, 560, canvas.height);
 
-        // Bordures rouge/blanc
         ctx.fillStyle = "#ef4444";
-        ctx.fillRect(142, 0, 8, canvas.height);
-        ctx.fillRect(610, 0, 8, canvas.height);
+        ctx.fillRect(190, 0, 10, canvas.height);
+        ctx.fillRect(760, 0, 10, canvas.height);
 
-        // Lignes de voies animées
-        const currentSpeed = turboTimer > 0 ? speed * 1.65 : speed;
+        const progress = 1 - Math.max(0, distance) / 2500;
+        const progressiveSpeed = baseSpeed + progress * 4.2;
+        const currentSpeed = turboTimer > 0 ? progressiveSpeed * 1.55 : progressiveSpeed;
+
         if (state === "playing") {
-          roadOffset = (roadOffset + currentSpeed) % 40;
-          distance -= currentSpeed * 0.14;
+          roadOffset = (roadOffset + currentSpeed) % 44;
+          distance -= currentSpeed * 0.22;
+          score += Math.round(currentSpeed * 0.15);
+          best = Math.max(best, score);
+          storage.set("shuttle_best", best);
+
           if (turboTimer > 0) turboTimer--;
-          if (distance <= 0) state = "won";
+          if (distance <= 0) {
+            score += 300;
+            best = Math.max(best, score);
+            storage.set("shuttle_best", best);
+            state = "won"; sfx.success();
+          }
         }
 
         ctx.strokeStyle = "rgba(255,255,255,0.45)";
         ctx.lineWidth = 3;
-        ctx.setLineDash([22, 18]);
+        ctx.setLineDash([24, 20]);
         ctx.lineDashOffset = -roadOffset;
-        [265, 380, 495].forEach(lx => {
-          ctx.beginPath();
-          ctx.moveTo(lx, 0);
-          ctx.lineTo(lx, canvas.height);
-          ctx.stroke();
+        [337, 480, 622].forEach(lx => {
+          ctx.beginPath(); ctx.moveTo(lx, 0); ctx.lineTo(lx, canvas.height); ctx.stroke();
         });
         ctx.setLineDash([]);
 
-        // Génération obstacles & bonus
         if (state === "playing") {
           spawnTimer++;
-          if (spawnTimer > 42) {
+          const spawnGap = Math.max(20, Math.floor(42 - progress * 18));
+          if (spawnTimer > spawnGap) {
             spawnTimer = 0;
             const lane = Math.floor(Math.random() * lanes.length);
             const r = Math.random();
-            let type = "cone"; // obstacle
-            if (r > 0.72) type = "coffee"; // +pts +bouclier
-            else if (r > 0.58) type = "fastpass"; // turbo coupe-file
-            items.push({ lane, y: -35, type });
+            let type = "cone";
+            if (r > 0.76) type = "coffee";
+            else if (r > 0.62) type = "fastpass";
+            items.push({ lane, y: -40, type });
           }
 
           for (let i = items.length - 1; i >= 0; i--) {
             const it = items[i];
             it.y += currentSpeed;
 
-            // Collision avec la Navette DS (y ~ 340)
-            if (it.lane === currentLane && Math.abs(it.y - 340) < 42) {
+            if (it.lane === currentLane && Math.abs(it.y - 460) < 46) {
               if (it.type === "coffee") {
-                score += 50;
-                shield = Math.min(100, shield + 15);
+                score += 80; shield = Math.min(100, shield + 15); sfx.bonus();
               } else if (it.type === "fastpass") {
-                score += 100;
-                turboTimer = 110;
+                score += 140; turboTimer = 115; sfx.bonus();
               } else if (turboTimer <= 0) {
-                shield -= 34;
-                if (shield <= 0) state = "lost";
+                shield -= 34; sfx.crash();
+                if (shield <= 0) { state = "lost"; sfx.error(); }
               }
+              best = Math.max(best, score);
+              storage.set("shuttle_best", best);
               items.splice(i, 1);
               continue;
             }
@@ -1142,56 +1213,41 @@
           updateHUD();
         }
 
-        // Dessin des objets sur la route
-        ctx.font = "30px sans-serif";
+        ctx.font = "34px sans-serif";
         ctx.textAlign = "center";
         for (const it of items) {
           const x = lanes[it.lane];
-          if (it.type === "coffee") ctx.fillText("☕", x, it.y + 10);
-          else if (it.type === "fastpass") ctx.fillText("⚡", x, it.y + 10);
-          else ctx.fillText("🚧", x, it.y + 10);
+          if (it.type === "coffee") ctx.fillText("☕", x, it.y + 12);
+          else if (it.type === "fastpass") ctx.fillText("⚡", x, it.y + 12);
+          else ctx.fillText("🚧", x, it.y + 12);
         }
 
-        // Dessin de la Navette DS (van noir/argent/rouge)
         const sx = lanes[currentLane];
-        const sy = 340;
+        const sy = 460;
         if (turboTimer > 0) {
-          ctx.fillStyle = "rgba(250, 204, 21, 0.32)";
-          ctx.beginPath();
-          ctx.arc(sx, sy, 46, 0, Math.PI * 2);
-          ctx.fill();
+          ctx.fillStyle = "rgba(250, 204, 21, 0.34)";
+          ctx.beginPath(); ctx.arc(sx, sy, 52, 0, Math.PI * 2); ctx.fill();
         }
-        // Carrosserie Navette DS
+
         ctx.fillStyle = "#09090b";
-        ctx.beginPath();
-        ctx.roundRect(sx - 24, sy - 38, 48, 76, 10);
-        ctx.fill();
-        ctx.strokeStyle = "#cbd5e1";
-        ctx.lineWidth = 2;
-        ctx.stroke();
-        // Bande rouge & pare-brise
-        ctx.fillStyle = "#d91b24";
-        ctx.fillRect(sx - 20, sy - 8, 40, 28);
-        ctx.fillStyle = "#38bdf8";
-        ctx.fillRect(sx - 18, sy - 28, 36, 15);
-        // Phares
-        ctx.fillStyle = "#facc15";
-        ctx.fillRect(sx - 19, sy - 39, 9, 4);
-        ctx.fillRect(sx + 10, sy - 39, 9, 4);
+        ctx.beginPath(); ctx.roundRect(sx - 26, sy - 42, 52, 84, 11); ctx.fill();
+        ctx.strokeStyle = "#cbd5e1"; ctx.lineWidth = 2; ctx.stroke();
+        ctx.fillStyle = "#d91b24"; ctx.fillRect(sx - 22, sy - 8, 44, 30);
+        ctx.fillStyle = "#38bdf8"; ctx.fillRect(sx - 20, sy - 31, 40, 17);
+        ctx.fillStyle = "#facc15"; ctx.fillRect(sx - 21, sy - 43, 10, 4); ctx.fillRect(sx + 11, sy - 43, 10, 4);
 
         if (state === "won" || state === "lost") {
-          ctx.fillStyle = "rgba(9, 9, 11, 0.84)";
+          ctx.fillStyle = "rgba(9, 9, 11, 0.85)";
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           ctx.fillStyle = "#fff";
-          ctx.font = "bold 30px sans-serif";
+          ctx.font = "bold 32px sans-serif";
           ctx.fillText(
-            state === "won" ? `✈️ Arrivé à l'aéroport à l'heure ! (${score} pts)` : "🚧 Navette bloquée dans les travaux !",
-            canvas.width / 2,
-            190
+            state === "won" ? `✈️ Terminal atteint ! Score : ${score}` : "🚧 Navette bloquée dans les travaux !",
+            canvas.width / 2, 245
           );
-          ctx.font = "18px sans-serif";
+          ctx.font = "20px sans-serif";
           ctx.fillStyle = "#facc15";
-          ctx.fillText("Clique ou appuie sur une flèche pour recommencer", canvas.width / 2, 235);
+          ctx.fillText(`Record : ${best} • Clique ou appuie sur une flèche pour rejouer`, canvas.width / 2, 295);
         }
 
         activeLoopId = requestAnimationFrame(loop);
