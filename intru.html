@@ -2,150 +2,166 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trouve l'intrus ! 🔍</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Trouve l'intrus ! — Défi 20 Niveaux 🔍</title>
   <style>
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      min-height: 100vh;
-      font-family: 'Comic Sans MS', 'Chalkboard SE', 'Arial Rounded MT Bold', Arial, sans-serif;
-      background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 35%, #a1c4fd 100%);
+      min-height: 100dvh;
+      font-family: 'Segoe UI', 'Comic Sans MS', Arial, sans-serif;
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 45%, #4c1d95 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      color: #2d3748;
+      color: #1e293b;
       user-select: none;
       overflow-x: hidden;
-      padding: 15px;
+      padding: 14px;
     }
 
     #btn-son {
       position: fixed;
-      top: 15px;
-      right: 15px;
-      background: white;
+      top: 14px;
+      right: 14px;
+      background: rgba(255, 255, 255, 0.94);
       border: none;
       border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      font-size: 1.5rem;
+      width: 48px;
+      height: 48px;
+      font-size: 1.4rem;
       cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.25);
       z-index: 100;
     }
 
     h1 {
-      margin: 0 0 10px;
-      font-size: 2.4rem;
-      color: #1a202c;
-      text-shadow: 2px 2px 0 rgba(255,255,255,0.8);
+      margin: 0 0 12px;
+      font-size: 2.1rem;
+      color: #ffffff;
+      text-shadow: 0 3px 12px rgba(0,0,0,0.35);
       text-align: center;
     }
 
     .carte {
-      background: rgba(255, 255, 255, 0.88);
-      padding: 25px;
-      border-radius: 28px;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.14);
+      background: rgba(255, 255, 255, 0.96);
+      padding: 22px;
+      border-radius: 26px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.3);
       text-align: center;
-      max-width: 520px;
+      max-width: 580px;
       width: 100%;
     }
 
-    /* Écran d'accueil */
     #ecran-accueil p {
-      font-size: 1.2rem;
-      margin-bottom: 20px;
+      font-size: 1.08rem;
+      color: #334155;
+      margin-bottom: 18px;
+      line-height: 1.5;
     }
 
     .choix-mode {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 11px;
     }
 
     .btn-mode {
-      padding: 14px 20px;
-      font-size: 1.2rem;
-      font-weight: bold;
+      padding: 13px 18px;
+      font-size: 1.08rem;
+      font-weight: 700;
       border: none;
-      border-radius: 18px;
+      border-radius: 16px;
       color: white;
       cursor: pointer;
-      transition: transform 0.12s;
+      transition: transform 0.12s, filter 0.12s;
       font-family: inherit;
-    }
-    .btn-mode:hover { transform: scale(1.03); }
-    .btn-mode:active { transform: scale(0.97); }
-    .facile { background: #48bb78; box-shadow: 0 4px 0 #2f855a; }
-    .moyen { background: #ed8936; box-shadow: 0 4px 0 #c05621; }
-    .difficile { background: #9f7aea; box-shadow: 0 4px 0 #6b46c1; }
-
-    /* Écran de jeu */
-    #ecran-jeu { display: none; }
-
-    #barre-infos {
+      text-align: left;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #edf2f7;
-      padding: 10px 16px;
+    }
+    .btn-mode:hover { transform: scale(1.02); filter: brightness(1.05); }
+    .btn-mode:active { transform: scale(0.98); }
+    .btn-mode small { font-weight: 500; opacity: 0.92; }
+
+    .facile { background: #16a34a; box-shadow: 0 4px 0 #15803d; }
+    .moyen { background: #d97706; box-shadow: 0 4px 0 #b45309; }
+    .difficile { background: #7c3aed; box-shadow: 0 4px 0 #6d28d9; }
+    .expert { background: #be123c; box-shadow: 0 4px 0 #9f1239; }
+
+    #ecran-jeu { display: none; }
+
+    #barre-infos {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      background: #f1f5f9;
+      padding: 10px 12px;
       border-radius: 16px;
-      font-weight: bold;
-      font-size: 1.05rem;
-      margin-bottom: 14px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 12px;
     }
 
     #barre-progression-fond {
       width: 100%;
-      height: 12px;
+      height: 11px;
       background: #e2e8f0;
       border-radius: 10px;
       overflow: hidden;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     #barre-progression {
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, #48bb78, #38b2ac);
-      transition: width 0.3s ease;
+      background: linear-gradient(90deg, #6366f1, #ec4899);
+      transition: width 0.25s ease;
     }
 
     #grille {
       display: grid;
-      gap: 8px;
+      gap: 6px;
       justify-content: center;
       margin: 0 auto;
     }
 
     .case {
-      background: white;
-      border-radius: 16px;
+      background: #ffffff;
+      border-radius: 13px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      box-shadow: 0 4px 0 #cbd5e0;
-      border: 2px solid #edf2f7;
-      transition: transform 0.1s, background-color 0.2s;
+      box-shadow: 0 3px 0 #cbd5e1;
+      border: 2px solid #e2e8f0;
+      transition: transform 0.1s, background-color 0.2s, border-color 0.2s;
+      overflow: hidden;
     }
 
-    .case:hover { transform: scale(1.07); }
-    .case:active { transform: scale(0.94); }
+    .case span {
+      display: inline-block;
+      line-height: 1;
+    }
+
+    .case:hover {
+      transform: scale(1.06);
+      border-color: #94a3b8;
+    }
+    .case:active { transform: scale(0.95); }
 
     .erreur {
       animation: secousse 0.35s;
-      background-color: #fed7d7 !important;
-      border-color: #fc8181;
+      background-color: #fee2e2 !important;
+      border-color: #ef4444 !important;
     }
 
     .bravo {
-      background-color: #c6f6d5 !important;
-      border-color: #48bb78;
-      transform: scale(1.15) !important;
+      background-color: #dcfce7 !important;
+      border-color: #22c55e !important;
+      transform: scale(1.12) !important;
     }
 
     @keyframes secousse {
@@ -157,41 +173,53 @@
     }
 
     #message {
-      margin-top: 15px;
-      font-size: 1.2rem;
-      font-weight: bold;
-      min-height: 1.6em;
-      color: #2b6cb0;
+      margin-top: 14px;
+      font-size: 1.08rem;
+      font-weight: 700;
+      min-height: 1.5em;
+      color: #3730a3;
+    }
+
+    .actions-jeu {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
     }
 
     .btn-action {
-      margin-top: 14px;
-      padding: 12px 24px;
-      font-size: 1.15rem;
-      font-weight: bold;
+      padding: 11px 20px;
+      font-size: 1rem;
+      font-weight: 700;
       border: none;
-      border-radius: 16px;
-      background: #4299e1;
+      border-radius: 14px;
+      background: #4f46e5;
       color: white;
       cursor: pointer;
-      box-shadow: 0 4px 0 #2b6cb0;
+      box-shadow: 0 4px 0 #3730a3;
       font-family: inherit;
     }
+    .btn-action:hover { background: #4338ca; }
 
-    /* Confettis */
+    .btn-secondaire {
+      background: #e2e8f0;
+      color: #1e293b;
+      box-shadow: 0 4px 0 #cbd5e1;
+    }
+    .btn-secondaire:hover { background: #cbd5e1; }
+
     .confetti {
       position: fixed;
-      top: -20px;
-      font-size: 1.6rem;
+      top: -24px;
+      font-size: 1.5rem;
       animation: tomber linear forwards;
       pointer-events: none;
       z-index: 50;
     }
 
     @keyframes tomber {
-      to {
-        transform: translateY(105vh) rotate(720deg);
-      }
+      to { transform: translateY(105vh) rotate(720deg); }
     }
   </style>
 </head>
@@ -203,32 +231,53 @@
 
   <!-- ÉCRAN D'ACCUEIL -->
   <div id="ecran-accueil" class="carte">
-    <p>Un dessin s'est caché au milieu des autres. Saura-tu le repérer ?</p>
+    <p>
+      <strong>20 niveaux</strong> progressifs avec grilles jusqu'à <strong>7×7</strong>, paires quasi identiques et rotations piégeuses.<br>
+      Chaque erreur ajoute <strong>+3s</strong> au chrono !
+    </p>
     <div class="choix-mode">
-      <button class="btn-mode facile" onclick="demarrerPartie('facile')">🐣 Facile (Grilles 3×3 et 4×4)</button>
-      <button class="btn-mode moyen" onclick="demarrerPartie('moyen')">🦊 Moyen (Grilles jusqu'à 5×5)</button>
-      <button class="btn-mode difficile" onclick="demarrerPartie('difficile')">🦄 Championne (Grilles jusqu'à 6×6)</button>
+      <button class="btn-mode facile" onclick="demarrerPartie('facile')">
+        <span>🐣 Facile</span>
+        <small>Grilles 3×3 à 5×5</small>
+      </button>
+      <button class="btn-mode moyen" onclick="demarrerPartie('moyen')">
+        <span>🦊 Moyen</span>
+        <small>Grilles 4×4 à 6×6 + rotations</small>
+      </button>
+      <button class="btn-mode difficile" onclick="demarrerPartie('difficile')">
+        <span>🦄 Difficile</span>
+        <small>Grilles 5×5 à 7×7 + pièges</small>
+      </button>
+      <button class="btn-mode expert" onclick="demarrerPartie('expert')">
+        <span>🔥 Expert</span>
+        <small>Grilles 6×6 à 7×7 + micro-détails</small>
+      </button>
     </div>
-    <p id="affichage-record" style="font-size: 1rem; color: #4a5568; margin-top: 18px; margin-bottom: 0;"></p>
+    <p id="affichage-record" style="font-size: 0.95rem; color: #475569; margin-top: 16px; margin-bottom: 0;"></p>
   </div>
 
   <!-- ÉCRAN DE JEU -->
   <div id="ecran-jeu" class="carte">
     <div id="barre-infos">
-      <span>Niveau <span id="niveau">1</span> / 10</span>
+      <span>🎯 <span id="niveau">1</span>/20</span>
       <span>⏱️ <span id="chrono">0</span>s</span>
+      <span>🔥 <span id="serie">0</span></span>
       <span>❌ <span id="erreurs">0</span></span>
     </div>
     <div id="barre-progression-fond">
       <div id="barre-progression"></div>
     </div>
     <div id="grille"></div>
-    <div id="message">Clique sur celui qui est différent !</div>
-    <button id="btn-menu" class="btn-action" style="display:none;" onclick="retourAccueil()">Choisir un autre mode</button>
+    <div id="message">Repère l'intrus le plus vite possible !</div>
+    <div class="actions-jeu">
+      <button id="btn-abandon" class="btn-action btn-secondaire" onclick="retourAccueil()">Menu</button>
+      <button id="btn-menu" class="btn-action" style="display:none;" onclick="retourAccueil()">Choisir un autre mode</button>
+    </div>
   </div>
 
   <script>
-    // --- SYNTHÉTISEUR AUDIO (BRUITAGES SANS FICHIER EXTERNE) ---
+    const TOTAL_NIVEAUX = 20;
+
     let audioCtx = null;
     let sonActive = true;
 
@@ -263,47 +312,42 @@
       osc.stop(audioCtx.currentTime + delai + duree);
     }
 
-    function sonClic() {
-      jouerNote(520, 0.08, "sine", 0, 0.15);
-    }
-
+    function sonClic() { jouerNote(520, 0.08, "sine", 0, 0.14); }
     function sonBravo() {
-      jouerNote(523.25, 0.12, "triangle", 0, 0.22);    // Do
-      jouerNote(659.25, 0.12, "triangle", 0.1, 0.22);  // Mi
-      jouerNote(783.99, 0.22, "triangle", 0.2, 0.25);  // Sol
+      jouerNote(523.25, 0.11, "triangle", 0, 0.2);
+      jouerNote(659.25, 0.11, "triangle", 0.09, 0.2);
+      jouerNote(783.99, 0.2, "triangle", 0.18, 0.24);
     }
-
     function sonErreur() {
-      jouerNote(220, 0.15, "sawtooth", 0, 0.15);
-      jouerNote(165, 0.25, "sawtooth", 0.12, 0.15);
+      jouerNote(210, 0.15, "sawtooth", 0, 0.15);
+      jouerNote(155, 0.25, "sawtooth", 0.12, 0.15);
     }
-
     function sonFanfare() {
-      const notes = [523.25, 659.25, 783.99, 1046.50, 783.99, 1046.50];
-      const temps = [0, 0.12, 0.24, 0.36, 0.52, 0.65];
-      notes.forEach((n, i) => jouerNote(n, 0.25, "triangle", temps[i], 0.25));
+      const notes = [523.25, 659.25, 783.99, 1046.50, 783.99, 1046.50, 1318.51];
+      const temps = [0, 0.11, 0.22, 0.34, 0.5, 0.64, 0.8];
+      notes.forEach((n, i) => jouerNote(n, 0.25, "triangle", temps[i], 0.24));
     }
 
-    // --- BANQUE DE PAIRES D'EMOJIS ---
-    const pairesFaciles = [
+    // Paires progressives : des plus évidentes aux pièges visuels serrés
+    const pairesSimples = [
       ["🐶", "🐱"], ["🍎", "🍌"], ["🚗", "🚀"], ["🌞", "🌙"], ["🐸", "🐷"],
       ["🍓", "🍉"], ["⚽", "🏀"], ["🦋", "🐝"], ["🍦", "🍩"], ["👑", "🎩"]
     ];
 
-    const pairesMoyennes = [
-      ["🐻", "🐨"], ["🌻", "🌼"], ["🍩", "🍪"], ["🦊", "🐯"], ["🍏", "🍐"],
-      ["🦄", "🐴"], ["🧁", "🍰"], ["🐢", "🦖"], ["🐬", "🐳"], ["🍒", "🍓"]
+    const pairesSubtiles = [
+      ["😀", "😃"], ["😁", "😄"], ["😊", "🙂"], ["😺", "😸"], ["🐼", "🐨"],
+      ["🐹", "🐭"], ["🦊", "🐺"], ["🐯", "🦁"], ["🍋", "🍊"], ["🍏", "🍐"],
+      ["🍇", "🫐"], ["🍒", "🍓"], ["🌺", "🌸"], ["🌻", "🌼"], ["🌷", "🌹"],
+      ["🕐", "🕑"], ["🕓", "🕔"], ["🌕", "🌖"], ["🌒", "🌓"], ["⬆️", "↗️"],
+      ["⬅️", "↖️"], ["🔵", "🟣"], ["🟢", "🟡"], ["🔸", "🔹"], ["🔺", "🔻"],
+      ["0", "O"], ["rn", "m"], ["vv", "w"], ["il", "li"], ["6", "9"]
     ];
 
-    const pairesDifficiles = [
-      ["😊", "😉"], ["😺", "😸"], ["🐼", "🐨"], ["🍋", "🍊"], ["🐹", "🐭"],
-      ["🌺", "🌸"], ["🦆", "🦢"], ["🍇", "🫐"], ["😄", "😁"], ["🐯", "🦁"]
-    ];
-
-    // --- VARIABLES DE JEU ---
+    let modeActuel = "facile";
     let niveauxPartie = [];
     let niveauActuel = 0;
     let erreurs = 0;
+    let serie = 0;
     let secondes = 0;
     let timerInterval = null;
     let verrouille = false;
@@ -313,48 +357,79 @@
     const grilleEl = document.getElementById("grille");
     const niveauEl = document.getElementById("niveau");
     const erreursEl = document.getElementById("erreurs");
+    const serieEl = document.getElementById("serie");
     const chronoEl = document.getElementById("chrono");
     const messageEl = document.getElementById("message");
     const barreEl = document.getElementById("barre-progression");
     const btnMenu = document.getElementById("btn-menu");
+    const btnAbandon = document.getElementById("btn-abandon");
 
     function melanger(tableau) {
       return [...tableau].sort(() => Math.random() - 0.5);
     }
 
     function afficherRecord() {
-      const record = localStorage.getItem("record_intrus");
-      const el = document.getElementById("affichage-record");
-      el.textContent = record ? `🏆 Meilleur temps : ${record} secondes` : "";
+      const modes = ["facile", "moyen", "difficile", "expert"];
+      const labels = { facile: "🐣 Facile", moyen: "🦊 Moyen", difficile: "🦄 Difficile", expert: "🔥 Expert" };
+      const lignes = modes
+        .map(m => {
+          const rec = localStorage.getItem(`record_intrus_20_${m}`);
+          return rec ? `${labels[m]} : <strong>${rec}s</strong>` : null;
+        })
+        .filter(Boolean);
+      document.getElementById("affichage-record").innerHTML =
+        lignes.length ? `🏆 Records (20 niveaux) : ${lignes.join(" • ")}` : "";
+    }
+
+    function genererPoolPaires(mode) {
+      let source = [];
+      if (mode === "facile") {
+        source = [...melanger(pairesSimples), ...melanger(pairesSubtiles).slice(0, 10)];
+      } else if (mode === "moyen") {
+        source = [...melanger(pairesSimples).slice(0, 5), ...melanger(pairesSubtiles)];
+      } else if (mode === "difficile") {
+        source = [...melanger(pairesSubtiles), ...melanger(pairesSubtiles)];
+      } else {
+        source = [...melanger(pairesSubtiles).reverse(), ...melanger(pairesSubtiles)];
+      }
+      const resultat = [];
+      while (resultat.length < TOTAL_NIVEAUX) {
+        for (const paire of source) {
+          if (resultat.length >= TOTAL_NIVEAUX) break;
+          // Alterne le sens de la paire pour varier
+          resultat.push(Math.random() < 0.5 ? paire : [paire[1], paire[0]]);
+        }
+      }
+      return resultat;
+    }
+
+    function tailleGrillePourNiveau(mode, index) {
+      const progressions = {
+        facile:    [3,3,3,3, 4,4,4,4,4, 4,5,5,5,5, 5,5,5,5,5,5],
+        moyen:     [4,4,4,4, 5,5,5,5,5, 5,6,6,6,6, 6,6,6,6,6,6],
+        difficile: [5,5,5,5, 6,6,6,6,6, 6,6,7,7,7, 7,7,7,7,7,7],
+        expert:    [6,6,6,6, 6,7,7,7,7, 7,7,7,7,7, 7,7,7,7,7,7]
+      };
+      return progressions[mode][index];
     }
 
     function demarrerPartie(mode) {
       sonClic();
+      modeActuel = mode;
       niveauActuel = 0;
       erreurs = 0;
+      serie = 0;
       secondes = 0;
       erreursEl.textContent = "0";
+      serieEl.textContent = "0";
       chronoEl.textContent = "0";
       btnMenu.style.display = "none";
-      messageEl.textContent = "Clique sur celui qui est différent !";
+      btnAbandon.style.display = "inline-block";
+      messageEl.textContent = "Repère l'intrus le plus vite possible !";
 
-      // Construction des 10 niveaux selon le mode
-      let pool = [];
-      let tailles = [];
-
-      if (mode === "facile") {
-        pool = melanger(pairesFaciles);
-        tailles = [3, 3, 3, 3, 4, 4, 4, 4, 4, 4];
-      } else if (mode === "moyen") {
-        pool = melanger([...pairesFaciles.slice(0, 4), ...pairesMoyennes]);
-        tailles = [3, 4, 4, 4, 4, 5, 5, 5, 5, 5];
-      } else {
-        pool = melanger([...pairesMoyennes.slice(0, 3), ...pairesDifficiles]);
-        tailles = [4, 4, 5, 5, 5, 6, 6, 6, 6, 6];
-      }
-
-      niveauxPartie = tailles.map((taille, i) => ({
-        taille,
+      const pool = genererPoolPaires(mode);
+      niveauxPartie = Array.from({ length: TOTAL_NIVEAUX }, (_, i) => ({
+        taille: tailleGrillePourNiveau(mode, i),
         normal: pool[i][0],
         intrus: pool[i][1]
       }));
@@ -371,6 +446,18 @@
       chargerNiveau();
     }
 
+    function stylePiege(indexNiveau, mode, estIntrus) {
+      // À partir du niveau 6 en moyen, niveau 3 en difficile, niveau 1 en expert
+      const seuilRotation = mode === "expert" ? 0 : mode === "difficile" ? 2 : mode === "moyen" ? 5 : 14;
+      if (indexNiveau < seuilRotation) return "none";
+
+      const angles = [0, 90, 180, -90, 15, -15];
+      const angle = angles[Math.floor(Math.random() * angles.length)];
+      const flip = (mode === "difficile" || mode === "expert") && Math.random() < 0.35 ? " scaleX(-1)" : "";
+      const decalageIntrus = estIntrus && mode === "expert" && Math.random() < 0.4 ? " scale(0.86)" : "";
+      return `rotate(${angle}deg)${flip}${decalageIntrus}`;
+    }
+
     function chargerNiveau() {
       verrouille = false;
       const config = niveauxPartie[niveauActuel];
@@ -378,23 +465,28 @@
       const indexIntrus = Math.floor(Math.random() * totalCases);
 
       niveauEl.textContent = niveauActuel + 1;
-      barreEl.style.width = `${(niveauActuel / 10) * 100}%`;
+      barreEl.style.width = `${(niveauActuel / TOTAL_NIVEAUX) * 100}%`;
 
       grilleEl.innerHTML = "";
       grilleEl.style.gridTemplateColumns = `repeat(${config.taille}, 1fr)`;
 
-      const tailleCase = config.taille >= 6 ? "52px" : config.taille === 5 ? "60px" : "72px";
-      const tailleEmoji = config.taille >= 6 ? "1.8rem" : config.taille === 5 ? "2.1rem" : "2.5rem";
+      const tailleCase = config.taille === 7 ? "44px" : config.taille === 6 ? "50px" : config.taille === 5 ? "58px" : "68px";
+      const tailleEmoji = config.taille === 7 ? "1.45rem" : config.taille === 6 ? "1.7rem" : config.taille === 5 ? "2rem" : "2.35rem";
 
       for (let i = 0; i < totalCases; i++) {
         const cell = document.createElement("div");
         cell.className = "case";
         cell.style.width = tailleCase;
         cell.style.height = tailleCase;
-        cell.style.fontSize = tailleEmoji;
+
+        const span = document.createElement("span");
+        span.style.fontSize = tailleEmoji;
 
         const estIntrus = i === indexIntrus;
-        cell.textContent = estIntrus ? config.intrus : config.normal;
+        span.textContent = estIntrus ? config.intrus : config.normal;
+        span.style.transform = stylePiege(niveauActuel, modeActuel, estIntrus);
+
+        cell.appendChild(span);
         cell.onclick = () => verifierChoix(cell, estIntrus);
 
         grilleEl.appendChild(cell);
@@ -406,49 +498,61 @@
 
       if (estIntrus) {
         verrouille = true;
+        serie++;
+        serieEl.textContent = serie;
         sonBravo();
         cell.classList.add("bravo");
-        const encouragements = ["Super œil ! 🌟", "Bravo, trouvé ! 🎉", "Trop forte ! ✨", "Génial ! 🦄"];
-        messageEl.textContent = encouragements[Math.floor(Math.random() * encouragements.length)];
+
+        const textes = serie >= 5
+          ? [`🔥 Série de ${serie} ! Impressionnant !`, `⚡ En feu ! ${serie} d'affilée !`]
+          : ["Bien vu ! 👀", "Précision chirurgicale ! 🎯", "Trouvé ! ✨", "Super réflexe ! ⚡"];
+        messageEl.textContent = textes[Math.floor(Math.random() * textes.length)];
 
         setTimeout(() => {
           niveauActuel++;
-          if (niveauActuel < 10) {
+          if (niveauActuel < TOTAL_NIVEAUX) {
             chargerNiveau();
           } else {
             terminerPartie();
           }
-        }, 750);
+        }, 550);
       } else {
         sonErreur();
         erreurs++;
+        serie = 0;
+        secondes += 3;
         erreursEl.textContent = erreurs;
+        serieEl.textContent = "0";
+        chronoEl.textContent = secondes;
+
         cell.classList.remove("erreur");
         void cell.offsetWidth;
         cell.classList.add("erreur");
-        messageEl.textContent = "Oups, regarde encore bien ! 👀";
+        messageEl.textContent = "Raté ! +3s de pénalité 😬";
       }
     }
 
     function terminerPartie() {
       clearInterval(timerInterval);
       barreEl.style.width = "100%";
+      btnAbandon.style.display = "none";
       sonFanfare();
       lancerConfettis();
 
-      const recordActuel = localStorage.getItem("record_intrus");
+      const cleRecord = `record_intrus_20_${modeActuel}`;
+      const recordActuel = localStorage.getItem(cleRecord);
       let texteRecord = "";
       if (!recordActuel || secondes < parseInt(recordActuel, 10)) {
-        localStorage.setItem("record_intrus", secondes);
-        texteRecord = "<br>🌟 <strong>Nouveau record de vitesse !</strong> 🌟";
+        localStorage.setItem(cleRecord, secondes);
+        texteRecord = "<br>🌟 <strong>Nouveau record pour ce mode !</strong> 🌟";
       }
 
       grilleEl.style.gridTemplateColumns = "1fr";
       grilleEl.innerHTML = `
-        <div style="padding: 20px; font-size: 1.3rem; line-height: 1.6;">
-          🏆 <strong>BRAVO !</strong> 🏆<br>
-          Tu as terminé les 10 niveaux en <strong>${secondes} secondes</strong><br>
-          avec <strong>${erreurs} erreur(s)</strong> !
+        <div style="padding: 18px; font-size: 1.2rem; line-height: 1.65;">
+          🏆 <strong>20 NIVEAUX VALIDÉS !</strong> 🏆<br>
+          Temps final (avec pénalités) : <strong>${secondes} secondes</strong><br>
+          Erreurs : <strong>${erreurs}</strong>
           ${texteRecord}
         </div>
       `;
@@ -457,19 +561,20 @@
     }
 
     function lancerConfettis() {
-      const emojis = ["🎉", "⭐", "🦄", "🌈", "🎈", "✨"];
-      for (let i = 0; i < 35; i++) {
+      const emojis = ["🎉", "⭐", "🔥", "🏆", "⚡", "✨"];
+      for (let i = 0; i < 40; i++) {
         const c = document.createElement("div");
         c.className = "confetti";
         c.textContent = emojis[Math.floor(Math.random() * emojis.length)];
         c.style.left = Math.random() * 100 + "vw";
-        c.style.animationDuration = (Math.random() * 2 + 2) + "s";
+        c.style.animationDuration = (Math.random() * 2 + 1.8) + "s";
         document.body.appendChild(c);
         setTimeout(() => c.remove(), 4000);
       }
     }
 
     function retourAccueil() {
+      clearInterval(timerInterval);
       sonClic();
       afficherRecord();
       ecranJeu.style.display = "none";
