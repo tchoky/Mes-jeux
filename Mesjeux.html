@@ -14,19 +14,24 @@
       margin: 0;
     }
     header {
-      max-width: 400px;
+      max-width: 420px;
       margin: 0 auto 20px auto;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 8px;
     }
-    h1 { color: #2b547e; margin: 0; font-size: 1.7em; }
+    h1 { color: #2b547e; margin: 0; font-size: 1.6em; }
+    .actions-header {
+      display: flex;
+      gap: 8px;
+    }
     .btn-params {
       background: #e2e8f0;
       border: none;
-      padding: 10px 14px;
+      padding: 10px 12px;
       border-radius: 8px;
-      font-size: 1.1em;
+      font-size: 1em;
       cursor: pointer;
       color: #1e293b;
       font-weight: 600;
@@ -174,7 +179,10 @@
 
   <header>
     <h1>🎮 Mes jeux</h1>
-    <button class="btn-params" onclick="ouvrirParams()">⚙️ Paramètres</button>
+    <div class="actions-header">
+      <button class="btn-params" type="button" onclick="chargerEtAfficher()" title="Actualiser la liste">🔄</button>
+      <button class="btn-params" type="button" onclick="ouvrirParams()">⚙️ Paramètres</button>
+    </div>
   </header>
 
   <p class="sous-titre">Choisis le jeu auquel tu veux jouer :</p>
@@ -190,7 +198,7 @@
     <div class="modal">
       <div class="modal-header">
         <h2>⚙️ Ajouter un jeu</h2>
-        <button class="btn-fermer" onclick="fermerParams()">✖</button>
+        <button class="btn-fermer" type="button" onclick="fermerParams()">✖</button>
       </div>
 
       <div class="form-group">
@@ -206,7 +214,7 @@
         <input type="text" id="fichier-jeu" placeholder="Ex: motscroises.html ou https://…">
       </div>
 
-      <button class="btn-ajouter" onclick="ajouterJeu()">➕ Ajouter à la liste</button>
+      <button class="btn-ajouter" type="button" onclick="ajouterJeu()">➕ Ajouter à la liste</button>
       <div id="erreur" role="status"></div>
 
       <div class="liste-gestion" id="liste-gestion"></div>
@@ -214,11 +222,9 @@
   </div>
 
   <script>
-    // À REMPLIR AVEC TON PSEUDO ET LE NOM DE TON DÉPÔT GITHUB
-    const GITHUB_USER = "TON_PSEUDO_GITHUB";
-    const GITHUB_REPO = "TON_NOM_DE_REPO";
+    const GITHUB_USER = "tchoky";
+    const GITHUB_REPO = "Mes-jeux";
 
-    // Fichiers ignorés (comme ceux soulignés sur ta photo)
     const FICHIERS_IGNORES = [
       "mesjeux.html",
       "index.html",
@@ -253,7 +259,8 @@
     async function lancerJeuPleinEcran(url) {
       const lecteur = document.getElementById("lecteur-ecran");
       const frame = document.getElementById("frame-jeu");
-      frame.src = url;
+      const sep = url.includes("?") ? "&" : "?";
+      frame.src = `${url}${sep}v=${Date.now()}`;
       lecteur.classList.add("actif");
 
       if (lecteur.requestFullscreen) {
@@ -277,10 +284,12 @@
 
     async function chargerEtAfficher() {
       const conteneur = document.getElementById("liste-jeux");
+      conteneur.textContent = "Actualisation...";
       let jeuxAuto = [];
 
       try {
-        const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/`);
+        const urlApi = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/?t=${Date.now()}`;
+        const res = await fetch(urlApi, { cache: "no-store" });
         if (res.ok) {
           const items = await res.json();
           jeuxAuto = items
