@@ -41,19 +41,54 @@
       max-width: 360px;
       margin: 0 auto;
     }
-    a.bouton {
+    button.bouton {
       display: block;
+      width: 100%;
       padding: 16px 20px;
       background: #2b547e;
       color: #ffffff;
-      text-decoration: none;
+      border: none;
       border-radius: 10px;
       font-size: 1.15em;
       font-weight: 600;
+      cursor: pointer;
       box-shadow: 0 4px 10px rgba(43, 84, 126, 0.15);
       transition: transform 0.15s ease, background 0.15s ease;
     }
-    a.bouton:hover { background: #1e3b59; transform: translateY(-2px); }
+    button.bouton:hover { background: #1e3b59; transform: translateY(-2px); }
+
+    /* Plein écran */
+    #lecteur-ecran {
+      display: none;
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100dvh;
+      background: #000;
+      z-index: 9999;
+    }
+    #lecteur-ecran.actif { display: block; }
+    #frame-jeu {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+    #bouton-retour {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      z-index: 10000;
+      padding: 8px 14px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(30, 41, 59, 0.85);
+      color: #fff;
+      font-size: 0.95em;
+      font-weight: 600;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+    }
 
     .modal-overlay {
       display: none;
@@ -63,6 +98,7 @@
       justify-content: center;
       align-items: center;
       padding: 20px;
+      z-index: 5000;
     }
     .modal-overlay.actif { display: flex; }
     .modal {
@@ -143,7 +179,12 @@
 
   <p class="sous-titre">Choisis le jeu auquel tu veux jouer :</p>
 
-  <div class="choix" id="liste-jeux"></div>
+  <div class="choix" id="liste-jeux">Chargement...</div>
+
+  <div id="lecteur-ecran">
+    <button id="bouton-retour" type="button" onclick="fermerJeu()">✕ Menu</button>
+    <iframe id="frame-jeu" allowfullscreen></iframe>
+  </div>
 
   <div class="modal-overlay" id="modal-params">
     <div class="modal">
@@ -173,42 +214,120 @@
   </div>
 
   <script>
-    // Jeux par défaut
-    const jeuxParDefaut = [
-      { icone: "🔤", nom: "Jeu de mots", fichier: "https://claude.ai/artifact/Xkf6BZQPshCAEub7kMZUPM" },
-      { icone: "🪄", nom: "Pendu magique", fichier: "https://claude.ai/artifact/EHM4t8bH1q9Fh9wCVEj1xP" }
+    // À REMPLIR AVEC TON PSEUDO ET LE NOM DE TON DÉPÔT GITHUB
+    const GITHUB_USER = "TON_PSEUDO_GITHUB";
+    const GITHUB_REPO = "TON_NOM_DE_REPO";
+
+    // Fichiers ignorés (comme ceux soulignés sur ta photo)
+    const FICHIERS_IGNORES = [
+      "mesjeux.html",
+      "index.html",
+      "calcul.html",
+      "navetteds.html"
     ];
 
-    // Charger depuis le stockage local ou utiliser ceux par défaut
-    let jeux = jeuxParDefaut;
+    let jeuxManuels = [];
     try {
-      jeux = JSON.parse(localStorage.getItem("mesJeuxListe")) || jeuxParDefaut;
+      jeuxManuels = JSON.parse(localStorage.getItem("mesJeuxListe")) || [];
     } catch (e) {}
 
-    function sauvegarderEtAfficher() {
-      try { localStorage.setItem("mesJeuxListe", JSON.stringify(jeux)); } catch (e) {}
-      afficherJeux();
-      afficherGestion();
+    function formaterTitre(nomFichier) {
+      const propre = nomFichier
+        .replace(/\.html$/i, "")
+        .replace(/[-_]+/g, " ")
+        .trim();
+      return propre.charAt(0).toUpperCase() + propre.slice(1);
     }
 
-    function afficherJeux() {
+    function devinerIcone(nom) {
+      const n = nom.toLowerCase();
+      if (n.includes("mot")) return "🔤";
+      if (n.includes("pendu")) return "🪄";
+      if (n.includes("calcul")) return "🧮";
+      if (n.includes("intru")) return "🕵️";
+      if (n.includes("navette")) return "🚀";
+      if (n.includes("classique")) return "🕹️";
+      return "🎮";
+    }
+
+    async function lancerJeuPleinEcran(url) {
+      const lecteur = document.getElementById("lecteur-ecran");
+      const frame = document.getElementById("frame-jeu");
+      frame.src = url;
+      lecteur.classList.add("actif");
+
+      if (lecteur.requestFullscreen) {
+        try {
+          await lecteur.requestFullscreen();
+        } catch (_) {}
+      }
+    }
+
+    async function fermerJeu() {
+      const lecteur = document.getElementById("lecteur-ecran");
+      const frame = document.getElementById("frame-jeu");
+      if (document.fullscreenElement && document.exitFullscreen) {
+        try {
+          await document.exitFullscreen();
+        } catch (_) {}
+      }
+      lecteur.classList.remove("actif");
+      frame.src = "";
+    }
+
+    async function chargerEtAfficher() {
       const conteneur = document.getElementById("liste-jeux");
+      let jeuxAuto = [];
+
+      try {
+        const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/`);
+        if (res.ok) {
+          const items = await res.json();
+          jeuxAuto = items
+            .filter(f =>
+              f.type === "file" &&
+              f.name.toLowerCase().endsWith(".html") &&
+              !FICHIERS_IGNORES.includes(f.name.toLowerCase())
+            )
+            .map(f => {
+              const titre = formaterTitre(f.name);
+              return {
+                icone: devinerIcone(titre),
+                nom: titre,
+                fichier: `./${encodeURIComponent(f.name)}`
+              };
+            });
+        }
+      } catch (e) {
+        console.warn("Lecture GitHub impossible :", e);
+      }
+
+      const tousLesJeux = [...jeuxAuto, ...jeuxManuels];
       conteneur.innerHTML = "";
-      jeux.forEach(jeu => {
-        const lien = document.createElement("a");
-        lien.className = "bouton";
-        lien.href = jeu.fichier;
-        lien.target = "_blank";
-        lien.rel = "noopener";
-        lien.textContent = `${jeu.icone} ${jeu.nom}`;
-        conteneur.appendChild(lien);
+
+      if (tousLesJeux.length === 0) {
+        conteneur.textContent = "Aucun jeu trouvé.";
+        return;
+      }
+
+      tousLesJeux.forEach(jeu => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "bouton";
+        btn.textContent = `${jeu.icone} ${jeu.nom}`;
+        btn.onclick = () => lancerJeuPleinEcran(jeu.fichier);
+        conteneur.appendChild(btn);
       });
     }
 
     function afficherGestion() {
       const conteneur = document.getElementById("liste-gestion");
-      conteneur.innerHTML = "<strong>Jeux enregistrés :</strong>";
-      jeux.forEach((jeu, index) => {
+      conteneur.innerHTML = "<strong>Jeux ajoutés manuellement :</strong>";
+      if (jeuxManuels.length === 0) {
+        conteneur.innerHTML += "<p><small>Aucun jeu manuel.</small></p>";
+        return;
+      }
+      jeuxManuels.forEach((jeu, index) => {
         const div = document.createElement("div");
         div.className = "item-jeu";
         const span = document.createElement("span");
@@ -236,15 +355,19 @@
         return;
       }
       document.getElementById("erreur").textContent = "";
-      jeux.push({ icone, nom, fichier });
+      jeuxManuels.push({ icone, nom, fichier });
+      try { localStorage.setItem("mesJeuxListe", JSON.stringify(jeuxManuels)); } catch (e) {}
       document.getElementById("nom-jeu").value = "";
       document.getElementById("fichier-jeu").value = "";
-      sauvegarderEtAfficher();
+      chargerEtAfficher();
+      afficherGestion();
     }
 
     function supprimerJeu(index) {
-      jeux.splice(index, 1);
-      sauvegarderEtAfficher();
+      jeuxManuels.splice(index, 1);
+      try { localStorage.setItem("mesJeuxListe", JSON.stringify(jeuxManuels)); } catch (e) {}
+      chargerEtAfficher();
+      afficherGestion();
     }
 
     function ouvrirParams() {
@@ -256,7 +379,7 @@
       document.getElementById("modal-params").classList.remove("actif");
     }
 
-    afficherJeux();
+    chargerEtAfficher();
   </script>
 
 </body>
