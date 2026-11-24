@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculateur Lits / Trays & Numéro d'OF</title>
+    <title>Calculateur Lits / Trays, OF & Photo</title>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
         :root {
             --primary: #2563eb;
@@ -69,11 +70,11 @@
         .btn-reset:hover { opacity: 0.92; }
         .btn-reset:active { transform: scale(0.96); }
 
-        /* Navigation Onglets (Pages) */
+        /* Navigation Onglets (3 Pages) */
         .nav-tabs {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
             margin-bottom: 18px;
         }
 
@@ -81,16 +82,17 @@
             background: var(--card);
             border: 2px solid var(--border);
             color: var(--muted);
-            padding: 14px;
+            padding: 12px 8px;
             border-radius: 14px;
-            font-size: 1rem;
+            font-size: 0.92rem;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
+            text-align: center;
         }
 
         .tab-btn.active {
@@ -137,7 +139,7 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 800;
             flex-shrink: 0;
         }
@@ -227,6 +229,85 @@
             color: var(--muted);
             margin-top: 8px;
             font-weight: 600;
+        }
+
+        /* Page 3 : Photo & Extraction */
+        .photo-upload-box {
+            border: 2.5px dashed var(--primary);
+            background: #eff6ff;
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .btn-photo {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 22px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+        }
+
+        .btn-photo:hover { background: var(--primary-dark); }
+
+        .photo-preview {
+            margin-top: 14px;
+            max-width: 100%;
+            max-height: 240px;
+            border-radius: 12px;
+            display: none;
+            margin-left: auto;
+            margin-right: auto;
+            border: 1px solid var(--border);
+        }
+
+        .ocr-status {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            min-height: 20px;
+        }
+
+        .numbers-textarea {
+            width: 100%;
+            min-height: 95px;
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            font-family: "Courier New", Courier, monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+            background: #f8fafc;
+            outline: none;
+        }
+
+        .numbers-textarea:focus {
+            border-color: var(--primary);
+            background: white;
+        }
+
+        .barcodes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .empty-msg {
+            color: var(--muted);
+            font-size: 0.95rem;
+            font-weight: 600;
+            padding: 18px;
         }
 
         /* Cases à cocher Tray 6, 8, 12 */
@@ -450,11 +531,11 @@
 <div class="container">
     <!-- En-tête commun avec bouton Reset global -->
     <div class="header">
-        <h1>📦 Gestion Trays & OF</h1>
+        <h1>📦 Gestion Trays, OF & Photo</h1>
         <button class="btn-reset" onclick="resetAll()">🔄 Reset (Tout à 0)</button>
     </div>
 
-    <!-- Navigation entre les 2 pages -->
+    <!-- Navigation entre les 3 pages -->
     <div class="nav-tabs">
         <button class="tab-btn active" id="tabBtnTrays" onclick="switchPage('trays')">
             🧮 1. Calcul Trays
@@ -462,13 +543,15 @@
         <button class="tab-btn" id="tabBtnOf" onclick="switchPage('of')">
             🏷️ 2. Numéro d'OF
         </button>
+        <button class="tab-btn" id="tabBtnPhoto" onclick="switchPage('photo')">
+            📷 3. Photo & Codes
+        </button>
     </div>
 
     <!-- ========================================== -->
     <!-- PAGE 1 : CALCUL TRAYS                      -->
     <!-- ========================================== -->
     <div id="page-trays" class="page-section active">
-        <!-- Question 1 : NB de lit -->
         <div class="card">
             <div class="question-label">
                 <span class="step-badge">1</span>
@@ -481,7 +564,6 @@
             </div>
         </div>
 
-        <!-- Question 2 : NB de tray par lit -->
         <div class="card">
             <div class="question-label">
                 <span class="step-badge">2</span>
@@ -494,7 +576,6 @@
             </div>
         </div>
 
-        <!-- Question 3 : Case à cocher Tray 6, 8, 12 -->
         <div class="card">
             <div class="question-label">
                 <span class="step-badge">3</span>
@@ -530,7 +611,6 @@
             </div>
         </div>
 
-        <!-- Question 4 : Ajout sur le dernier lit (multiplié par le format de tray) -->
         <div class="card">
             <div class="question-label">
                 <span class="step-badge bonus">+</span>
@@ -543,7 +623,6 @@
             </div>
         </div>
 
-        <!-- Résultat en Grand -->
         <div class="result-card">
             <div class="formula-display" id="formulaText">
                 (<span>0</span> lit × <span>0</span> × <span>6</span>) + (<span class="bonus-val">0</span> × <span>6</span>)
@@ -552,7 +631,6 @@
             <div class="total-unit">Total Calculé</div>
         </div>
 
-        <!-- Génération du Code-Barres Total -->
         <div class="barcode-card">
             <div class="barcode-header">
                 <span class="barcode-title">Code-Barres généré (Code 128)</span>
@@ -607,6 +685,59 @@
             </div>
         </div>
     </div>
+
+    <!-- ========================================== -->
+    <!-- PAGE 3 : PHOTO -> NUMÉROS -> CODES-BARRES  -->
+    <!-- ========================================== -->
+    <div id="page-photo" class="page-section">
+        <div class="card">
+            <div class="question-label">
+                <span class="step-badge">📷</span>
+                <span>Prendre une photo ou choisir une image</span>
+            </div>
+
+            <div class="photo-upload-box">
+                <input
+                    type="file"
+                    id="photoInput"
+                    accept="image/*"
+                    capture="environment"
+                    style="display: none;"
+                    onchange="handlePhotoSelected(this)"
+                >
+                <button class="btn-photo" onclick="document.getElementById('photoInput').click()">
+                    📸 Faire une photo / Importer
+                </button>
+                <div class="of-hint">Détection automatique des numéros (ex: <code>EU26034567</code>)</div>
+                <img id="photoPreview" class="photo-preview" alt="Aperçu photo">
+                <div id="ocrStatus" class="ocr-status"></div>
+            </div>
+
+            <div class="question-label" style="margin-top: 18px; margin-bottom: 6px;">
+                <span>Numéros détectés (un par ligne ou séparés) :</span>
+            </div>
+            <textarea
+                id="extractedNumbersInput"
+                class="numbers-textarea"
+                placeholder="Ex:&#10;EU26034567&#10;EU26034568"
+                oninput="renderPhotoBarcodes()"
+            ></textarea>
+        </div>
+
+        <div class="barcode-card">
+            <div class="barcode-header">
+                <span class="barcode-title">Codes-Barres générés par numéro (<span id="photoBarcodeCount">0</span>)</span>
+            </div>
+
+            <div id="photoBarcodesContainer" class="barcodes-list">
+                <div class="empty-msg">Prenez une photo ou saisissez des numéros pour générer leurs codes-barres.</div>
+            </div>
+
+            <div>
+                <button class="btn-print" onclick="window.print()">🖨️ Imprimer / PDF</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -646,7 +777,7 @@
 
         for (let i = 0; i < str.length; i++) {
             const charCode = str.charCodeAt(i);
-            const val = (charCode >= 32 && charCode <= 126) ? (charCode - 32) : 16; // fallback '0'
+            const val = (charCode >= 32 && charCode <= 126) ? (charCode - 32) : 16;
             codes.push(val);
             checksum += val * (i + 1);
         }
@@ -659,9 +790,8 @@
             binary += CODE128_PATTERNS[c];
         });
 
-        // Adaptation automatique de la finesse des barres pour que le code tienne toujours sur la largeur
         const barWidth = str.length > 7 ? 2 : 3;
-        const height = 85;
+        const height = 80;
         const quietZone = 8 * barWidth;
         const totalWidth = binary.length * barWidth + quietZone * 2;
 
@@ -679,13 +809,15 @@
         svgElement.innerHTML = rects;
     }
 
-    // Navigation entre Page 1 (Trays) et Page 2 (OF)
+    // Navigation entre les 3 pages
     function switchPage(pageName) {
         document.getElementById('page-trays').classList.toggle('active', pageName === 'trays');
         document.getElementById('page-of').classList.toggle('active', pageName === 'of');
+        document.getElementById('page-photo').classList.toggle('active', pageName === 'photo');
 
         document.getElementById('tabBtnTrays').classList.toggle('active', pageName === 'trays');
         document.getElementById('tabBtnOf').classList.toggle('active', pageName === 'of');
+        document.getElementById('tabBtnPhoto').classList.toggle('active', pageName === 'photo');
     }
 
     function stepValue(inputId, delta) {
@@ -733,7 +865,6 @@
         renderCode128SVG(document.getElementById('barcodeSvg'), barcodeData);
     }
 
-    // Génération d'un seul code-barres : 00000 + Numéro d'OF (ex: 12345 -> 0000012345)
     function updateOfBarcode() {
         const rawVal = document.getElementById('ofNumberInput').value.trim();
         const fullCode = "00000" + rawVal;
@@ -742,9 +873,93 @@
         renderCode128SVG(document.getElementById('barcodeOfSvg'), fullCode);
     }
 
-    // Remet tout à zéro (Page Trays + Page OF)
+    // Extraction des numéros depuis le texte OCR (ex: EU26034567 ou suites alphanumériques/numériques)
+    function extractSerialNumbers(rawText) {
+        const cleaned = String(rawText || "").toUpperCase();
+        // Cherche d'abord les codes type EU26034567 ou préfixe lettres + chiffres (5+ caractères)
+        const prefixedMatches = cleaned.match(/\b[A-Z]{2,}[0-9]{4,}\b/g);
+        if (prefixedMatches && prefixedMatches.length > 0) {
+            return [...new Set(prefixedMatches)];
+        }
+        // Sinon récupère les lignes/tokens non vides
+        return [...new Set(
+            cleaned
+                .split(/[\s,;]+/)
+                .map(s => s.replace(/[^A-Z0-9-]/g, ""))
+                .filter(s => s.length >= 2)
+        )];
+    }
+
+    async function handlePhotoSelected(input) {
+        const file = input.files && input.files[0];
+        if (!file) return;
+
+        const preview = document.getElementById('photoPreview');
+        const statusEl = document.getElementById('ocrStatus');
+        const textarea = document.getElementById('extractedNumbersInput');
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            preview.src = e.target.result;
+            preview.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+
+        if (typeof Tesseract === "undefined") {
+            statusEl.innerText = "Reconnaissance hors ligne indisponible : tu peux saisir les numéros ci-dessous.";
+            return;
+        }
+
+        statusEl.innerText = "🔍 Analyse de la photo en cours...";
+        try {
+            const { data } = await Tesseract.recognize(file, "eng");
+            const found = extractSerialNumbers(data.text);
+            if (found.length > 0) {
+                textarea.value = found.join("\n");
+                statusEl.innerText = `✅ ${found.length} numéro(s) détecté(s).`;
+            } else {
+                textarea.value = data.text.trim();
+                statusEl.innerText = "ℹ️ Texte lu : vérifie ou ajuste les numéros ci-dessous.";
+            }
+            renderPhotoBarcodes();
+        } catch (err) {
+            statusEl.innerText = "⚠️ Lecture impossible, saisis les numéros manuellement ci-dessous.";
+        }
+    }
+
+    function renderPhotoBarcodes() {
+        const raw = document.getElementById('extractedNumbersInput').value;
+        const numbers = raw
+            .split(/[\n,;]+/)
+            .map(n => n.trim().toUpperCase())
+            .filter(n => n.length > 0);
+
+        const container = document.getElementById('photoBarcodesContainer');
+        document.getElementById('photoBarcodeCount').innerText = numbers.length;
+
+        if (numbers.length === 0) {
+            container.innerHTML = '<div class="empty-msg">Prenez une photo ou saisissez des numéros pour générer leurs codes-barres.</div>';
+            return;
+        }
+
+        container.innerHTML = "";
+        numbers.forEach((num, idx) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'barcode-wrapper';
+
+            const svgId = `photoBarcodeSvg_${idx}`;
+            wrapper.innerHTML = `
+                <svg id="${svgId}"></svg>
+                <div class="barcode-text">${num}</div>
+            `;
+            container.appendChild(wrapper);
+            renderCode128SVG(document.getElementById(svgId), num);
+        });
+    }
+
+    // Remet tout à zéro (Page Trays + Page OF + Page Photo)
     function resetAll() {
-        // Page 1 : Lits = 0, Trays/lit = 0, Ajout = 0, Tray = 6
+        // Page 1
         document.getElementById('nbLit').value = 0;
         document.getElementById('nbTrayLit').value = 0;
         document.getElementById('ajoutDernierLit').value = 0;
@@ -752,9 +967,18 @@
         checkboxes.forEach(cb => cb.checked = (cb.value === '6'));
         calculate();
 
-        // Page 2 : Numéro d'OF vidé -> code-barres revient à 00000
+        // Page 2
         document.getElementById('ofNumberInput').value = "";
         updateOfBarcode();
+
+        // Page 3
+        document.getElementById('photoInput').value = "";
+        const preview = document.getElementById('photoPreview');
+        preview.src = "";
+        preview.style.display = "none";
+        document.getElementById('ocrStatus').innerText = "";
+        document.getElementById('extractedNumbersInput').value = "";
+        renderPhotoBarcodes();
     }
 
     // Initialisation au chargement (tout à 0)
