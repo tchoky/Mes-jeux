@@ -231,7 +231,49 @@
             font-weight: 600;
         }
 
-        /* Page 3 : Photo & Extraction */
+        /* Page 3 : Photo & Extraction IA */
+        .ai-config-box {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 14px;
+        }
+
+        .ai-config-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .ai-key-input {
+            flex: 1;
+            min-width: 190px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1.5px solid var(--border);
+            font-size: 0.9rem;
+            background: white;
+            color: var(--text);
+            outline: none;
+        }
+
+        .ai-key-input:focus {
+            border-color: var(--primary);
+        }
+
+        .btn-save-key {
+            background: var(--text);
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
         .photo-upload-box {
             border: 2.5px dashed var(--primary);
             background: #eff6ff;
@@ -714,8 +756,24 @@
     <div id="page-photo" class="page-section">
         <div class="card">
             <div class="question-label">
-                <span class="step-badge">📷</span>
-                <span>Prendre une photo ou choisir une image</span>
+                <span class="step-badge">🤖</span>
+                <span>Lecture IA des numéros sur photo</span>
+            </div>
+
+            <div class="ai-config-box">
+                <div style="font-size: 0.85rem; font-weight: 700; color: var(--text);">
+                    Clé API Gemini (optionnel — sinon secours OCR local) :
+                </div>
+                <div class="ai-config-row">
+                    <input
+                        type="password"
+                        id="geminiApiKeyInput"
+                        class="ai-key-input"
+                        placeholder="Coller votre clé API Gemini ici..."
+                    >
+                    <button class="btn-save-key" onclick="saveApiKey()">Enregistrer</button>
+                </div>
+                <div id="apiKeyStatus" style="font-size: 0.78rem; color: var(--muted); margin-top: 6px; font-weight: 600;"></div>
             </div>
 
             <div class="photo-upload-box">
@@ -730,7 +788,7 @@
                 <button class="btn-photo" onclick="document.getElementById('photoInput').click()">
                     📸 Faire une photo / Importer
                 </button>
-                <div class="of-hint">Détection automatique ligne par ligne (ex: <code>EU2611125140</code>)</div>
+                <div class="of-hint">Lecture automatique ligne par ligne (ex: <code>EU2610215025</code>)[span_2](start_span)[span_2](end_span)[span_3](start_span)[span_3](end_span)</div>
                 <img id="photoPreview" class="photo-preview" alt="Aperçu photo">
                 <div id="ocrStatus" class="ocr-status"></div>
             </div>
@@ -741,7 +799,7 @@
             <textarea
                 id="extractedNumbersInput"
                 class="numbers-textarea"
-                placeholder="Ex:&#10;EU2611125140&#10;EU2611125141&#10;EU2611125156&#10;EU2611125159"
+                placeholder="Ex:&#10;EU2610215025&#10;EU2610215027&#10;EU2610215023"
                 oninput="renderPhotoBarcodes()"
             ></textarea>
         </div>
@@ -763,6 +821,8 @@
 </div>
 
 <script>
+    const STORAGE_KEY_GEMINI = "gemini_api_key_tray_app";
+
     // Table complète Code 128 (Set B) pour génération autonome sans internet
     const CODE128_PATTERNS = [
         "11011001100","11001101100","11001100110","10010011000","10010001100",
@@ -894,114 +954,97 @@
         renderCode128SVG(document.getElementById('barcodeOfSvg'), fullCode);
     }
 
-    // Prétraitement d'image doux : agrandit l'image et garde les traits nets sans détruire les chiffres
-    function preprocessImageForOCR(imgElement) {
-        const targetWidth = Math.min(2200, Math.max(1200, (imgElement.naturalWidth || imgElement.width) * 2));
-        const origW = imgElement.naturalWidth || imgElement.width;
-        const origH = imgElement.naturalHeight || imgElement.height;
-        const ratio = targetWidth / origW;
-        const width = Math.round(origW * ratio);
-        const height = Math.round(origH * ratio);
+    function loadSavedApiKey() {
+        const saved = localStorage.getItem(STORAGE_KEY_GEMINI) || "";
+        document.getElementById('geminiApiKeyInput').value = saved;
+        document.getElementById('apiKeyStatus').innerText = saved
+            ? "✅ Clé IA enregistrée dans ce navigateur."
+            : "ℹ️ Aucune clé IA enregistrée : mode secours OCR local actif.";
+    }
 
+    function saveApiKey() {
+        const key = document.getElementById('geminiApiKeyInput').value.trim();
+        if (key) {
+            localStorage.setItem(STORAGE_KEY_GEMINI, key);
+            document.getElementById('apiKeyStatus').innerText = "✅ Clé IA enregistrée dans ce navigateur.";
+        } else {
+            localStorage.removeItem(STORAGE_KEY_GEMINI);
+            document.getElementById('apiKeyStatus').innerText = "ℹ️ Clé supprimée : mode secours OCR local actif.";
+        }
+    }
+
+    function imageToBase64Jpeg(imgElement, maxSide = 1600) {
+        let w = imgElement.naturalWidth || imgElement.width;
+        let h = imgElement.naturalHeight || imgElement.height;
+        if (w > maxSide || h > maxSide) {
+            if (w >= h) {
+                h = Math.round((h * maxSide) / w);
+                w = maxSide;
+            } else {
+                w = Math.round((w * maxSide) / h);
+                h = maxSide;
+            }
+        }
         const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
+        canvas.width = w;
+        canvas.height = h;
         const ctx = canvas.getContext("2d");
-
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = "high";
-        ctx.drawImage(imgElement, 0, 0, width, height);
-
-        const imgData = ctx.getImageData(0, 0, width, height);
-        const data = imgData.data;
-
-        // Calcul de la luminance moyenne pour adapter le seuil
-        let sumGray = 0;
-        const grays = new Uint8Array(width * height);
-        for (let i = 0, p = 0; i < data.length; i += 4, p++) {
-            const g = Math.round(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]);
-            grays[p] = g;
-            sumGray += g;
-        }
-        const meanGray = sumGray / grays.length;
-
-        // Léger renforcement du contraste autour de la moyenne (sans écraser les chiffres)
-        const contrast = 1.25;
-        for (let i = 0, p = 0; i < data.length; i += 4, p++) {
-            let val = meanGray + (grays[p] - meanGray) * contrast;
-            val = Math.max(0, Math.min(255, val));
-            data[i] = val;
-            data[i + 1] = val;
-            data[i + 2] = val;
-        }
-
-        ctx.putImageData(imgData, 0, 0);
-        return canvas.toDataURL("image/png");
+        ctx.drawImage(imgElement, 0, 0, w, h);
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
+        return dataUrl.split(",")[1];
     }
 
-    // Corrige une chaîne de type code (ex: EU2611125140)
-    function normalizeCodeToken(rawToken) {
-        let s = String(rawToken || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
-        if (s.length < 6) return null;
+    async function extractWithGeminiVision(imgElement, apiKey) {
+        const base64Image = imageToBase64Jpeg(imgElement);
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
 
-        // Si commence par 2 lettres (ou quasi-lettres comme OO pour EU) suivies d'au moins 6 caractères
-        if (/^[A-Z]{2}[A-Z0-9]{6,}$/.test(s)) {
-            let prefix = s.slice(0, 2);
-            // Correction fréquente de "OO" mal lu pour "EU" sur écran gris
-            if (prefix === "OO") prefix = "EU";
+        const response = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [
+                        {
+                            text: "Lis tous les numéros ou codes présents sur cette image de haut en bas. Retourne UNIQUEMENT les codes/numéros, un par ligne, en majuscules, sans explication ni numérotation de liste."
+                        },
+                        {
+                            inlineData: {
+                                mimeType: "image/jpeg",
+                                data: base64Image
+                            }
+                        }
+                    ]
+                }],
+                generationConfig: {
+                    temperature: 0
+                }
+            })
+        });
 
-            const rest = s.slice(2)
-                .replace(/[OQ]/g, "0")
-                .replace(/[IL]/g, "1")
-                .replace(/Z/g, "2")
-                .replace(/S/g, "5")
-                .replace(/G/g, "6")
-                .replace(/B/g, "8");
-
-            return prefix + rest;
+        if (!response.ok) {
+            throw new Error(`Erreur API (${response.status})`);
         }
 
-        return s;
+        const json = await response.json();
+        const text = json?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+        return text
+            .split(/\r?\n/)
+            .map(l => l.trim().toUpperCase().replace(/[^A-Z0-9-]/g, ""))
+            .filter(Boolean);
     }
 
-    // Nettoie et extrait les numéros ligne par ligne
-    function parseLinesToNumbers(rawText) {
-        const lines = String(rawText || "").split(/\r?\n/);
-        const results = [];
-        const seen = new Set();
-
-        for (const line of lines) {
-            const cleanLine = line.toUpperCase().replace(/[^A-Z0-9\s]/g, " ").trim();
-            if (!cleanLine) continue;
-
-            // Cherche un jeton principal sur la ligne (ex: EU2611125140)
-            const parts = cleanLine.split(/\s+/).filter(Boolean);
-            for (const part of parts) {
-                const candidateMatch = part.match(/[A-Z0-9]{7,18}/);
-                if (!candidateMatch) continue;
-
-                const normalized = normalizeCodeToken(candidateMatch[0]);
-                if (normalized && normalized.length >= 7 && !seen.has(normalized)) {
-                    seen.add(normalized);
-                    results.push(normalized);
-                    break;
-                }
-            }
+    async function extractWithTesseractFallback(imgElement) {
+        if (typeof Tesseract === "undefined") {
+            return [];
         }
-
-        // Fallback si aucun jeton isolé n'a été trouvé : cherche dans tout le texte
-        if (results.length === 0) {
-            const globalMatches = String(rawText || "").toUpperCase().match(/[A-Z]{2}[A-Z0-9]{6,14}/g) || [];
-            for (const m of globalMatches) {
-                const normalized = normalizeCodeToken(m);
-                if (normalized && !seen.has(normalized)) {
-                    seen.add(normalized);
-                    results.push(normalized);
-                }
-            }
-        }
-
-        return results;
+        const { data } = await Tesseract.recognize(imgElement, "eng", {
+            tessedit_pageseg_mode: Tesseract.PSM.AUTO,
+            tessedit_char_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        });
+        return String(data.text || "")
+            .split(/\r?\n/)
+            .map(l => l.trim().toUpperCase().replace(/[^A-Z0-9]/g, ""))
+            .filter(l => l.length >= 6);
     }
 
     async function handlePhotoSelected(input) {
@@ -1011,37 +1054,39 @@
         const preview = document.getElementById('photoPreview');
         const statusEl = document.getElementById('ocrStatus');
         const textarea = document.getElementById('extractedNumbersInput');
+        const apiKey = (document.getElementById('geminiApiKeyInput').value || localStorage.getItem(STORAGE_KEY_GEMINI) || "").trim();
 
         const objectUrl = URL.createObjectURL(file);
         preview.src = objectUrl;
         preview.style.display = "block";
 
-        if (typeof Tesseract === "undefined") {
-            statusEl.innerText = "Reconnaissance hors ligne indisponible : saisis les numéros ligne par ligne.";
-            return;
-        }
-
-        statusEl.innerText = "🔍 Préparation et lecture de la photo...";
+        statusEl.innerText = apiKey
+            ? "🤖 Analyse de la photo par l'IA..."
+            : "🔍 Lecture locale (OCR) en cours...";
 
         preview.onload = async () => {
             try {
-                const processedDataUrl = preprocessImageForOCR(preview);
-                const { data } = await Tesseract.recognize(processedDataUrl, "eng", {
-                    tessedit_pageseg_mode: Tesseract.PSM.AUTO,
-                    tessedit_char_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-                });
+                let lines = [];
+                if (apiKey) {
+                    lines = await extractWithGeminiVision(preview, apiKey);
+                    if (lines.length > 0) {
+                        textarea.value = lines.join("\n");
+                        statusEl.innerText = `✅ IA : ${lines.length} numéro(s) détecté(s).`;
+                        renderPhotoBarcodes();
+                        return;
+                    }
+                }
 
-                const parsed = parseLinesToNumbers(data.text);
-                if (parsed.length > 0) {
-                    textarea.value = parsed.join("\n");
-                    statusEl.innerText = `✅ ${parsed.length} ligne(s) détectée(s).`;
+                lines = await extractWithTesseractFallback(preview);
+                if (lines.length > 0) {
+                    textarea.value = lines.join("\n");
+                    statusEl.innerText = `ℹ️ Secours OCR : ${lines.length} ligne(s) détectée(s). Vérifie si besoin.`;
                 } else {
-                    textarea.value = data.text.trim();
-                    statusEl.innerText = "ℹ️ Vérifie ou corrige les lignes ci-dessous.";
+                    statusEl.innerText = "⚠️ Aucun numéro détecté : saisis ou corrige manuellement ci-dessous.";
                 }
                 renderPhotoBarcodes();
             } catch (err) {
-                statusEl.innerText = "⚠️ Lecture impossible, saisis les numéros ligne par ligne.";
+                statusEl.innerText = `⚠️ Erreur IA (${err.message}). Saisis ou corrige les numéros ci-dessous.`;
             }
         };
     }
@@ -1101,6 +1146,7 @@
         renderPhotoBarcodes();
     }
 
+    loadSavedApiKey();
     resetAll();
 </script>
 
