@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur Lits / Trays & Numéro d'OF</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --accent: #0ea5e9;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg: #f1f5f9;
+            --card: #ffffff;
+            --text: #0f172a;
+            --muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            padding: 20px 15px 50px;
+        }
+
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        /* En-tête */
+        .header {
+            background: var(--text);
+            color: white;
+            padding: 18px 22px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+        }
+
+        .header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .btn-reset {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+
+        .btn-reset:hover { opacity: 0.92; }
+        .btn-reset:active { transform: scale(0.96); }
+
+        /* Navigation Onglets (Pages) */
+        .nav-tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .tab-btn {
+            background: var(--card);
+            border: 2px solid var(--border);
+            color: var(--muted);
+            padding: 14px;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+        }
+
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        /* Cartes Questions */
+        .card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+        }
+
+        .question-label {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-badge {
+            background: var(--primary);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        /* Contrôleur +/- */
+        .stepper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg);
+            padding: 8px;
+            border-radius: 14px;
+            gap: 12px;
+        }
+
+        .btn-step {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            border: none;
+            font-size: 2rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s;
+        }
+
+        .btn-step:active { transform: scale(0.94); }
+
+        .btn-minus {
+            background: white;
+            color: var(--text);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        }
+
+        .btn-plus {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 3px 8px rgba(37, 99, 235, 0.3);
+        }
+
+        .num-input {
+            width: 120px;
+            text-align: center;
+            font-size: 2.3rem;
+            font-weight: 800;
+            color: var(--text);
+            border: none;
+            background: transparent;
+            outline: none;
+        }
+
+        /* Champ saisie OF */
+        .of-input {
+            width: 100%;
+            padding: 16px;
+            font-size: 1.6rem;
+            font-weight: 800;
+            text-align: center;
+            border: 2.5px solid var(--border);
+            border-radius: 14px;
+            background: #f8fafc;
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .of-input:focus {
+            border-color: var(--primary);
+            background: white;
+        }
+
+        /* Cases à cocher Tray 6, 8, 12 */
+        .tray-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .tray-option {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .tray-option input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .tray-box {
+            border: 2.5px solid var(--border);
+            border-radius: 14px;
+            padding: 16px 10px;
+            text-align: center;
+            background: #f8fafc;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tray-option input:checked + .tray-box {
+            border-color: var(--primary);
+            background: #eff6ff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.18);
+            transform: translateY(-2px);
+        }
+
+        .check-indicator {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            border: 2px solid #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            color: transparent;
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .tray-option input:checked + .tray-box .check-indicator {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .tray-val {
+            font-size: 1.9rem;
+            font-weight: 800;
+            color: var(--text);
+        }
+
+        .tray-option input:checked + .tray-box .tray-val {
+            color: var(--primary);
+        }
+
+        .tray-sub {
+            font-size: 0.8rem;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        /* Zone Résultat en Grand */
+        .result-card {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: white;
+            border-radius: 18px;
+            padding: 26px 20px;
+            text-align: center;
+            margin-bottom: 16px;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.2);
+        }
+
+        .formula-display {
+            font-size: 1.15rem;
+            color: #94a3b8;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .formula-display span {
+            color: #38bdf8;
+            font-weight: 700;
+        }
+
+        .grand-total {
+            font-size: 4.5rem;
+            font-weight: 900;
+            line-height: 1.05;
+            letter-spacing: -0.02em;
+            color: #ffffff;
+            margin: 6px 0;
+        }
+
+        .total-unit {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #34d399;
+            font-weight: 700;
+        }
+
+        /* Zone Code-Barres */
+        .barcode-card {
+            background: white;
+            border-radius: 16px;
+            padding: 22px 20px;
+            text-align: center;
+            border: 2px dashed #cbd5e1;
+        }
+
+        .barcode-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .barcode-title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text);
+        }
+
+        .mode-select {
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1.5px solid var(--border);
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text);
+            background: var(--bg);
+            outline: none;
+        }
+
+        .barcode-wrapper {
+            background: white;
+            padding: 14px;
+            border-radius: 12px;
+            display: inline-block;
+            max-width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+        }
+
+        /* Grille côte à côte pour 00000 et Numéro d'OF */
+        .side-by-side-barcodes {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .side-by-side-barcodes {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .barcode-box-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .barcode-text {
+            font-family: "Courier New", Courier, monospace;
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-top: 8px;
+            color: #000;
+        }
+
+        .btn-print {
+            margin-top: 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-print:hover { background: var(--primary-dark); }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .header, .nav-tabs, .card, .mode-select, .btn-print { display: none !important; }
+            .result-card {
+                background: white !important;
+                color: black !important;
+                border: 2px solid black;
+                box-shadow: none;
+            }
+            .grand-total, .formula-display, .formula-display span, .total-unit {
+                color: black !important;
+            }
+            .barcode-card {
+                border: 2px solid black;
+            }
+            .side-by-side-barcodes {
+                grid-template-columns: 1fr 1fr !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- En-tête commun avec bouton Reset global -->
+    <div class="header">
+        <h1>📦 Gestion Trays & OF</h1>
+        <button class="btn-reset" onclick="resetAll()">🔄 Reset (Tout à 0)</button>
+    </div>
+
+    <!-- Navigation entre les 2 pages -->
+    <div class="nav-tabs">
+        <button class="tab-btn active" id="tabBtnTrays" onclick="switchPage('trays')">
+            🧮 1. Calcul Trays
+        </button>
+        <button class="tab-btn" id="tabBtnOf" onclick="switchPage('of')">
+            🏷️ 2. Numéro d'OF
+        </button>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- PAGE 1 : CALCUL TRAYS                      -->
+    <!-- ========================================== -->
+    <div id="page-trays" class="page-section active">
+        <!-- Question 1 : NB de lit -->
+        <div class="card">
+            <div class="question-label">
+                <span class="step-badge">1</span>
+                <span>Nombre de lits (NB de lit)</span>
+            </div>
+            <div class="stepper">
+                <button class="btn-step btn-minus" onclick="stepValue('nbLit', -1)">−</button>
+                <input type="number" id="nbLit" class="num-input" value="0" min="0" oninput="calculate()">
+                <button class="btn-step btn-plus" onclick="stepValue('nbLit', 1)">+</button>
+            </div>
+        </div>
+
+        <!-- Question 2 : NB de tray par lit -->
+        <div class="card">
+            <div class="question-label">
+                <span class="step-badge">2</span>
+                <span>Nombre de trays par lit (NB de tray par lit)</span>
+            </div>
+            <div class="stepper">
+                <button class="btn-step btn-minus" onclick="stepValue('nbTrayLit', -1)">−</button>
+                <input type="number" id="nbTrayLit" class="num-input" value="0" min="0" oninput="calculate()">
+                <button class="btn-step btn-plus" onclick="stepValue('nbTrayLit', 1)">+</button>
+            </div>
+        </div>
+
+        <!-- Question 3 : Case à cocher Tray 6, 8, 12 -->
+        <div class="card">
+            <div class="question-label">
+                <span class="step-badge">3</span>
+                <span>Format du tray à cocher (6, 8 ou 12)</span>
+            </div>
+            <div class="tray-options">
+                <label class="tray-option">
+                    <input type="checkbox" name="trayType" value="6" checked onchange="selectTrayType(this)">
+                    <div class="tray-box">
+                        <div class="check-indicator">✓</div>
+                        <div class="tray-val">6</div>
+                        <div class="tray-sub">Tray de 6</div>
+                    </div>
+                </label>
+
+                <label class="tray-option">
+                    <input type="checkbox" name="trayType" value="8" onchange="selectTrayType(this)">
+                    <div class="tray-box">
+                        <div class="check-indicator">✓</div>
+                        <div class="tray-val">8</div>
+                        <div class="tray-sub">Tray de 8</div>
+                    </div>
+                </label>
+
+                <label class="tray-option">
+                    <input type="checkbox" name="trayType" value="12" onchange="selectTrayType(this)">
+                    <div class="tray-box">
+                        <div class="check-indicator">✓</div>
+                        <div class="tray-val">12</div>
+                        <div class="tray-sub">Tray de 12</div>
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <!-- Résultat en Grand -->
+        <div class="result-card">
+            <div class="formula-display" id="formulaText">
+                <span>0</span> lit × <span>0</span> tray/lit × <span>6</span>
+            </div>
+            <div class="grand-total" id="totalResult">0</div>
+            <div class="total-unit">Total Calculé</div>
+        </div>
+
+        <!-- Génération du Code-Barres Total -->
+        <div class="barcode-card">
+            <div class="barcode-header">
+                <span class="barcode-title">Code-Barres généré (Code 128)</span>
+                <select id="barcodeMode" class="mode-select" onchange="calculate()">
+                    <option value="total">Encoder le Total seul (ex: 0)</option>
+                    <option value="detail">Encoder le Détail (ex: L0-T0-C6-TOT0)</option>
+                </select>
+            </div>
+
+            <div class="barcode-wrapper">
+                <svg id="barcodeSvg"></svg>
+                <div class="barcode-text" id="barcodeHumanText">0</div>
+            </div>
+
+            <div>
+                <button class="btn-print" onclick="window.print()">🖨️ Imprimer / PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- PAGE 2 : NUMÉRO D'OF & CODE-BARRES 00000   -->
+    <!-- ========================================== -->
+    <div id="page-of" class="page-section">
+        <div class="card">
+            <div class="question-label">
+                <span class="step-badge">OF</span>
+                <span>Quel est le numéro d'OF ?</span>
+            </div>
+            <input
+                type="text"
+                id="ofNumberInput"
+                class="of-input"
+                placeholder="Saisir le numéro d'OF..."
+                oninput="updateOfBarcodes()"
+            >
+        </div>
+
+        <div class="barcode-card">
+            <div class="barcode-header">
+                <span class="barcode-title">Codes-Barres OF (Code 128)</span>
+            </div>
+
+            <!-- Affichage côte à côte : 00000 à gauche, Numéro d'OF à droite -->
+            <div class="side-by-side-barcodes">
+                <div class="barcode-wrapper">
+                    <div class="barcode-box-label">Code Fixe</div>
+                    <svg id="barcodeZeroSvg"></svg>
+                    <div class="barcode-text">00000</div>
+                </div>
+
+                <div class="barcode-wrapper">
+                    <div class="barcode-box-label">Numéro d'OF</div>
+                    <svg id="barcodeOfSvg"></svg>
+                    <div class="barcode-text" id="barcodeOfHumanText">0</div>
+                </div>
+            </div>
+
+            <div>
+                <button class="btn-print" onclick="window.print()">🖨️ Imprimer / PDF</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Table complète Code 128 (Set B) pour génération autonome sans internet
+    const CODE128_PATTERNS = [
+        "11011001100","11001101100","11001100110","10010011000","10010001100",
+        "10001001100","10011001000","10011000100","10001100100","11001001000",
+        "11001000100","11000100100","10110011100","10011011100","10011001110",
+        "10111001100","10011101100","10011100110","11001110010","11001011100",
+        "11001001110","11011100100","11001110100","11101101110","11101001100",
+        "11100101100","11100100110","11101100100","11100110100","11100110010",
+        "11011011000","11011000110","11000110110","10100011000","10001011000",
+        "10001000110","10110001000","10001101000","10001100010","11010001000",
+        "11000101000","11000100010","10110111000","10110001110","10001101110",
+        "10111011000","10111000110","10001110110","11101110110","11010001110",
+        "11000101110","11011101000","11011100010","11011101110","11101011000",
+        "11101000110","11100010110","11101101000","11101100010","11100011010",
+        "11101111010","11001000010","11110001010","10100110000","10100001100",
+        "10010110000","10010000110","10000101100","10000100110","10110010000",
+        "10110000100","10011010000","10011000010","10000110100","10000110010",
+        "11000010010","11001010000","11110111010","11000010100","10001111010",
+        "10100111100","10010111100","10010011110","10111100100","10011110100",
+        "10011110010","11110100100","11110010100","11110010010","11011011110",
+        "11011110110","11110110110","10101111000","10100011110","10001011110",
+        "10111101000","10111100010","11110101000","11110100010","10111011110",
+        "10111101110","11101011110","11110101110","11010000100","11010010000",
+        "11010011100","1100011101011"
+    ];
+
+    function renderCode128SVG(svgElement, text) {
+        const str = String(text || "0");
+        const START_B = 104;
+        const STOP = 106;
+
+        let codes = [START_B];
+        let checksum = START_B;
+
+        for (let i = 0; i < str.length; i++) {
+            const charCode = str.charCodeAt(i);
+            const val = (charCode >= 32 && charCode <= 126) ? (charCode - 32) : 16; // fallback '0'
+            codes.push(val);
+            checksum += val * (i + 1);
+        }
+
+        codes.push(checksum % 103);
+        codes.push(STOP);
+
+        let binary = "";
+        codes.forEach(c => {
+            binary += CODE128_PATTERNS[c];
+        });
+
+        const barWidth = 2.6;
+        const height = 80;
+        const quietZone = 10 * barWidth;
+        const totalWidth = binary.length * barWidth + quietZone * 2;
+
+        svgElement.setAttribute("width", totalWidth);
+        svgElement.setAttribute("height", height);
+        svgElement.setAttribute("viewBox", `0 0 ${totalWidth} ${height}`);
+
+        let rects = `<rect x="0" y="0" width="${totalWidth}" height="${height}" fill="#ffffff"/>`;
+        for (let i = 0; i < binary.length; i++) {
+            if (binary[i] === "1") {
+                const x = quietZone + i * barWidth;
+                rects += `<rect x="${x}" y="4" width="${barWidth}" height="${height - 8}" fill="#000000"/>`;
+            }
+        }
+        svgElement.innerHTML = rects;
+    }
+
+    // Navigation entre Page 1 (Trays) et Page 2 (OF)
+    function switchPage(pageName) {
+        document.getElementById('page-trays').classList.toggle('active', pageName === 'trays');
+        document.getElementById('page-of').classList.toggle('active', pageName === 'of');
+
+        document.getElementById('tabBtnTrays').classList.toggle('active', pageName === 'trays');
+        document.getElementById('tabBtnOf').classList.toggle('active', pageName === 'of');
+    }
+
+    function stepValue(inputId, delta) {
+        const input = document.getElementById(inputId);
+        const current = parseInt(input.value, 10) || 0;
+        input.value = Math.max(0, current + delta);
+        calculate();
+    }
+
+    function selectTrayType(clickedCheckbox) {
+        const checkboxes = document.querySelectorAll('input[name="trayType"]');
+        if (!clickedCheckbox.checked) {
+            clickedCheckbox.checked = true;
+            return;
+        }
+        checkboxes.forEach(cb => {
+            if (cb !== clickedCheckbox) cb.checked = false;
+        });
+        calculate();
+    }
+
+    function getSelectedTrayValue() {
+        const checked = document.querySelector('input[name="trayType"]:checked');
+        return checked ? parseInt(checked.value, 10) : 6;
+    }
+
+    function calculate() {
+        const nbLit = Math.max(0, parseInt(document.getElementById('nbLit').value, 10) || 0);
+        const nbTrayLit = Math.max(0, parseInt(document.getElementById('nbTrayLit').value, 10) || 0);
+        const trayVal = getSelectedTrayValue();
+
+        const total = nbLit * nbTrayLit * trayVal;
+
+        document.getElementById('formulaText').innerHTML =
+            `<span>${nbLit}</span> lit${nbLit > 1 ? 's' : ''} × <span>${nbTrayLit}</span> tray/lit × <span>${trayVal}</span>`;
+        document.getElementById('totalResult').innerText = total;
+
+        const mode = document.getElementById('barcodeMode').value;
+        const barcodeData = (mode === 'detail')
+            ? `L${nbLit}-T${nbTrayLit}-C${trayVal}-TOT${total}`
+            : `${total}`;
+
+        document.getElementById('barcodeHumanText').innerText = barcodeData;
+        renderCode128SVG(document.getElementById('barcodeSvg'), barcodeData);
+    }
+
+    function updateOfBarcodes() {
+        const rawVal = document.getElementById('ofNumberInput').value.trim();
+        const ofDisplay = rawVal !== "" ? rawVal : "0";
+
+        // Code-barres fixe 00000
+        renderCode128SVG(document.getElementById('barcodeZeroSvg'), "00000");
+
+        // Code-barres du numéro d'OF saisi (ou 0 si vide)
+        document.getElementById('barcodeOfHumanText').innerText = ofDisplay;
+        renderCode128SVG(document.getElementById('barcodeOfSvg'), ofDisplay);
+    }
+
+    // Remet tout à zéro (Page Trays + Page OF)
+    function resetAll() {
+        // Page 1 : Lits = 0, Trays/lit = 0, Tray = 6
+        document.getElementById('nbLit').value = 0;
+        document.getElementById('nbTrayLit').value = 0;
+        const checkboxes = document.querySelectorAll('input[name="trayType"]');
+        checkboxes.forEach(cb => cb.checked = (cb.value === '6'));
+        calculate();
+
+        // Page 2 : Numéro d'OF vidé -> code-barres à 0
+        document.getElementById('ofNumberInput').value = "";
+        updateOfBarcodes();
+    }
+
+    // Initialisation au chargement (tout à 0)
+    resetAll();
+</script>
+
+</body>
+</html>
