@@ -730,7 +730,7 @@
                 <button class="btn-photo" onclick="document.getElementById('photoInput').click()">
                     📸 Faire une photo / Importer
                 </button>
-                <div class="of-hint">Détection automatique ligne par ligne (ex: <code>EU2610215025</code>)</div>
+                <div class="of-hint">Détection automatique ligne par ligne (ex: <code>EU2611125140</code>)</div>
                 <img id="photoPreview" class="photo-preview" alt="Aperçu photo">
                 <div id="ocrStatus" class="ocr-status"></div>
             </div>
@@ -741,7 +741,7 @@
             <textarea
                 id="extractedNumbersInput"
                 class="numbers-textarea"
-                placeholder="Ex:&#10;EU2610215025&#10;EU2610215027&#10;EU2610215023"
+                placeholder="Ex:&#10;EU2611125140&#10;EU2611125141&#10;EU2611125156&#10;EU2611125159"
                 oninput="renderPhotoBarcodes()"
             ></textarea>
         </div>
@@ -894,34 +894,41 @@
         renderCode128SVG(document.getElementById('barcodeOfSvg'), fullCode);
     }
 
-    // Prétraitement d'image pour améliorer l'OCR (redimensionnement + niveaux de gris + contraste)
+    // Prétraitement d'image doux : agrandit l'image et garde les traits nets sans détruire les chiffres
     function preprocessImageForOCR(imgElement) {
-        const maxWidth = 1600;
-        let width = imgElement.naturalWidth || imgElement.width;
-        let height = imgElement.naturalHeight || imgElement.height;
-
-        if (width > maxWidth) {
-            height = Math.round((height * maxWidth) / width);
-            width = maxWidth;
-        }
+        const targetWidth = Math.min(2200, Math.max(1200, (imgElement.naturalWidth || imgElement.width) * 2));
+        const origW = imgElement.naturalWidth || imgElement.width;
+        const origH = imgElement.naturalHeight || imgElement.height;
+        const ratio = targetWidth / origW;
+        const width = Math.round(origW * ratio);
+        const height = Math.round(origH * ratio);
 
         const canvas = document.createElement("canvas");
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext("2d");
 
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
         ctx.drawImage(imgElement, 0, 0, width, height);
 
         const imgData = ctx.getImageData(0, 0, width, height);
         const data = imgData.data;
 
-        // Contraste élevé en niveaux de gris
-        const contrast = 1.65;
-        const intercept = 128 * (1 - contrast);
+        // Calcul de la luminance moyenne pour adapter le seuil
+        let sumGray = 0;
+        const grays = new Uint8Array(width * height);
+        for (let i = 0, p = 0; i < data.length; i += 4, p++) {
+            const g = Math.round(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]);
+            grays[p] = g;
+            sumGray += g;
+        }
+        const meanGray = sumGray / grays.length;
 
-        for (let i = 0; i < data.length; i += 4) {
-            const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-            let val = gray * contrast + intercept;
+        // Léger renforcement du contraste autour de la moyenne (sans écraser les chiffres)
+        const contrast = 1.25;
+        for (let i = 0, p = 0; i < data.length; i += 4, p++) {
+            let val = meanGray + (grays[p] - meanGray) * contrast;
             val = Math.max(0, Math.min(255, val));
             data[i] = val;
             data[i + 1] = val;
@@ -932,30 +939,68 @@
         return canvas.toDataURL("image/png");
     }
 
-    // Nettoie et extrait les numéros ligne par ligne (ex: EU2610215025)
+    // Corrige une chaîne de type code (ex: EU2611125140)
+    function normalizeCodeToken(rawToken) {
+        let s = String(rawToken || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+        if (s.length < 6) return null;
+
+        // Si commence par 2 lettres (ou quasi-lettres comme OO pour EU) suivies d'au moins 6 caractères
+        if (/^[A-Z]{2}[A-Z0-9]{6,}$/.test(s)) {
+            let prefix = s.slice(0, 2);
+            // Correction fréquente de "OO" mal lu pour "EU" sur écran gris
+            if (prefix === "OO") prefix = "EU";
+
+            const rest = s.slice(2)
+                .replace(/[OQ]/g, "0")
+                .replace(/[IL]/g, "1")
+                .replace(/Z/g, "2")
+                .replace(/S/g, "5")
+                .replace(/G/g, "6")
+                .replace(/B/g, "8");
+
+            return prefix + rest;
+        }
+
+        return s;
+    }
+
+    // Nettoie et extrait les numéros ligne par ligne
     function parseLinesToNumbers(rawText) {
         const lines = String(rawText || "").split(/\r?\n/);
         const results = [];
+        const seen = new Set();
 
         for (const line of lines) {
-            // Supprime espaces et caractères parasites, passe en majuscules
-            let token = line.toUpperCase().replace(/[^A-Z0-9]/g, "");
-            if (!token) continue;
+            const cleanLine = line.toUpperCase().replace(/[^A-Z0-9\s]/g, " ").trim();
+            if (!cleanLine) continue;
 
-            // Cherche un motif type 2 lettres + chiffres (ex: EU2610215025)
-            const match = token.match(/[A-Z]{2}[A-Z0-9]{5,}/);
-            if (match) {
-                token = match[0];
-                // Corrige les confusions O -> 0 dans la suite de chiffres après les 2 lettres
-                const prefix = token.slice(0, 2);
-                const rest = token.slice(2).replace(/O/g, "0").replace(/I/g, "1").replace(/S/g, "5");
-                token = prefix + rest;
-            }
+            // Cherche un jeton principal sur la ligne (ex: EU2611125140)
+            const parts = cleanLine.split(/\s+/).filter(Boolean);
+            for (const part of parts) {
+                const candidateMatch = part.match(/[A-Z0-9]{7,18}/);
+                if (!candidateMatch) continue;
 
-            if (token.length >= 3) {
-                results.push(token);
+                const normalized = normalizeCodeToken(candidateMatch[0]);
+                if (normalized && normalized.length >= 7 && !seen.has(normalized)) {
+                    seen.add(normalized);
+                    results.push(normalized);
+                    break;
+                }
             }
         }
+
+        // Fallback si aucun jeton isolé n'a été trouvé : cherche dans tout le texte
+        if (results.length === 0) {
+            const globalMatches = String(rawText || "").toUpperCase().match(/[A-Z]{2}[A-Z0-9]{6,14}/g) || [];
+            for (const m of globalMatches) {
+                const normalized = normalizeCodeToken(m);
+                if (normalized && !seen.has(normalized)) {
+                    seen.add(normalized);
+                    results.push(normalized);
+                }
+            }
+        }
+
         return results;
     }
 
@@ -982,6 +1027,7 @@
             try {
                 const processedDataUrl = preprocessImageForOCR(preview);
                 const { data } = await Tesseract.recognize(processedDataUrl, "eng", {
+                    tessedit_pageseg_mode: Tesseract.PSM.AUTO,
                     tessedit_char_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
                 });
 
