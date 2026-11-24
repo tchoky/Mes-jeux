@@ -142,6 +142,10 @@
             flex-shrink: 0;
         }
 
+        .step-badge.bonus {
+            background: var(--success);
+        }
+
         /* Contrôleur +/- */
         .stepper {
             display: flex;
@@ -181,6 +185,11 @@
             box-shadow: 0 3px 8px rgba(37, 99, 235, 0.3);
         }
 
+        .btn-plus.bonus {
+            background: var(--success);
+            box-shadow: 0 3px 8px rgba(16, 185, 129, 0.3);
+        }
+
         .num-input {
             width: 120px;
             text-align: center;
@@ -196,7 +205,7 @@
         .of-input {
             width: 100%;
             padding: 16px;
-            font-size: 1.6rem;
+            font-size: 1.8rem;
             font-weight: 800;
             text-align: center;
             border: 2.5px solid var(--border);
@@ -210,6 +219,14 @@
         .of-input:focus {
             border-color: var(--primary);
             background: white;
+        }
+
+        .of-hint {
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-top: 8px;
+            font-weight: 600;
         }
 
         /* Cases à cocher Tray 6, 8, 12 */
@@ -309,6 +326,10 @@
             font-weight: 700;
         }
 
+        .formula-display span.bonus-val {
+            color: #34d399;
+        }
+
         .grand-total {
             font-size: 4.5rem;
             font-weight: 900;
@@ -363,7 +384,7 @@
 
         .barcode-wrapper {
             background: white;
-            padding: 14px;
+            padding: 16px;
             border-radius: 12px;
             display: inline-block;
             max-width: 100%;
@@ -371,33 +392,10 @@
             border: 1px solid var(--border);
         }
 
-        /* Grille côte à côte pour 00000 et Numéro d'OF */
-        .side-by-side-barcodes {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            align-items: center;
-            margin-top: 10px;
-        }
-
-        @media (max-width: 600px) {
-            .side-by-side-barcodes {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .barcode-box-label {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--muted);
-            margin-bottom: 6px;
-            text-transform: uppercase;
-        }
-
         .barcode-text {
             font-family: "Courier New", Courier, monospace;
-            font-size: 1.15rem;
-            font-weight: 700;
+            font-size: 1.35rem;
+            font-weight: 800;
             letter-spacing: 2px;
             margin-top: 8px;
             color: #000;
@@ -434,9 +432,6 @@
             }
             .barcode-card {
                 border: 2px solid black;
-            }
-            .side-by-side-barcodes {
-                grid-template-columns: 1fr 1fr !important;
             }
         }
     </style>
@@ -526,10 +521,23 @@
             </div>
         </div>
 
+        <!-- Question 4 : Ajout sur le dernier lit -->
+        <div class="card">
+            <div class="question-label">
+                <span class="step-badge bonus">+</span>
+                <span>Ajout sur le dernier lit (ex: +6)</span>
+            </div>
+            <div class="stepper">
+                <button class="btn-step btn-minus" onclick="stepValue('ajoutDernierLit', -1)">−</button>
+                <input type="number" id="ajoutDernierLit" class="num-input" value="0" min="0" oninput="calculate()">
+                <button class="btn-step btn-plus bonus" onclick="stepValue('ajoutDernierLit', 1)">+</button>
+            </div>
+        </div>
+
         <!-- Résultat en Grand -->
         <div class="result-card">
             <div class="formula-display" id="formulaText">
-                <span>0</span> lit × <span>0</span> tray/lit × <span>6</span>
+                <span>0</span> lit × <span>0</span> tray/lit × <span>6</span> + <span class="bonus-val">0</span>
             </div>
             <div class="grand-total" id="totalResult">0</div>
             <div class="total-unit">Total Calculé</div>
@@ -541,7 +549,7 @@
                 <span class="barcode-title">Code-Barres généré (Code 128)</span>
                 <select id="barcodeMode" class="mode-select" onchange="calculate()">
                     <option value="total">Encoder le Total seul (ex: 0)</option>
-                    <option value="detail">Encoder le Détail (ex: L0-T0-C6-TOT0)</option>
+                    <option value="detail">Encoder le Détail (ex: L0-T0-C6-A0-TOT0)</option>
                 </select>
             </div>
 
@@ -557,7 +565,7 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- PAGE 2 : NUMÉRO D'OF & CODE-BARRES 00000   -->
+    <!-- PAGE 2 : NUMÉRO D'OF (00000 + NUMÉRO)      -->
     <!-- ========================================== -->
     <div id="page-of" class="page-section">
         <div class="card">
@@ -569,29 +577,20 @@
                 type="text"
                 id="ofNumberInput"
                 class="of-input"
-                placeholder="Saisir le numéro d'OF..."
-                oninput="updateOfBarcodes()"
+                placeholder="Ex: 12345"
+                oninput="updateOfBarcode()"
             >
+            <div class="of-hint">Le préfixe <strong>00000</strong> est ajouté automatiquement devant le numéro.</div>
         </div>
 
         <div class="barcode-card">
             <div class="barcode-header">
-                <span class="barcode-title">Codes-Barres OF (Code 128)</span>
+                <span class="barcode-title">Code-Barres OF généré (Code 128)</span>
             </div>
 
-            <!-- Affichage côte à côte : 00000 à gauche, Numéro d'OF à droite -->
-            <div class="side-by-side-barcodes">
-                <div class="barcode-wrapper">
-                    <div class="barcode-box-label">Code Fixe</div>
-                    <svg id="barcodeZeroSvg"></svg>
-                    <div class="barcode-text">00000</div>
-                </div>
-
-                <div class="barcode-wrapper">
-                    <div class="barcode-box-label">Numéro d'OF</div>
-                    <svg id="barcodeOfSvg"></svg>
-                    <div class="barcode-text" id="barcodeOfHumanText">0</div>
-                </div>
+            <div class="barcode-wrapper">
+                <svg id="barcodeOfSvg"></svg>
+                <div class="barcode-text" id="barcodeOfHumanText">00000</div>
             </div>
 
             <div>
@@ -651,8 +650,8 @@
             binary += CODE128_PATTERNS[c];
         });
 
-        const barWidth = 2.6;
-        const height = 80;
+        const barWidth = 3;
+        const height = 85;
         const quietZone = 10 * barWidth;
         const totalWidth = binary.length * barWidth + quietZone * 2;
 
@@ -707,46 +706,45 @@
         const nbLit = Math.max(0, parseInt(document.getElementById('nbLit').value, 10) || 0);
         const nbTrayLit = Math.max(0, parseInt(document.getElementById('nbTrayLit').value, 10) || 0);
         const trayVal = getSelectedTrayValue();
+        const ajout = Math.max(0, parseInt(document.getElementById('ajoutDernierLit').value, 10) || 0);
 
-        const total = nbLit * nbTrayLit * trayVal;
+        const total = (nbLit * nbTrayLit * trayVal) + ajout;
 
         document.getElementById('formulaText').innerHTML =
-            `<span>${nbLit}</span> lit${nbLit > 1 ? 's' : ''} × <span>${nbTrayLit}</span> tray/lit × <span>${trayVal}</span>`;
+            `<span>${nbLit}</span> lit${nbLit > 1 ? 's' : ''} × <span>${nbTrayLit}</span> tray/lit × <span>${trayVal}</span> + <span class="bonus-val">${ajout}</span>`;
         document.getElementById('totalResult').innerText = total;
 
         const mode = document.getElementById('barcodeMode').value;
         const barcodeData = (mode === 'detail')
-            ? `L${nbLit}-T${nbTrayLit}-C${trayVal}-TOT${total}`
+            ? `L${nbLit}-T${nbTrayLit}-C${trayVal}-A${ajout}-TOT${total}`
             : `${total}`;
 
         document.getElementById('barcodeHumanText').innerText = barcodeData;
         renderCode128SVG(document.getElementById('barcodeSvg'), barcodeData);
     }
 
-    function updateOfBarcodes() {
+    // Génération d'un seul code-barres : 00000 + Numéro d'OF (ex: 12345 -> 0000012345)
+    function updateOfBarcode() {
         const rawVal = document.getElementById('ofNumberInput').value.trim();
-        const ofDisplay = rawVal !== "" ? rawVal : "0";
+        const fullCode = "00000" + rawVal;
 
-        // Code-barres fixe 00000
-        renderCode128SVG(document.getElementById('barcodeZeroSvg'), "00000");
-
-        // Code-barres du numéro d'OF saisi (ou 0 si vide)
-        document.getElementById('barcodeOfHumanText').innerText = ofDisplay;
-        renderCode128SVG(document.getElementById('barcodeOfSvg'), ofDisplay);
+        document.getElementById('barcodeOfHumanText').innerText = fullCode;
+        renderCode128SVG(document.getElementById('barcodeOfSvg'), fullCode);
     }
 
     // Remet tout à zéro (Page Trays + Page OF)
     function resetAll() {
-        // Page 1 : Lits = 0, Trays/lit = 0, Tray = 6
+        // Page 1 : Lits = 0, Trays/lit = 0, Ajout = 0, Tray = 6
         document.getElementById('nbLit').value = 0;
         document.getElementById('nbTrayLit').value = 0;
+        document.getElementById('ajoutDernierLit').value = 0;
         const checkboxes = document.querySelectorAll('input[name="trayType"]');
         checkboxes.forEach(cb => cb.checked = (cb.value === '6'));
         calculate();
 
-        // Page 2 : Numéro d'OF vidé -> code-barres à 0
+        // Page 2 : Numéro d'OF vidé -> code-barres revient à 00000
         document.getElementById('ofNumberInput').value = "";
-        updateOfBarcodes();
+        updateOfBarcode();
     }
 
     // Initialisation au chargement (tout à 0)
