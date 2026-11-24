@@ -278,14 +278,15 @@
 
         .numbers-textarea {
             width: 100%;
-            min-height: 95px;
-            margin-top: 12px;
+            min-height: 140px;
+            margin-top: 10px;
             padding: 12px;
             border-radius: 12px;
             border: 2px solid var(--border);
             font-family: "Courier New", Courier, monospace;
-            font-size: 1rem;
+            font-size: 1.05rem;
             font-weight: 700;
+            line-height: 1.5;
             color: var(--text);
             background: #f8fafc;
             outline: none;
@@ -296,11 +297,31 @@
             background: white;
         }
 
+        /* 1 code-barres par ligne */
         .barcodes-list {
             display: flex;
             flex-direction: column;
             gap: 12px;
             margin-top: 10px;
+        }
+
+        .line-barcode-row {
+            background: white;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .line-badge {
+            font-size: 0.78rem;
+            font-weight: 800;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .empty-msg {
@@ -474,7 +495,8 @@
             border: 1px solid var(--border);
         }
 
-        .barcode-wrapper svg {
+        .barcode-wrapper svg,
+        .line-barcode-row svg {
             display: block;
             margin: 0 auto;
             max-width: 100%;
@@ -486,7 +508,7 @@
             font-size: 1.35rem;
             font-weight: 800;
             letter-spacing: 2px;
-            margin-top: 8px;
+            margin-top: 6px;
             color: #000;
             word-break: break-all;
         }
@@ -687,7 +709,7 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- PAGE 3 : PHOTO -> NUMÉROS -> CODES-BARRES  -->
+    <!-- PAGE 3 : PHOTO -> 1 CODE-BARRES PAR LIGNE  -->
     <!-- ========================================== -->
     <div id="page-photo" class="page-section">
         <div class="card">
@@ -708,29 +730,29 @@
                 <button class="btn-photo" onclick="document.getElementById('photoInput').click()">
                     📸 Faire une photo / Importer
                 </button>
-                <div class="of-hint">Détection automatique des numéros (ex: <code>EU26034567</code>)</div>
+                <div class="of-hint">Détection automatique ligne par ligne (ex: <code>EU2610215025</code>)</div>
                 <img id="photoPreview" class="photo-preview" alt="Aperçu photo">
                 <div id="ocrStatus" class="ocr-status"></div>
             </div>
 
             <div class="question-label" style="margin-top: 18px; margin-bottom: 6px;">
-                <span>Numéros détectés (un par ligne ou séparés) :</span>
+                <span>1 numéro par ligne (modifiable) :</span>
             </div>
             <textarea
                 id="extractedNumbersInput"
                 class="numbers-textarea"
-                placeholder="Ex:&#10;EU26034567&#10;EU26034568"
+                placeholder="Ex:&#10;EU2610215025&#10;EU2610215027&#10;EU2610215023"
                 oninput="renderPhotoBarcodes()"
             ></textarea>
         </div>
 
         <div class="barcode-card">
             <div class="barcode-header">
-                <span class="barcode-title">Codes-Barres générés par numéro (<span id="photoBarcodeCount">0</span>)</span>
+                <span class="barcode-title">1 Code-Barres par ligne (<span id="photoBarcodeCount">0</span>)</span>
             </div>
 
             <div id="photoBarcodesContainer" class="barcodes-list">
-                <div class="empty-msg">Prenez une photo ou saisissez des numéros pour générer leurs codes-barres.</div>
+                <div class="empty-msg">Prenez une photo ou saisissez des numéros pour générer 1 code-barres par ligne.</div>
             </div>
 
             <div>
@@ -791,7 +813,7 @@
         });
 
         const barWidth = str.length > 7 ? 2 : 3;
-        const height = 80;
+        const height = 75;
         const quietZone = 8 * barWidth;
         const totalWidth = binary.length * barWidth + quietZone * 2;
 
@@ -809,7 +831,6 @@
         svgElement.innerHTML = rects;
     }
 
-    // Navigation entre les 3 pages
     function switchPage(pageName) {
         document.getElementById('page-trays').classList.toggle('active', pageName === 'trays');
         document.getElementById('page-of').classList.toggle('active', pageName === 'of');
@@ -873,21 +894,69 @@
         renderCode128SVG(document.getElementById('barcodeOfSvg'), fullCode);
     }
 
-    // Extraction des numéros depuis le texte OCR (ex: EU26034567 ou suites alphanumériques/numériques)
-    function extractSerialNumbers(rawText) {
-        const cleaned = String(rawText || "").toUpperCase();
-        // Cherche d'abord les codes type EU26034567 ou préfixe lettres + chiffres (5+ caractères)
-        const prefixedMatches = cleaned.match(/\b[A-Z]{2,}[0-9]{4,}\b/g);
-        if (prefixedMatches && prefixedMatches.length > 0) {
-            return [...new Set(prefixedMatches)];
+    // Prétraitement d'image pour améliorer l'OCR (redimensionnement + niveaux de gris + contraste)
+    function preprocessImageForOCR(imgElement) {
+        const maxWidth = 1600;
+        let width = imgElement.naturalWidth || imgElement.width;
+        let height = imgElement.naturalHeight || imgElement.height;
+
+        if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
         }
-        // Sinon récupère les lignes/tokens non vides
-        return [...new Set(
-            cleaned
-                .split(/[\s,;]+/)
-                .map(s => s.replace(/[^A-Z0-9-]/g, ""))
-                .filter(s => s.length >= 2)
-        )];
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+
+        ctx.drawImage(imgElement, 0, 0, width, height);
+
+        const imgData = ctx.getImageData(0, 0, width, height);
+        const data = imgData.data;
+
+        // Contraste élevé en niveaux de gris
+        const contrast = 1.65;
+        const intercept = 128 * (1 - contrast);
+
+        for (let i = 0; i < data.length; i += 4) {
+            const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+            let val = gray * contrast + intercept;
+            val = Math.max(0, Math.min(255, val));
+            data[i] = val;
+            data[i + 1] = val;
+            data[i + 2] = val;
+        }
+
+        ctx.putImageData(imgData, 0, 0);
+        return canvas.toDataURL("image/png");
+    }
+
+    // Nettoie et extrait les numéros ligne par ligne (ex: EU2610215025)
+    function parseLinesToNumbers(rawText) {
+        const lines = String(rawText || "").split(/\r?\n/);
+        const results = [];
+
+        for (const line of lines) {
+            // Supprime espaces et caractères parasites, passe en majuscules
+            let token = line.toUpperCase().replace(/[^A-Z0-9]/g, "");
+            if (!token) continue;
+
+            // Cherche un motif type 2 lettres + chiffres (ex: EU2610215025)
+            const match = token.match(/[A-Z]{2}[A-Z0-9]{5,}/);
+            if (match) {
+                token = match[0];
+                // Corrige les confusions O -> 0 dans la suite de chiffres après les 2 lettres
+                const prefix = token.slice(0, 2);
+                const rest = token.slice(2).replace(/O/g, "0").replace(/I/g, "1").replace(/S/g, "5");
+                token = prefix + rest;
+            }
+
+            if (token.length >= 3) {
+                results.push(token);
+            }
+        }
+        return results;
     }
 
     async function handlePhotoSelected(input) {
@@ -898,66 +967,71 @@
         const statusEl = document.getElementById('ocrStatus');
         const textarea = document.getElementById('extractedNumbersInput');
 
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            preview.src = e.target.result;
-            preview.style.display = "block";
-        };
-        reader.readAsDataURL(file);
+        const objectUrl = URL.createObjectURL(file);
+        preview.src = objectUrl;
+        preview.style.display = "block";
 
         if (typeof Tesseract === "undefined") {
-            statusEl.innerText = "Reconnaissance hors ligne indisponible : tu peux saisir les numéros ci-dessous.";
+            statusEl.innerText = "Reconnaissance hors ligne indisponible : saisis les numéros ligne par ligne.";
             return;
         }
 
-        statusEl.innerText = "🔍 Analyse de la photo en cours...";
-        try {
-            const { data } = await Tesseract.recognize(file, "eng");
-            const found = extractSerialNumbers(data.text);
-            if (found.length > 0) {
-                textarea.value = found.join("\n");
-                statusEl.innerText = `✅ ${found.length} numéro(s) détecté(s).`;
-            } else {
-                textarea.value = data.text.trim();
-                statusEl.innerText = "ℹ️ Texte lu : vérifie ou ajuste les numéros ci-dessous.";
+        statusEl.innerText = "🔍 Préparation et lecture de la photo...";
+
+        preview.onload = async () => {
+            try {
+                const processedDataUrl = preprocessImageForOCR(preview);
+                const { data } = await Tesseract.recognize(processedDataUrl, "eng", {
+                    tessedit_char_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+                });
+
+                const parsed = parseLinesToNumbers(data.text);
+                if (parsed.length > 0) {
+                    textarea.value = parsed.join("\n");
+                    statusEl.innerText = `✅ ${parsed.length} ligne(s) détectée(s).`;
+                } else {
+                    textarea.value = data.text.trim();
+                    statusEl.innerText = "ℹ️ Vérifie ou corrige les lignes ci-dessous.";
+                }
+                renderPhotoBarcodes();
+            } catch (err) {
+                statusEl.innerText = "⚠️ Lecture impossible, saisis les numéros ligne par ligne.";
             }
-            renderPhotoBarcodes();
-        } catch (err) {
-            statusEl.innerText = "⚠️ Lecture impossible, saisis les numéros manuellement ci-dessous.";
-        }
+        };
     }
 
+    // Génère strictement 1 code-barres par ligne non vide
     function renderPhotoBarcodes() {
         const raw = document.getElementById('extractedNumbersInput').value;
-        const numbers = raw
-            .split(/[\n,;]+/)
-            .map(n => n.trim().toUpperCase())
-            .filter(n => n.length > 0);
+        const lines = raw
+            .split(/\r?\n/)
+            .map(l => l.trim().toUpperCase())
+            .filter(l => l.length > 0);
 
         const container = document.getElementById('photoBarcodesContainer');
-        document.getElementById('photoBarcodeCount').innerText = numbers.length;
+        document.getElementById('photoBarcodeCount').innerText = lines.length;
 
-        if (numbers.length === 0) {
-            container.innerHTML = '<div class="empty-msg">Prenez une photo ou saisissez des numéros pour générer leurs codes-barres.</div>';
+        if (lines.length === 0) {
+            container.innerHTML = '<div class="empty-msg">Prenez une photo ou saisissez des numéros pour générer 1 code-barres par ligne.</div>';
             return;
         }
 
         container.innerHTML = "";
-        numbers.forEach((num, idx) => {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'barcode-wrapper';
+        lines.forEach((lineText, idx) => {
+            const row = document.createElement('div');
+            row.className = 'line-barcode-row';
 
-            const svgId = `photoBarcodeSvg_${idx}`;
-            wrapper.innerHTML = `
+            const svgId = `lineBarcodeSvg_${idx}`;
+            row.innerHTML = `
+                <div class="line-badge">Ligne ${idx + 1}</div>
                 <svg id="${svgId}"></svg>
-                <div class="barcode-text">${num}</div>
+                <div class="barcode-text">${lineText}</div>
             `;
-            container.appendChild(wrapper);
-            renderCode128SVG(document.getElementById(svgId), num);
+            container.appendChild(row);
+            renderCode128SVG(document.getElementById(svgId), lineText);
         });
     }
 
-    // Remet tout à zéro (Page Trays + Page OF + Page Photo)
     function resetAll() {
         // Page 1
         document.getElementById('nbLit').value = 0;
@@ -981,7 +1055,6 @@
         renderPhotoBarcodes();
     }
 
-    // Initialisation au chargement (tout à 0)
     resetAll();
 </script>
 
