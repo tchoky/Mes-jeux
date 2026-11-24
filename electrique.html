@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compteur Symboles & Articles - Chantier</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --danger: #ef4444;
+            --danger-dark: #dc2626;
+            --success: #059669;
+            --bg: #f1f5f9;
+            --card: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            padding-bottom: 50px;
+        }
+
+        /* Header & Navigation */
+        header {
+            background: var(--text);
+            color: white;
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+        }
+
+        header h1 {
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-reset {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        .btn-reset:hover { background: var(--danger-dark); }
+
+        .tabs {
+            display: flex;
+            background: white;
+            border-bottom: 2px solid var(--border);
+            position: sticky;
+            top: 56px;
+            z-index: 90;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 14px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.98rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background: #eff6ff;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        /* Gestion des pièces */
+        .panel {
+            background: var(--card);
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            margin-bottom: 18px;
+        }
+
+        .panel-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .row-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .row-controls input, .row-controls select {
+            flex: 1;
+            min-width: 160px;
+            padding: 10px 14px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            background: white;
+            color: var(--text);
+        }
+
+        .row-controls input:focus, .row-controls select:focus {
+            border-color: var(--primary);
+        }
+
+        .btn-add {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.98rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-add:hover { background: var(--primary-dark); }
+
+        .btn-add-custom {
+            background: var(--success);
+        }
+
+        .btn-add-custom:hover { background: #047857; }
+
+        .room-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .room-pill {
+            padding: 8px 14px;
+            border-radius: 20px;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .room-pill.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .room-pill .badge {
+            background: rgba(0,0,0,0.12);
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+        }
+
+        .room-pill.active .badge {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .room-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .btn-del-room {
+            background: transparent;
+            color: var(--danger);
+            border: 1px solid var(--danger);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Grille des articles */
+        .articles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .article-card {
+            background: var(--card);
+            border-radius: 14px;
+            padding: 18px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
+            position: relative;
+        }
+
+        .article-card.has-items {
+            border-color: #93c5fd;
+            background: #f8fafc;
+        }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            min-height: 78px;
+            gap: 12px;
+        }
+
+        .article-title {
+            font-weight: 700;
+            font-size: 1.08rem;
+            color: var(--text);
+        }
+
+        .article-sub {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        .btn-remove-article {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 0.82rem;
+            cursor: pointer;
+            margin-top: 6px;
+            text-decoration: underline;
+            padding: 0;
+        }
+
+        .btn-remove-article:hover { color: var(--danger); }
+
+        .symbol-box {
+            width: 72px;
+            height: 72px;
+            flex-shrink: 0;
+            background: #f8fafc;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .custom-tag {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--primary);
+            padding: 4px 8px;
+            text-align: center;
+            word-break: break-word;
+        }
+
+        /* Contrôleur +/- */
+        .counter-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg);
+            padding: 6px;
+            border-radius: 12px;
+        }
+
+        .btn-step {
+            width: 56px;
+            height: 56px;
+            border-radius: 10px;
+            border: none;
+            font-size: 1.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s, background 0.2s;
+        }
+
+        .btn-step:active { transform: scale(0.94); }
+
+        .btn-minus {
+            background: white;
+            color: var(--text);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+
+        .btn-plus {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 5px rgba(37, 99, 235, 0.35);
+        }
+
+        .count-display {
+            font-size: 2.3rem;
+            font-weight: 800;
+            color: var(--text);
+            min-width: 64px;
+            text-align: center;
+        }
+
+        .article-card.has-items .count-display {
+            color: var(--primary);
+        }
+
+        /* Vue Résumé */
+        .hidden { display: none; }
+
+        .summary-card {
+            background: var(--card);
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
+        }
+
+        .summary-card h2 {
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 11px 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg);
+            font-weight: 700;
+            color: var(--text-muted);
+            font-size: 0.88rem;
+        }
+
+        td.num, th.num {
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .total-highlight {
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .info-banner {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+            padding: 14px 16px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-print {
+            background: var(--text);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        @media print {
+            header, .tabs, .panel, .btn-print { display: none !important; }
+            #view-summary { display: block !important; }
+            #view-encode { display: none !important; }
+            body { background: white; }
+            .summary-card { box-shadow: none; border: 1px solid #ccc; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>⚡ Compteur Symboles & Pièces</h1>
+    <button class="btn-reset" onclick="resetAll()">🗑️ Reset Tout</button>
+</header>
+
+<div class="tabs">
+    <div class="tab active" id="tab-encode" onclick="switchTab('encode')">1. Encodage par Pièce</div>
+    <div class="tab" id="tab-summary" onclick="switchTab('summary')">2. Résumé Total Maison</div>
+</div>
+
+<div class="container">
+    <!-- VUE ENCODAGE -->
+    <div id="view-encode">
+        <!-- Pièces -->
+        <div class="panel">
+            <div class="panel-title">Pièces de la maison</div>
+            <div class="row-controls">
+                <input type="text" id="new-room-name" placeholder="Nom de pièce (ex: Garage, Bureau...)" onkeypress="if(event.key==='Enter') addRoom()">
+                <button class="btn-add" onclick="addRoom()">+ Ajouter Pièce</button>
+            </div>
+            <div class="room-pills" id="room-list"></div>
+        </div>
+
+        <!-- Ajout manuel d'article dans la pièce active -->
+        <div class="panel">
+            <div class="panel-title">Ajouter un article manuellement dans cette pièce</div>
+            <div class="row-controls" style="margin-bottom: 0;">
+                <input type="text" id="new-article-name" placeholder="Nom de l'article (ex: Détecteur, Prise TV...)" onkeypress="if(event.key==='Enter') addManualArticle()">
+                <select id="new-article-symbol">
+                    <option value="sym_1">Symbole 1 (Image 1 - T + arc)</option>
+                    <option value="sym_2">Symbole 2 (Image 2 - 1 branche)</option>
+                    <option value="sym_3">Symbole 3 (Image 2 - 2 branches opposées)</option>
+                    <option value="sym_4">Symbole 4 (Image 2 - 4 branches)</option>
+                    <option value="sym_5">Symbole 5 (Image 2 - V haut)</option>
+                    <option value="sym_6">Symbole 6 (Image 2 - V coudé)</option>
+                    <option value="custom_text">Badge texte / code libre</option>
+                </select>
+                <input type="text" id="new-article-badge" placeholder="Code court (si badge libre)" style="max-width: 180px;">
+                <button class="btn-add btn-add-custom" onclick="addManualArticle()">+ Article Pièce</button>
+            </div>
+        </div>
+
+        <div class="room-header-bar">
+            <h2 id="current-room-title">Pièce : Salon</h2>
+            <button class="btn-del-room" onclick="deleteCurrentRoom()">Supprimer cette pièce</button>
+        </div>
+
+        <div class="articles-grid" id="articles-container"></div>
+    </div>
+
+    <!-- VUE RÉSUMÉ -->
+    <div id="view-summary" class="hidden">
+        <div class="summary-card">
+            <h2>
+                <span>Total Général Maison</span>
+                <button class="btn-print" onclick="window.print()">🖨️ Imprimer / PDF</button>
+            </h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Article</th>
+                        <th class="num">Symbole</th>
+                        <th class="num">Total Maison</th>
+                    </tr>
+                </thead>
+                <tbody id="summary-total-body"></tbody>
+            </table>
+            <div class="info-banner">
+                <span>Total cumulé de tous les articles encodés :</span>
+                <span style="font-size: 1.4rem;" id="grand-total-items">0</span>
+            </div>
+        </div>
+
+        <div class="summary-card">
+            <h2>Détail par Pièce</h2>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead id="summary-rooms-head"></thead>
+                    <tbody id="summary-rooms-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 6 articles par défaut correspondant aux symboles des 2 images
+    const BASE_ARTICLES = [
+        { id: 'sym_1', name: 'Article Symbole 1', sub: 'Image 1', symbolKey: 'sym_1' },
+        { id: 'sym_2', name: 'Article Symbole 2', sub: 'Image 2 — n°1', symbolKey: 'sym_2' },
+        { id: 'sym_3', name: 'Article Symbole 3', sub: 'Image 2 — n°2', symbolKey: 'sym_3' },
+        { id: 'sym_4', name: 'Article Symbole 4', sub: 'Image 2 — n°3', symbolKey: 'sym_4' },
+        { id: 'sym_5', name: 'Article Symbole 5', sub: 'Image 2 — n°4', symbolKey: 'sym_5' },
+        { id: 'sym_6', name: 'Article Symbole 6', sub: 'Image 2 — n°5', symbolKey: 'sym_6' }
+    ];
+
+    const DEFAULT_ROOMS = ['Salon', 'Cuisine', 'Chambre 1', 'Salle de bain', 'Hall / Couloir'];
+
+    // Structure state:
+    // rooms[roomName] = {
+    //   counts: { [articleId]: number },
+    //   customArticles: [ { id, name, sub, symbolKey, badgeText } ]
+    // }
+    let state = {
+        rooms: {},
+        currentRoom: 'Salon'
+    };
+
+    function createEmptyRoomData() {
+        const counts = {};
+        BASE_ARTICLES.forEach(a => counts[a.id] = 0);
+        return {
+            counts,
+            customArticles: []
+        };
+    }
+
+    function init() {
+        const saved = localStorage.getItem('symboles_maison_v1');
+        if (saved) {
+            state = JSON.parse(saved);
+        } else {
+            DEFAULT_ROOMS.forEach(r => {
+                state.rooms[r] = createEmptyRoomData();
+            });
+            state.currentRoom = DEFAULT_ROOMS[0];
+        }
+        renderAll();
+    }
+
+    function saveState() {
+        localStorage.setItem('symboles_maison_v1', JSON.stringify(state));
+    }
+
+    // Rendu SVG des symboles des 2 images
+    function getSymbolHTML(symbolKey, badgeText = '', size = 48) {
+        if (symbolKey === 'custom_text') {
+            return `<div class="custom-tag">${escapeHTML(badgeText || 'ART')}</div>`;
+        }
+
+        const svgs = {
+            // Image 1 : trait vertical descendant sur barre horizontale + arc en dessous
+            sym_1: `
+                <svg width="${size}" height="${size}" viewBox="0 0 64 64" fill="none" stroke="#1e293b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="32" y1="10" x2="32" y2="33"/>
+                    <line x1="14" y1="33" x2="50" y2="33"/>
+                    <path d="M 16 50 A 20 17 0 0 1 48 50"/>
+                </svg>`,
+            // Image 2 n°1 : cercle + branche vers haut-droite avec petit retour
+            sym_2: `
+                <svg width="${size}" height="${size}" viewBox="0 0 64 64" fill="none" stroke="#1e293b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="26" cy="39" r="9"/>
+                    <polyline points="33,33 47,18 52,22"/>
+                </svg>`,
+            // Image 2 n°2 : cercle + 2 branches opposées (haut-droite et bas-gauche)
+            sym_3: `
+                <svg width="${size}" height="${size}" viewBox="0 0 64 64" fill="none" stroke="#1e293b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="32" cy="32" r="9"/>
+                    <polyline points="39,26 52,13 56,17"/>
+                    <polyline points="25,38 12,51 8,47"/>
+                </svg>`,
+            // Image 2 n°3 : cercle + 4 branches diagonales avec petits retours
+            sym_4: `
+                <svg width="${size}" height="${size}" viewBox="0 0 64 64" fill="none" stroke="#1e293b" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="32" cy="32" r="8"/>
+                    <polyline points="38,26 50,15 54,19"/>
+                    <polyline points="26,26 14,15 10,19"/>
+                    <polyline points="38,38 50,49 54,45"/>
+                    <polyline points="26,38 14,49 10,45"/>
+                </svg>`,
+            // Image 2 n°4 : cercle en bas + 2 branches en V vers le haut
+            sym_5: `
+                <svg width="${size}" height="${size}" viewBox="0 0 64 64" fill="none" stroke="#1e293b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="32" cy="44" r="9"/>
+                    <polyline points="26,37 15,20 11,24"/>
+                    <polyline points="38,37 49,20 53,24"/>
+                </svg>`,
+            // Image 2 n°5 : cercle en bas + 2 branches en V avec crochet à gauche
+            sym_6: `
+                <svg width="${size}" height="${size}" viewBox="0 0 64 64" fill="none" stroke="#1e293b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="32" cy="45" r="9"/>
+                    <polyline points="26,38 14,16 19,14"/>
+                    <polyline points="38,38 49,21 53,25"/>
+                </svg>`
+        };
+
+        return svgs[symbolKey] || svgs.sym_1;
+    }
+
+    function escapeHTML(str) {
+        return String(str).replace(/[&<>"']/g, m => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        }[m]));
+    }
+
+    function getRoomArticles(roomName) {
+        const roomData = state.rooms[roomName];
+        return [...BASE_ARTICLES, ...(roomData.customArticles || [])];
+    }
+
+    function switchTab(tab) {
+        document.getElementById('tab-encode').classList.toggle('active', tab === 'encode');
+        document.getElementById('tab-summary').classList.toggle('active', tab === 'summary');
+        document.getElementById('view-encode').classList.toggle('hidden', tab !== 'encode');
+        document.getElementById('view-summary').classList.toggle('hidden', tab !== 'summary');
+
+        if (tab === 'summary') {
+            renderSummary();
+        }
+    }
+
+    function addRoom() {
+        const input = document.getElementById('new-room-name');
+        const name = input.value.trim();
+        if (!name) return;
+        if (state.rooms[name]) {
+            alert('Cette pièce existe déjà !');
+            return;
+        }
+        state.rooms[name] = createEmptyRoomData();
+        state.currentRoom = name;
+        input.value = '';
+        saveState();
+        renderAll();
+    }
+
+    function selectRoom(name) {
+        state.currentRoom = name;
+        saveState();
+        renderAll();
+    }
+
+    function deleteCurrentRoom() {
+        const names = Object.keys(state.rooms);
+        if (names.length <= 1) {
+            alert('Vous devez conserver au moins une pièce.');
+            return;
+        }
+        if (confirm(`Supprimer la pièce "${state.currentRoom}" et ses données ?`)) {
+            delete state.rooms[state.currentRoom];
+            state.currentRoom = Object.keys(state.rooms)[0];
+            saveState();
+            renderAll();
+        }
+    }
+
+    function addManualArticle() {
+        const nameInput = document.getElementById('new-article-name');
+        const symSelect = document.getElementById('new-article-symbol');
+        const badgeInput = document.getElementById('new-article-badge');
+
+        const name = nameInput.value.trim();
+        if (!name) {
+            alert('Veuillez entrer un nom pour l\'article.');
+            return;
+        }
+
+        const roomData = state.rooms[state.currentRoom];
+        const id = 'custom_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+        const symbolKey = symSelect.value;
+        const badgeText = badgeInput.value.trim();
+
+        roomData.customArticles.push({
+            id,
+            name,
+            sub: 'Ajouté dans cette pièce',
+            symbolKey,
+            badgeText,
+            isCustom: true
+        });
+        roomData.counts[id] = 0;
+
+        nameInput.value = '';
+        badgeInput.value = '';
+        saveState();
+        renderAll();
+    }
+
+    function deleteCustomArticle(articleId) {
+        const roomData = state.rooms[state.currentRoom];
+        if (confirm('Retirer cet article ajouté manuellement de cette pièce ?')) {
+            roomData.customArticles = roomData.customArticles.filter(a => a.id !== articleId);
+            delete roomData.counts[articleId];
+            saveState();
+            renderAll();
+        }
+    }
+
+    function updateCount(articleId, delta) {
+        const counts = state.rooms[state.currentRoom].counts;
+        const currentVal = counts[articleId] || 0;
+        counts[articleId] = Math.max(0, currentVal + delta);
+        saveState();
+        renderAll();
+    }
+
+    function resetAll() {
+        if (confirm('⚠️ Voulez-vous vraiment remettre tous les compteurs, articles ajoutés et pièces à zéro ?')) {
+            localStorage.removeItem('symboles_maison_v1');
+            state.rooms = {};
+            DEFAULT_ROOMS.forEach(r => {
+                state.rooms[r] = createEmptyRoomData();
+            });
+            state.currentRoom = DEFAULT_ROOMS[0];
+            saveState();
+            renderAll();
+            if (!document.getElementById('view-summary').classList.contains('hidden')) {
+                renderSummary();
+            }
+        }
+    }
+
+    function renderAll() {
+        const roomListEl = document.getElementById('room-list');
+        roomListEl.innerHTML = '';
+
+        Object.keys(state.rooms).forEach(roomName => {
+            const roomData = state.rooms[roomName];
+            const totalInRoom = Object.values(roomData.counts || {}).reduce((a, b) => a + b, 0);
+            const isActive = roomName === state.currentRoom;
+
+            const pill = document.createElement('div');
+            pill.className = `room-pill ${isActive ? 'active' : ''}`;
+            pill.onclick = () => selectRoom(roomName);
+            pill.innerHTML = `
+                <span>${escapeHTML(roomName)}</span>
+                <span class="badge">${totalInRoom}</span>
+            `;
+            roomListEl.appendChild(pill);
+        });
+
+        document.getElementById('current-room-title').innerText = `Pièce : ${state.currentRoom}`;
+
+        const gridEl = document.getElementById('articles-container');
+        gridEl.innerHTML = '';
+
+        const roomData = state.rooms[state.currentRoom];
+        const articles = getRoomArticles(state.currentRoom);
+
+        articles.forEach(art => {
+            const qty = (roomData.counts && roomData.counts[art.id]) || 0;
+            const card = document.createElement('div');
+            card.className = `article-card ${qty > 0 ? 'has-items' : ''}`;
+
+            card.innerHTML = `
+                <div class="card-top">
+                    <div>
+                        <div class="article-title">${escapeHTML(art.name)}</div>
+                        <div class="article-sub">${escapeHTML(art.sub || '')}</div>
+                        ${art.isCustom ? `<button class="btn-remove-article" onclick="deleteCustomArticle('${art.id}')">Supprimer l'article</button>` : ''}
+                    </div>
+                    <div class="symbol-box">
+                        ${getSymbolHTML(art.symbolKey, art.badgeText, 48)}
+                    </div>
+                </div>
+                <div class="counter-controls">
+                    <button class="btn-step btn-minus" onclick="updateCount('${art.id}', -1)">−</button>
+                    <div class="count-display">${qty}</div>
+                    <button class="btn-step btn-plus" onclick="updateCount('${art.id}', 1)">+</button>
+                </div>
+            `;
+            gridEl.appendChild(card);
+        });
+    }
+
+    function renderSummary() {
+        // Regroupe tous les articles (de base + personnalisés de chaque pièce) par clé unique d'affichage
+        const catalogMap = new Map();
+
+        Object.entries(state.rooms).forEach(([roomName, roomData]) => {
+            const arts = getRoomArticles(roomName);
+            arts.forEach(art => {
+                const key = art.isCustom ? `${art.name}__${art.symbolKey}__${art.badgeText || ''}` : art.id;
+                if (!catalogMap.has(key)) {
+                    catalogMap.set(key, {
+                        key,
+                        name: art.name,
+                        symbolKey: art.symbolKey,
+                        badgeText: art.badgeText || '',
+                        total: 0,
+                        perRoom: {}
+                    });
+                }
+                const qty = (roomData.counts && roomData.counts[art.id]) || 0;
+                const entry = catalogMap.get(key);
+                entry.total += qty;
+                entry.perRoom[roomName] = (entry.perRoom[roomName] || 0) + qty;
+            });
+        });
+
+        const catalog = Array.from(catalogMap.values());
+        const tbody = document.getElementById('summary-total-body');
+        tbody.innerHTML = '';
+
+        let grandTotal = 0;
+
+        catalog.forEach(item => {
+            grandTotal += item.total;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${escapeHTML(item.name)}</strong></td>
+                <td class="num">${getSymbolHTML(item.symbolKey, item.badgeText, 36)}</td>
+                <td class="num total-highlight">${item.total}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        document.getElementById('grand-total-items').innerText = grandTotal;
+
+        // Tableau détaillé par pièce
+        const theadRooms = document.getElementById('summary-rooms-head');
+        const tbodyRooms = document.getElementById('summary-rooms-body');
+
+        theadRooms.innerHTML = `
+            <tr>
+                <th>Pièce</th>
+                ${catalog.map(c => `<th class="num">${escapeHTML(c.name)}</th>`).join('')}
+                <th class="num">Total Pièce</th>
+            </tr>
+        `;
+
+        tbodyRooms.innerHTML = '';
+        Object.keys(state.rooms).forEach(roomName => {
+            let roomSum = 0;
+            const cells = catalog.map(c => {
+                const v = c.perRoom[roomName] || 0;
+                roomSum += v;
+                return `<td class="num" style="${v > 0 ? 'color: var(--primary); font-size: 1.05rem;' : 'color: #cbd5e1;'}">${v}</td>`;
+            }).join('');
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${escapeHTML(roomName)}</strong></td>
+                ${cells}
+                <td class="num"><strong>${roomSum}</strong></td>
+            `;
+            tbodyRooms.appendChild(tr);
+        });
+    }
+
+    init();
+</script>
+
+</body>
+</html>
