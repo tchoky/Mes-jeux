@@ -949,7 +949,7 @@
 
             <div class="ai-config-box">
                 <div style="font-size: 0.85rem; font-weight: 700; color: var(--text);">
-                    Clé API Gemini (optionnel — sinon secours OCR local) :
+                    Clé API Gemini (format <code>AQ.</code> ou <code>AIza...</code> — sinon secours OCR local) :
                 </div>
                 <div class="ai-config-row">
                     <input
@@ -1223,13 +1223,37 @@
         return dataUrl.split(",")[1];
     }
 
+    async function resolveAvailableGeminiModel(apiKey) {
+        try {
+            const listRes = await fetch("https://generativelanguage.googleapis.com/v1beta/models?pageSize=50", {
+                headers: { "x-goog-api-key": apiKey }
+            });
+            if (listRes.ok) {
+                const listData = await listRes.json();
+                const models = (listData.models || [])
+                    .filter(m => (m.supportedGenerationMethods || []).includes("generateContent"))
+                    .map(m => m.name.replace(/^models\//, ""));
+                const preferred = ["gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-2.0-flash", "gemini-flash-latest"];
+                for (const p of preferred) {
+                    if (models.includes(p)) return p;
+                }
+                if (models.length > 0) return models[0];
+            }
+        } catch (_) {}
+        return "gemini-2.5-flash-lite";
+    }
+
     async function extractWithGeminiVision(imgElement, apiKey) {
         const base64Image = imageToBase64Jpeg(imgElement);
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
+        const modelName = await resolveAvailableGeminiModel(apiKey);
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(modelName)}:generateContent`;
 
         const response = await fetch(endpoint, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                "x-goog-api-key": apiKey
+            },
             body: JSON.stringify({
                 contents: [{
                     parts: [
@@ -1251,7 +1275,14 @@
         });
 
         if (!response.ok) {
-            throw new Error(`Erreur API (${response.status})`);
+            let errDetail = `Erreur API (${response.status})`;
+            try {
+                const errJson = await response.json();
+                if (errJson?.error?.message) {
+                    errDetail += ` : ${errJson.error.message}`;
+                }
+            } catch (_) {}
+            throw new Error(errDetail);
         }
 
         const json = await response.json();
@@ -1293,29 +1324,40 @@
             : "🔍 Lecture locale (OCR) en cours...";
 
         preview.onload = async () => {
-            try {
-                let lines = [];
-                if (apiKey) {
-                    lines = await extractWithGeminiVision(preview, apiKey);
-                    if (lines.length > 0) {
-                        textarea.value = lines.join("\n");
-                        statusEl.innerText = `✅ IA : ${lines.length} numéro(s) détecté(s).`;
+            let aiErrorMsg = "";
+            if (apiKey) {
+                try {
+                    const aiLines = await extractWithGeminiVision(preview, apiKey);
+                    if (aiLines.length > 0) {
+                        textarea.value = aiLines.join("\n");
+                        statusEl.innerText = `✅ IA : ${aiLines.length} numéro(s) détecté(s).`;
                         renderPhotoBarcodes();
                         return;
                     }
+                } catch (err) {
+                    aiErrorMsg = err.message;
                 }
+            }
 
-                lines = await extractWithTesseractFallback(preview);
-                if (lines.length > 0) {
-                    textarea.value = lines.join("\n");
-                    statusEl.innerText = `ℹ️ Secours OCR : ${lines.length} ligne(s) détectée(s). Vérifie si besoin.`;
+            // Secours automatique vers OCR local si pas de clé ou en cas d'erreur IA
+            statusEl.innerText = aiErrorMsg
+                ? `⚠️ ${aiErrorMsg} — Bascule sur le secours OCR local...`
+                : "🔍 Lecture locale (OCR) en cours...";
+
+            try {
+                const ocrLines = await extractWithTesseractFallback(preview);
+                if (ocrLines.length > 0) {
+                    textarea.value = ocrLines.join("\n");
+                    statusEl.innerText = aiErrorMsg
+                        ? `ℹ️ Secours OCR : ${ocrLines.length} ligne(s) détectée(s). Vérifie si besoin.`
+                        : `✅ OCR local : ${ocrLines.length} ligne(s) détectée(s).`;
                 } else {
                     statusEl.innerText = "⚠️ Aucun numéro détecté : saisis ou corrige manuellement ci-dessous.";
                 }
-                renderPhotoBarcodes();
-            } catch (err) {
-                statusEl.innerText = `⚠️ Erreur IA (${err.message}). Saisis ou corrige les numéros ci-dessous.`;
+            } catch (_) {
+                statusEl.innerText = "⚠️ Lecture impossible : saisis les numéros manuellement ci-dessous.";
             }
+            renderPhotoBarcodes();
         };
 
         preview.src = objectUrl;
