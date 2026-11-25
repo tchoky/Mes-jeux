@@ -46,14 +46,37 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 14px;
+            gap: 12px;
+            margin-bottom: 16px;
             box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
         }
 
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
         .header h1 {
-            font-size: 1.25rem;
+            font-size: 1.2rem;
             font-weight: 700;
         }
+
+        .btn-back {
+            background: rgba(255, 255, 255, 0.14);
+            color: white;
+            border: 1.5px solid rgba(255, 255, 255, 0.28);
+            padding: 9px 14px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.92rem;
+            transition: background 0.2s, transform 0.1s;
+            white-space: nowrap;
+        }
+
+        .btn-back:hover { background: rgba(255, 255, 255, 0.24); }
+        .btn-back:active { transform: scale(0.96); }
 
         .btn-reset {
             background: var(--danger);
@@ -63,43 +86,107 @@
             border-radius: 10px;
             font-weight: 700;
             cursor: pointer;
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             transition: opacity 0.2s, transform 0.1s;
+            white-space: nowrap;
         }
 
         .btn-reset:hover { opacity: 0.92; }
         .btn-reset:active { transform: scale(0.96); }
 
-        /* Navigation Onglets (3 Pages) */
-        .nav-tabs {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-bottom: 18px;
+        /* Écran Menu Principal */
+        .menu-card {
+            background: var(--card);
+            border-radius: 18px;
+            padding: 24px 20px;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+            border: 1px solid var(--border);
         }
 
-        .tab-btn {
-            background: var(--card);
-            border: 2px solid var(--border);
-            color: var(--muted);
-            padding: 12px 8px;
-            border-radius: 14px;
+        .menu-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 6px;
+            color: var(--text);
+        }
+
+        .menu-subtitle {
             font-size: 0.92rem;
-            font-weight: 700;
+            text-align: center;
+            color: var(--muted);
+            margin-bottom: 22px;
+            font-weight: 600;
+        }
+
+        .menu-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .menu-choice-btn {
+            background: #f8fafc;
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
             cursor: pointer;
+            text-align: left;
             transition: all 0.2s;
+            width: 100%;
+        }
+
+        .menu-choice-btn:hover {
+            border-color: var(--primary);
+            background: #eff6ff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(37, 99, 235, 0.12);
+        }
+
+        .menu-choice-btn:active {
+            transform: scale(0.99);
+        }
+
+        .menu-choice-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .menu-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: var(--primary);
+            color: white;
+            font-size: 1.45rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            text-align: center;
+            flex-shrink: 0;
         }
 
-        .tab-btn.active {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: white;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+        .menu-choice-title {
+            font-size: 1.08rem;
+            font-weight: 800;
+            color: var(--text);
+        }
+
+        .menu-choice-desc {
+            font-size: 0.85rem;
+            color: var(--muted);
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .menu-arrow {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary);
         }
 
         .page-section {
@@ -282,11 +369,18 @@
             text-align: center;
         }
 
+        .photo-actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
         .btn-photo {
             background: var(--primary);
             color: white;
             border: none;
-            padding: 14px 22px;
+            padding: 14px 20px;
             border-radius: 12px;
             font-size: 1rem;
             font-weight: 700;
@@ -295,9 +389,30 @@
             align-items: center;
             gap: 8px;
             box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+            transition: background 0.2s, transform 0.1s;
         }
 
         .btn-photo:hover { background: var(--primary-dark); }
+        .btn-photo:active { transform: scale(0.97); }
+
+        .btn-gallery {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 6px rgba(37, 99, 235, 0.1);
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .btn-gallery:hover { background: #dbeafe; }
+        .btn-gallery:active { transform: scale(0.97); }
 
         .photo-preview {
             margin-top: 14px;
@@ -575,7 +690,7 @@
 
         @media print {
             body { background: white; padding: 0; }
-            .header, .nav-tabs, .card, .mode-select, .btn-print { display: none !important; }
+            .header, .card, .mode-select, .btn-print { display: none !important; }
             .result-card {
                 background: white !important;
                 color: black !important;
@@ -594,29 +709,66 @@
 <body>
 
 <div class="container">
-    <!-- En-tête commun avec bouton Reset global -->
+    <!-- En-tête commun avec bouton Retour Menu (sur les pages) et Reset global -->
     <div class="header">
-        <h1>📦 Gestion Trays, OF & Photo</h1>
-        <button class="btn-reset" onclick="resetAll()">🔄 Reset (Tout à 0)</button>
+        <div class="header-left">
+            <button id="btnBackMenu" class="btn-back" style="display: none;" onclick="switchPage('menu')">
+                ← Menu
+            </button>
+            <h1 id="headerTitle">📦 Menu Principal</h1>
+        </div>
+        <button class="btn-reset" onclick="resetAll()">🔄 Reset</button>
     </div>
 
-    <!-- Navigation entre les 3 pages -->
-    <div class="nav-tabs">
-        <button class="tab-btn active" id="tabBtnTrays" onclick="switchPage('trays')">
-            🧮 1. Calcul Trays
-        </button>
-        <button class="tab-btn" id="tabBtnOf" onclick="switchPage('of')">
-            🏷️ 2. Numéro d'OF
-        </button>
-        <button class="tab-btn" id="tabBtnPhoto" onclick="switchPage('photo')">
-            📷 3. Photo & Codes
-        </button>
+    <!-- ========================================== -->
+    <!-- MENU D'ACCUEIL : SÉLECTION DES 3 PAGES     -->
+    <!-- ========================================== -->
+    <div id="page-menu" class="page-section active">
+        <div class="menu-card">
+            <div class="menu-title">Choisissez une page</div>
+            <div class="menu-subtitle">Sélectionnez l'outil souhaité pour ouvrir la page correspondante</div>
+
+            <div class="menu-grid">
+                <button type="button" class="menu-choice-btn" onclick="switchPage('trays')">
+                    <div class="menu-choice-left">
+                        <div class="menu-icon">🧮</div>
+                        <div>
+                            <div class="menu-choice-title">1. Calcul Trays</div>
+                            <div class="menu-choice-desc">Lits, trays par lit, format (6, 8, 12), ajout et code-barres</div>
+                        </div>
+                    </div>
+                    <div class="menu-arrow">→</div>
+                </button>
+
+                <button type="button" class="menu-choice-btn" onclick="switchPage('of')">
+                    <div class="menu-choice-left">
+                        <div class="menu-icon">🏷️</div>
+                        <div>
+                            <div class="menu-choice-title">2. Numéro d'OF & Verre</div>
+                            <div class="menu-choice-desc">Numéro d'OF (00000+), NB verre et code-barres 0</div>
+                        </div>
+                    </div>
+                    <div class="menu-arrow">→</div>
+                </button>
+
+                <button type="button" class="menu-choice-btn" onclick="switchPage('photo')">
+                    <div class="menu-choice-left">
+                        <div class="menu-icon">📷</div>
+                        <div>
+                            <div class="menu-choice-title">3. Photo & Codes</div>
+                            <div class="menu-choice-desc">Photo ou galerie, lecture ligne par ligne et codes-barres</div>
+                        </div>
+                    </div>
+                    <div class="menu-arrow">→</div>
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- ========================================== -->
     <!-- PAGE 1 : CALCUL TRAYS                      -->
     <!-- ========================================== -->
-    <div id="page-trays" class="page-section active">
+    <div id="page-trays" class="page-section">
         <div class="card">
             <div class="question-label">
                 <span class="step-badge">1</span>
@@ -720,7 +872,6 @@
     <!-- PAGE 2 : NUMÉRO D'OF + NB VERRE + CODE 0   -->
     <!-- ========================================== -->
     <div id="page-of" class="page-section">
-        <!-- 1. Question Numéro d'OF -->
         <div class="card">
             <div class="question-label">
                 <span class="step-badge">OF</span>
@@ -747,7 +898,6 @@
             </div>
         </div>
 
-        <!-- 2. Question NB verre -->
         <div class="card">
             <div class="question-label">
                 <span class="step-badge">🥃</span>
@@ -760,7 +910,6 @@
             </div>
         </div>
 
-        <!-- Code-barres NB verre -->
         <div class="barcode-card">
             <div class="barcode-header">
                 <span class="barcode-title">Code-Barres NB verre</span>
@@ -772,7 +921,6 @@
             </div>
         </div>
 
-        <!-- 3. Code-barres 0 en dessous -->
         <div class="barcode-card">
             <div class="barcode-header">
                 <span class="barcode-title">Code-Barres 0</span>
@@ -818,16 +966,30 @@
             <div class="photo-upload-box">
                 <input
                     type="file"
-                    id="photoInput"
+                    id="cameraInput"
                     accept="image/*"
                     capture="environment"
                     style="display: none;"
                     onchange="handlePhotoSelected(this)"
                 >
-                <button class="btn-photo" onclick="document.getElementById('photoInput').click()">
-                    📸 Faire une photo / Importer
-                </button>
-                <div class="of-hint">Lecture automatique ligne par ligne (ex: <code>EU2610215025</code>)[span_1](start_span)[span_1](end_span)</div>
+                <input
+                    type="file"
+                    id="galleryInput"
+                    accept="image/*"
+                    style="display: none;"
+                    onchange="handlePhotoSelected(this)"
+                >
+
+                <div class="photo-actions">
+                    <button type="button" class="btn-photo" onclick="document.getElementById('cameraInput').click()">
+                        📸 Prendre une photo
+                    </button>
+                    <button type="button" class="btn-gallery" onclick="document.getElementById('galleryInput').click()">
+                        🖼️ Importer depuis la galerie
+                    </button>
+                </div>
+
+                <div class="of-hint">Lecture automatique ligne par ligne (ex: <code>EU2610215025</code>)</div>
                 <img id="photoPreview" class="photo-preview" alt="Aperçu photo">
                 <div id="ocrStatus" class="ocr-status"></div>
             </div>
@@ -849,7 +1011,7 @@
             </div>
 
             <div id="photoBarcodesContainer" class="barcodes-list">
-                <div class="empty-msg">Prenez une photo ou saisissez des numéros pour générer 1 code-barres par ligne.</div>
+                <div class="empty-msg">Prenez une photo, importez une image ou saisissez des numéros pour générer 1 code-barres par ligne.</div>
             </div>
 
             <div>
@@ -861,6 +1023,13 @@
 
 <script>
     const STORAGE_KEY_GEMINI = "gemini_api_key_tray_app";
+
+    const PAGE_TITLES = {
+        menu: "📦 Menu Principal",
+        trays: "🧮 1. Calcul Trays",
+        of: "🏷️ 2. Numéro d'OF",
+        photo: "📷 3. Photo & Codes"
+    };
 
     // Table complète Code 128 (Set B) pour génération autonome sans internet
     const CODE128_PATTERNS = [
@@ -931,13 +1100,14 @@
     }
 
     function switchPage(pageName) {
+        document.getElementById('page-menu').classList.toggle('active', pageName === 'menu');
         document.getElementById('page-trays').classList.toggle('active', pageName === 'trays');
         document.getElementById('page-of').classList.toggle('active', pageName === 'of');
         document.getElementById('page-photo').classList.toggle('active', pageName === 'photo');
 
-        document.getElementById('tabBtnTrays').classList.toggle('active', pageName === 'trays');
-        document.getElementById('tabBtnOf').classList.toggle('active', pageName === 'of');
-        document.getElementById('tabBtnPhoto').classList.toggle('active', pageName === 'photo');
+        document.getElementById('btnBackMenu').style.display = (pageName === 'menu') ? 'none' : 'inline-flex';
+        document.getElementById('headerTitle').innerText = PAGE_TITLES[pageName] || "📦 Gestion Trays, OF & Photo";
+        window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     function stepValue(inputId, delta) {
@@ -1116,11 +1286,10 @@
         const apiKey = (document.getElementById('geminiApiKeyInput').value || localStorage.getItem(STORAGE_KEY_GEMINI) || "").trim();
 
         const objectUrl = URL.createObjectURL(file);
-        preview.src = objectUrl;
         preview.style.display = "block";
 
         statusEl.innerText = apiKey
-            ? "🤖 Analyse de la photo par l'IA..."
+            ? "🤖 Analyse de l'image par l'IA..."
             : "🔍 Lecture locale (OCR) en cours...";
 
         preview.onload = async () => {
@@ -1148,6 +1317,8 @@
                 statusEl.innerText = `⚠️ Erreur IA (${err.message}). Saisis ou corrige les numéros ci-dessous.`;
             }
         };
+
+        preview.src = objectUrl;
     }
 
     // Génère strictement 1 code-barres par ligne non vide
@@ -1162,7 +1333,7 @@
         document.getElementById('photoBarcodeCount').innerText = lines.length;
 
         if (lines.length === 0) {
-            container.innerHTML = '<div class="empty-msg">Prenez une photo ou saisissez des numéros pour générer 1 code-barres par ligne.</div>';
+            container.innerHTML = '<div class="empty-msg">Prenez une photo, importez une image ou saisissez des numéros pour générer 1 code-barres par ligne.</div>';
             return;
         }
 
@@ -1199,7 +1370,8 @@
         updateZeroBarcode();
 
         // Page 3
-        document.getElementById('photoInput').value = "";
+        document.getElementById('cameraInput').value = "";
+        document.getElementById('galleryInput').value = "";
         const preview = document.getElementById('photoPreview');
         preview.src = "";
         preview.style.display = "none";
@@ -1210,6 +1382,7 @@
 
     loadSavedApiKey();
     resetAll();
+    switchPage('menu');
 </script>
 
 </body>
