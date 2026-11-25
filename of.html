@@ -949,7 +949,7 @@
 
             <div class="ai-config-box">
                 <div style="font-size: 0.85rem; font-weight: 700; color: var(--text);">
-                    Clé API Gemini (format <code>AQ.</code> ou <code>AIza...</code> — sinon secours OCR local) :
+                    Clé API Gemini (optionnel — sinon secours OCR local) :
                 </div>
                 <div class="ai-config-row">
                     <input
@@ -1023,6 +1023,7 @@
 
 <script>
     const STORAGE_KEY_GEMINI = "gemini_api_key_tray_app";
+    const GEMINI_MODEL = "gemini-3.5-flash-lite";
 
     const PAGE_TITLES = {
         menu: "📦 Menu Principal",
@@ -1106,7 +1107,7 @@
         document.getElementById('page-photo').classList.toggle('active', pageName === 'photo');
 
         document.getElementById('btnBackMenu').style.display = (pageName === 'menu') ? 'none' : 'inline-flex';
-        document.getElementById('headerTitle').innerText = PAGE_TITLES[pageName] || "📦 Gestion Trays, OF & Photo";
+        document.getElementById('headerTitle').innerText = PAGE_TITLES[pageName] || "📦 Menu Principal";
         window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
@@ -1223,30 +1224,9 @@
         return dataUrl.split(",")[1];
     }
 
-    async function resolveAvailableGeminiModel(apiKey) {
-        try {
-            const listRes = await fetch("https://generativelanguage.googleapis.com/v1beta/models?pageSize=50", {
-                headers: { "x-goog-api-key": apiKey }
-            });
-            if (listRes.ok) {
-                const listData = await listRes.json();
-                const models = (listData.models || [])
-                    .filter(m => (m.supportedGenerationMethods || []).includes("generateContent"))
-                    .map(m => m.name.replace(/^models\//, ""));
-                const preferred = ["gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-2.0-flash", "gemini-flash-latest"];
-                for (const p of preferred) {
-                    if (models.includes(p)) return p;
-                }
-                if (models.length > 0) return models[0];
-            }
-        } catch (_) {}
-        return "gemini-2.5-flash-lite";
-    }
-
     async function extractWithGeminiVision(imgElement, apiKey) {
         const base64Image = imageToBase64Jpeg(imgElement);
-        const modelName = await resolveAvailableGeminiModel(apiKey);
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(modelName)}:generateContent`;
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(GEMINI_MODEL)}:generateContent`;
 
         const response = await fetch(endpoint, {
             method: "POST",
@@ -1267,10 +1247,7 @@
                             }
                         }
                     ]
-                }],
-                generationConfig: {
-                    temperature: 0
-                }
+                }]
             })
         });
 
@@ -1320,7 +1297,7 @@
         preview.style.display = "block";
 
         statusEl.innerText = apiKey
-            ? "🤖 Analyse de l'image par l'IA..."
+            ? `🤖 Analyse de l'image (${GEMINI_MODEL})...`
             : "🔍 Lecture locale (OCR) en cours...";
 
         preview.onload = async () => {
@@ -1330,7 +1307,7 @@
                     const aiLines = await extractWithGeminiVision(preview, apiKey);
                     if (aiLines.length > 0) {
                         textarea.value = aiLines.join("\n");
-                        statusEl.innerText = `✅ IA : ${aiLines.length} numéro(s) détecté(s).`;
+                        statusEl.innerText = `✅ IA (${GEMINI_MODEL}) : ${aiLines.length} numéro(s) détecté(s).`;
                         renderPhotoBarcodes();
                         return;
                     }
