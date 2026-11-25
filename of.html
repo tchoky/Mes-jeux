@@ -498,6 +498,7 @@
             padding: 20px 14px;
             text-align: center;
             border: 2px dashed #cbd5e1;
+            margin-bottom: 16px;
         }
 
         .barcode-header {
@@ -716,9 +717,10 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- PAGE 2 : NUMÉRO D'OF (00000 + NUMÉRO)      -->
+    <!-- PAGE 2 : NUMÉRO D'OF + NB VERRE + CODE 0   -->
     <!-- ========================================== -->
     <div id="page-of" class="page-section">
+        <!-- 1. Question Numéro d'OF -->
         <div class="card">
             <div class="question-label">
                 <span class="step-badge">OF</span>
@@ -742,6 +744,43 @@
             <div class="barcode-wrapper">
                 <svg id="barcodeOfSvg"></svg>
                 <div class="barcode-text" id="barcodeOfHumanText">00000</div>
+            </div>
+        </div>
+
+        <!-- 2. Question NB verre -->
+        <div class="card">
+            <div class="question-label">
+                <span class="step-badge">🥃</span>
+                <span>NB verre</span>
+            </div>
+            <div class="stepper">
+                <button class="btn-step btn-minus" onclick="stepVerre(-1)">−</button>
+                <input type="number" id="nbVerreInput" class="num-input" value="0" min="0" oninput="updateVerreBarcode()">
+                <button class="btn-step btn-plus" onclick="stepVerre(1)">+</button>
+            </div>
+        </div>
+
+        <!-- Code-barres NB verre -->
+        <div class="barcode-card">
+            <div class="barcode-header">
+                <span class="barcode-title">Code-Barres NB verre</span>
+            </div>
+
+            <div class="barcode-wrapper">
+                <svg id="barcodeVerreSvg"></svg>
+                <div class="barcode-text" id="barcodeVerreHumanText">0</div>
+            </div>
+        </div>
+
+        <!-- 3. Code-barres 0 en dessous -->
+        <div class="barcode-card">
+            <div class="barcode-header">
+                <span class="barcode-title">Code-Barres 0</span>
+            </div>
+
+            <div class="barcode-wrapper">
+                <svg id="barcodeZeroSvg"></svg>
+                <div class="barcode-text" id="barcodeZeroHumanText">0</div>
             </div>
 
             <div>
@@ -788,7 +827,7 @@
                 <button class="btn-photo" onclick="document.getElementById('photoInput').click()">
                     📸 Faire une photo / Importer
                 </button>
-                <div class="of-hint">Lecture automatique ligne par ligne (ex: <code>EU2610215025</code>)[span_2](start_span)[span_2](end_span)[span_3](start_span)[span_3](end_span)</div>
+                <div class="of-hint">Lecture automatique ligne par ligne (ex: <code>EU2610215025</code>)[span_1](start_span)[span_1](end_span)</div>
                 <img id="photoPreview" class="photo-preview" alt="Aperçu photo">
                 <div id="ocrStatus" class="ocr-status"></div>
             </div>
@@ -952,6 +991,26 @@
 
         document.getElementById('barcodeOfHumanText').innerText = fullCode;
         renderCode128SVG(document.getElementById('barcodeOfSvg'), fullCode);
+    }
+
+    function stepVerre(delta) {
+        const input = document.getElementById('nbVerreInput');
+        const current = parseInt(input.value, 10) || 0;
+        input.value = Math.max(0, current + delta);
+        updateVerreBarcode();
+    }
+
+    function updateVerreBarcode() {
+        const val = Math.max(0, parseInt(document.getElementById('nbVerreInput').value, 10) || 0);
+        const codeText = String(val);
+
+        document.getElementById('barcodeVerreHumanText').innerText = codeText;
+        renderCode128SVG(document.getElementById('barcodeVerreSvg'), codeText);
+    }
+
+    function updateZeroBarcode() {
+        document.getElementById('barcodeZeroHumanText').innerText = "0";
+        renderCode128SVG(document.getElementById('barcodeZeroSvg'), "0");
     }
 
     function loadSavedApiKey() {
@@ -1135,6 +1194,9 @@
         // Page 2
         document.getElementById('ofNumberInput').value = "";
         updateOfBarcode();
+        document.getElementById('nbVerreInput').value = 0;
+        updateVerreBarcode();
+        updateZeroBarcode();
 
         // Page 3
         document.getElementById('photoInput').value = "";
