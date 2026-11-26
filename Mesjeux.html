@@ -84,13 +84,13 @@
       top: 12px;
       right: 12px;
       z-index: 10000;
-      padding: 8px 14px;
+      padding: 6px 10px;
       border: none;
       border-radius: 8px;
       background: rgba(30, 41, 59, 0.85);
       color: #fff;
-      font-size: 0.95em;
-      font-weight: 600;
+      font-size: 1em;
+      line-height: 1;
       cursor: pointer;
       backdrop-filter: blur(6px);
     }
@@ -190,7 +190,7 @@
   <div class="choix" id="liste-jeux">Chargement...</div>
 
   <div id="lecteur-ecran">
-    <button id="bouton-retour" type="button" onclick="fermerJeu()">✕ Menu</button>
+    <button id="bouton-retour" type="button" onclick="fermerJeu()" title="Fermer">❌</button>
     <iframe id="frame-jeu" allowfullscreen></iframe>
   </div>
 
