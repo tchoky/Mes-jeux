@@ -15,7 +15,7 @@
       --border: #cbd5e1;
       --danger: #dc2626;
       --danger-bg: #fef2f2;
-      --danger-border: #fecaca;
+      --danger-border: #fca5a5;
       --success: #16a34a;
       --success-bg: #f0fdf4;
       --success-border: #bbf7d0;
@@ -97,7 +97,7 @@
       gap: 8px;
       font-size: 0.84rem;
       font-weight: 700;
-      padding: 7px 10px;
+      padding: 8px 10px;
       border-radius: 8px;
       background: var(--info-bg);
       border: 1px solid var(--info-border);
@@ -122,13 +122,13 @@
     }
 
     .step-btn {
-      width: 30px;
-      height: 34px;
+      width: 32px;
+      height: 36px;
       border-radius: 8px;
       border: 1px solid #94a3b8;
       background: #e2e8f0;
       color: var(--text);
-      font-size: 1rem;
+      font-size: 1.05rem;
       font-weight: 900;
       cursor: pointer;
       display: inline-flex;
@@ -141,7 +141,7 @@
     }
 
     .step-num-inp {
-      width: 68px !important;
+      width: 66px !important;
       text-align: center;
       padding: 7px 6px !important;
     }
@@ -158,7 +158,7 @@
       margin-bottom: 14px;
     }
 
-    /* Cartes de lignes lisibles */
+    /* Cartes de lignes */
     .line-card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -186,20 +186,11 @@
       gap: 8px;
     }
 
-    .pill-num {
-      background: #e2e8f0;
-      color: var(--text);
-      font-size: 0.8rem;
-      font-weight: 800;
-      padding: 4px 9px;
-      border-radius: 6px;
-    }
-
     .pill-fruit {
       background: #fef3c7;
       color: #92400e;
       border: 1px solid #fde68a;
-      font-size: 0.9rem;
+      font-size: 0.92rem;
       font-weight: 800;
       padding: 4px 10px;
       border-radius: 6px;
@@ -222,26 +213,26 @@
       gap: 6px;
     }
 
-    .app-stepper {
+    .mini-stepper {
       display: inline-flex;
       align-items: center;
       gap: 4px;
       background: #f8fafc;
       border: 1px solid #cbd5e1;
       border-radius: 8px;
-      padding: 2px 6px;
-      font-size: 0.82rem;
+      padding: 3px 6px;
+      font-size: 0.84rem;
       font-weight: 800;
     }
 
-    .app-step-btn {
-      width: 26px;
-      height: 26px;
+    .mini-step-btn {
+      width: 28px;
+      height: 28px;
       border-radius: 6px;
       border: 1px solid #94a3b8;
       background: #e2e8f0;
       color: var(--text);
-      font-size: 0.95rem;
+      font-size: 1rem;
       font-weight: 900;
       cursor: pointer;
       display: inline-flex;
@@ -249,12 +240,22 @@
       justify-content: center;
     }
 
-    /* Grille responsive des champs */
+    .line-meta {
+      font-size: 0.86rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Grille champs */
     .fields-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
       gap: 10px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .field {
@@ -385,7 +386,7 @@
     .btn-pdf   { background: var(--primary); color: #fff; }
     .btn-pdf:hover { background: var(--primary-hover); }
     .btn-sec   { background: #e2e8f0; color: var(--text); }
-    .btn-mini  { padding: 6px 10px; font-size: 0.82rem; border-radius: 7px; }
+    .btn-mini  { padding: 7px 11px; font-size: 0.84rem; border-radius: 8px; }
     .btn-del   { background: #fee2e2; color: var(--danger); }
 
     /* Modale formulaire Start */
@@ -410,7 +411,7 @@
       border-radius: 14px;
       padding: 18px;
       width: 100%;
-      max-width: 540px;
+      max-width: 560px;
       max-height: 92vh;
       overflow-y: auto;
       box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
@@ -479,12 +480,12 @@
           <button type="button" class="abc-btn" onclick="toggleAbc('g-ver-ref', this)">ABC</button>
         </div>
       </div>
-      <div class="field" style="flex:1 1 120px;">
+      <div class="field" style="flex:1 1 115px;">
         <label>Nb / palette</label>
         <input type="number" inputmode="numeric" pattern="[0-9]*" id="g-ver-pal" placeholder="0">
       </div>
       <div class="field" style="flex:0 0 auto;">
-        <label>Nb palettes</label>
+        <label>Nb palettes (0 si rien)</label>
         <div class="stepper">
           <button type="button" class="step-btn" onclick="stepGlassPallets(-1)">-</button>
           <input type="number" inputmode="numeric" pattern="[0-9]*" class="step-num-inp" id="g-ver-stk" placeholder="0">
@@ -519,21 +520,25 @@
         <div class="fields-grid">
           <div class="field">
             <label>Fruit</label>
-            <input type="text" inputmode="text" id="m-fruit" placeholder="Fruit 1">
+            <input type="text" inputmode="text" id="m-fruit" placeholder="Ex : Annas">
           </div>
           <div class="field">
             <label>Verre / app</label>
-            <input type="number" inputmode="numeric" pattern="[0-9]*" id="m-ver-app" value="3500">
+            <input type="number" inputmode="numeric" pattern="[0-9]*" id="m-ver-app" value="3500" oninput="updateLivePreview()">
           </div>
           <div class="field">
             <label>Nb app</label>
-            <input type="number" inputmode="numeric" pattern="[0-9]*" id="m-nb-app" value="1">
+            <div class="stepper">
+              <button type="button" class="step-btn" onclick="stepModalApps(-1)">-</button>
+              <input type="number" inputmode="numeric" pattern="[0-9]*" class="step-num-inp" id="m-nb-app" value="1" oninput="updateLivePreview()">
+              <button type="button" class="step-btn" onclick="stepModalApps(1)">+</button>
+            </div>
           </div>
         </div>
       </div>
 
       <div class="modal-section">
-        <div class="modal-sec-title">🏷️ Étiquette</div>
+        <div class="modal-sec-title">🏷️ Étiquette (0 paquet si rien)</div>
         <div class="fields-grid">
           <div class="field">
             <label>Réf eti</label>
@@ -544,17 +549,17 @@
           </div>
           <div class="field">
             <label>Ét / paquet</label>
-            <input type="number" inputmode="numeric" pattern="[0-9]*" id="m-et-pack" value="5000">
+            <input type="number" inputmode="numeric" pattern="[0-9]*" id="m-et-pack" value="5000" oninput="updateLivePreview()">
           </div>
           <div class="field">
-            <label>Stk paquets</label>
-            <input type="number" inputmode="numeric" pattern="[0-9]*" id="m-et-stk" placeholder="0">
+            <label>Nb paquets (0 si rien)</label>
+            <input type="number" inputmode="numeric" pattern="[0-9]*" id="m-et-stk" placeholder="0" oninput="updateLivePreview()">
           </div>
         </div>
       </div>
 
       <div class="modal-section">
-        <div class="modal-sec-title">🔘 Capsule</div>
+        <div class="modal-sec-title">🔘 Capsule (0 boîte si rien)</div>
         <div class="fields-grid">
           <div class="field">
             <label>Réf CRC</label>
@@ -565,17 +570,17 @@
           </div>
           <div class="field">
             <label>Cap / boîte</label>
-            <input type="number" inputmode="numeric" pattern="[0-9]*" id="m-cap-box" value="400">
+            <input type="number" inputmode="numeric" pattern="[0-9]*" id="m-cap-box" value="400" oninput="updateLivePreview()">
           </div>
           <div class="field">
-            <label>Nb boîtes</label>
-            <input type="number" inputmode="numeric" pattern="[0-9]*" id="m-cap-nb-box" value="1">
+            <label>Nb boîtes (0 si rien)</label>
+            <input type="number" inputmode="numeric" pattern="[0-9]*" id="m-cap-nb-box" value="1" oninput="updateLivePreview()">
           </div>
         </div>
       </div>
 
       <div class="modal-section">
-        <div class="modal-sec-title">📦 Tray</div>
+        <div class="modal-sec-title">📦 Tray (0 palette si rien)</div>
         <div class="fields-grid">
           <div class="field">
             <label>Réf cct</label>
@@ -586,21 +591,27 @@
           </div>
           <div class="field">
             <label>Tray / palette</label>
-            <input type="number" inputmode="numeric" pattern="[0-9]*" id="m-tr-pal" value="3000">
+            <input type="number" inputmode="numeric" pattern="[0-9]*" id="m-tr-pal" value="3000" oninput="updateLivePreview()">
           </div>
           <div class="field">
-            <label>Nb palettes</label>
-            <input type="number" inputmode="numeric" pattern="[0-9]*" id="m-tr-nb-pal" value="1">
+            <label>Nb palettes (0 si rien)</label>
+            <input type="number" inputmode="numeric" pattern="[0-9]*" id="m-tr-nb-pal" value="1" oninput="updateLivePreview()">
           </div>
           <div class="field">
             <label>Format</label>
             <div class="fmt-group">
-              <label class="fmt-btn"><input type="radio" name="m_fmt" value="6"><span>6</span></label>
-              <label class="fmt-btn"><input type="radio" name="m_fmt" value="8"><span>8</span></label>
-              <label class="fmt-btn"><input type="radio" name="m_fmt" value="12" checked><span>12</span></label>
+              <label class="fmt-btn"><input type="radio" name="m_fmt" value="6" onchange="updateLivePreview()"><span>6</span></label>
+              <label class="fmt-btn"><input type="radio" name="m_fmt" value="8" onchange="updateLivePreview()"><span>8</span></label>
+              <label class="fmt-btn"><input type="radio" name="m_fmt" value="12" checked onchange="updateLivePreview()"><span>12</span></label>
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- CALCUL AUTOMATIQUE EN DIRECT DANS START -->
+      <div class="modal-section">
+        <div class="modal-sec-title" id="m-pf-preview">Calcul auto : 0 PF</div>
+        <div class="needs-grid" id="m-needs-preview"></div>
       </div>
 
       <div class="modal-footer">
@@ -613,7 +624,7 @@
   <div id="print-area"></div>
 
   <script>
-    const STORAGE_KEY = 'compteurs_verre_fixe_3500_v1';
+    const STORAGE_KEY = 'compteurs_zero_defaut_v1';
 
     let state = {
       verre: { ref: '', perPal: '', stkPal: '' },
@@ -622,13 +633,9 @@
 
     let editingIndex = null;
 
-    function defaultFruitName(idx) {
-      return `Fruit ${idx + 1}`;
-    }
-
-    function createDefaultLine(idx = 0) {
+    function createEmptyLine() {
       return {
-        fruit: defaultFruitName(idx),
+        fruit: '',
         verPerApp: 3500,
         nbApp: 1,
         etRef: '',
@@ -673,17 +680,74 @@
       return state.lines.reduce((s, l) => s + lineTotal(l), 0);
     }
 
-    function fruitLabel(l, idx) {
-      const f = (l.fruit || '').trim();
-      return f ? f : defaultFruitName(idx);
-    }
-
     function toggleAbc(id, btn) {
       const inp = document.getElementById(id);
       if (!inp) return;
       const isText = btn.classList.toggle('active');
       inp.inputMode = isText ? 'text' : 'numeric';
       inp.focus();
+    }
+
+    function computeLineNeedsHtml(data) {
+      const pf = (Number(data.verPerApp) || 0) * (Number(data.nbApp) || 0);
+
+      // 1. Étiquettes : 0 paquet si rien
+      const etPack = Number(data.etPerPack) || 0;
+      const etStkPack = Number(data.etStkPack) || 0; // 0 si vide
+      const etNeedPack = etPack > 0 ? Math.ceil(pf / etPack) : 0;
+      const etDispo = etPack * etStkPack;
+      const etTag = (data.etRef || '').trim() ? ` [${data.etRef.trim()}]` : '';
+      let etCls = 'need-card';
+      let etMsg = `🏷️ <strong>Étiquettes${etTag}</strong> : besoin ${fmt(pf)}` + (etPack > 0 ? ` (${fmt(etNeedPack)} pqt)` : '');
+      if (pf > 0 && etDispo < pf) {
+        etCls = 'need-card err';
+        etMsg += `<br>⚠️ Manque ${fmt(pf - etDispo)} ét. (stock : ${etStkPack} pqt)`;
+      } else if (pf > 0 && etDispo >= pf) {
+        etCls = 'need-card ok';
+        etMsg += `<br>✔️ OK (+${fmt(etDispo - pf)})`;
+      }
+
+      // 2. Capsules : 0 boîte si rien
+      const cBox = Number(data.capPerBox) || 0;
+      const cNbBox = Number(data.capNbBox) || 0; // 0 si vide
+      const cNeedBox = cBox > 0 ? Math.ceil(pf / cBox) : 0;
+      const cDispo = cBox * cNbBox;
+      const cTag = (data.capRef || '').trim() ? ` [${data.capRef.trim()}]` : '';
+      let cCls = 'need-card';
+      let cMsg = `🔘 <strong>Capsules${cTag}</strong> : besoin ${fmt(pf)}` + (cBox > 0 ? ` (${fmt(cNeedBox)} bte)` : '');
+      if (pf > 0 && cDispo < pf) {
+        cCls = 'need-card err';
+        cMsg += `<br>⚠️ Manque ${fmt(pf - cDispo)} cap. (stock : ${cNbBox} bte)`;
+      } else if (pf > 0 && cDispo >= pf) {
+        cCls = 'need-card ok';
+        cMsg += `<br>✔️ OK (+${fmt(cDispo - pf)})`;
+      }
+
+      // 3. Trays : 0 palette si rien
+      const trFmt = Number(data.trFmt) || 12;
+      const trPal = Number(data.trPerPal) || 0;
+      const trNbPal = Number(data.trNbPal) || 0; // 0 si vide
+      const trNeed = pf > 0 ? Math.ceil(pf / trFmt) : 0;
+      const trDispo = trPal * trNbPal;
+      const trTag = (data.trRef || '').trim() ? ` [${data.trRef.trim()}]` : '';
+      let trCls = 'need-card';
+      let trMsg = `📦 <strong>Trays${trTag} (x${trFmt})</strong> : besoin ${fmt(trNeed)} trays`;
+      if (trNeed > 0 && trDispo < trNeed) {
+        trCls = 'need-card err';
+        trMsg += `<br>⚠️ Manque ${fmt(trNeed - trDispo)} tr. (stock : ${trNbPal} pal)`;
+      } else if (trNeed > 0 && trDispo >= trNeed) {
+        trCls = 'need-card ok';
+        trMsg += `<br>✔️ OK (+${fmt(trDispo - trNeed)})`;
+      }
+
+      return {
+        pf,
+        html: `
+          <div class="${etCls}">${etMsg}</div>
+          <div class="${cCls}">${cMsg}</div>
+          <div class="${trCls}">${trMsg}</div>
+        `
+      };
     }
 
     function bindFixedGlassInputs() {
@@ -703,8 +767,8 @@
     function stepGlassPallets(delta) {
       const current = Number(state.verre.stkPal) || 0;
       const next = Math.max(0, current + delta);
-      state.verre.stkPal = next === 0 ? '' : next;
-      document.getElementById('g-ver-stk').value = state.verre.stkPal;
+      state.verre.stkPal = next;
+      document.getElementById('g-ver-stk').value = next;
       saveState();
       refreshGlassStatus();
     }
@@ -722,7 +786,7 @@
       const pf = grandTotal();
       const vRef = (state.verre.ref || '').trim();
       const vPerPal = Number(state.verre.perPal) || 0;
-      const vStkPal = Number(state.verre.stkPal) || 0;
+      const vStkPal = Number(state.verre.stkPal) || 0; // 0 si rien
       const vStockUnits = vPerPal * vStkPal;
       const vNeedPal = vPerPal > 0 ? Math.ceil(pf / vPerPal) : 0;
 
@@ -732,17 +796,14 @@
       const namePart = vRef ? `<strong>${vRef}</strong> • ` : '';
       const needPart = `Besoin PF : <strong>${fmt(pf)}</strong>` + (vPerPal > 0 ? ` (${fmt(vNeedPal)} pal)` : '');
 
-      if (vPerPal > 0 || vStkPal > 0) {
-        const diff = vStockUnits - pf;
-        if (diff < 0) {
-          bar.classList.add('err');
-          bar.innerHTML = `<span>${namePart}Stock : <strong>${fmt(vStockUnits)}</strong> (${vStkPal} pal)</span><span>${needPart} • ⚠️ Manque <strong>${fmt(Math.abs(diff))}</strong></span>`;
-        } else {
-          bar.classList.add('ok');
-          bar.innerHTML = `<span>${namePart}Stock : <strong>${fmt(vStockUnits)}</strong> (${vStkPal} pal)</span><span>${needPart} • ✔️ Reste <strong>${fmt(diff)}</strong></span>`;
-        }
+      if (pf > 0 && vStockUnits < pf) {
+        bar.classList.add('err');
+        bar.innerHTML = `<span>${namePart}Stock : <strong>${fmt(vStockUnits)}</strong> (${vStkPal} pal)</span><span>${needPart} • ⚠️ Manque <strong>${fmt(pf - vStockUnits)}</strong></span>`;
+      } else if (pf > 0 && vStockUnits >= pf) {
+        bar.classList.add('ok');
+        bar.innerHTML = `<span>${namePart}Stock : <strong>${fmt(vStockUnits)}</strong> (${vStkPal} pal)</span><span>${needPart} • ✔️ Reste <strong>${fmt(vStockUnits - pf)}</strong></span>`;
       } else {
-        bar.innerHTML = `<span>${namePart}Renseignez nb/palette et palettes</span><span>${needPart}</span>`;
+        bar.innerHTML = `<span>${namePart}Stock : <strong>${fmt(vStockUnits)}</strong> (${vStkPal} pal)</span><span>${needPart}</span>`;
       }
     }
 
@@ -756,134 +817,111 @@
       refreshGlassStatus();
 
       if (state.lines.length === 0) {
-        container.innerHTML = `<div class="empty-box">Aucune ligne pour l'instant.<br>Appuyez sur <strong>▶️ Start</strong> pour ajouter une ligne.</div>`;
+        container.innerHTML = `<div class="empty-box">Aucune ligne pour l'instant.<br>Appuyez sur <strong>▶️ Start</strong> pour commencer.</div>`;
         return;
       }
 
       container.innerHTML = '';
 
       state.lines.forEach((l, idx) => {
-        const pf = lineTotal(l);
-        const fName = fruitLabel(l, idx);
-
-        // Étiquettes
-        const etPack = Number(l.etPerPack) || 0;
-        const etStkPack = Number(l.etStkPack) || 0;
-        const etNeedPack = etPack > 0 ? Math.ceil(pf / etPack) : 0;
-        const etDispo = etPack * etStkPack;
-        const etTag = (l.etRef || '').trim() ? ` [${l.etRef.trim()}]` : '';
-        let etCls = 'need-card';
-        let etMsg = `🏷️ <strong>Étiquettes${etTag}</strong> : besoin ${fmt(pf)}` + (etPack > 0 ? ` (${fmt(etNeedPack)} pqt)` : '');
-        if (etStkPack > 0 && etDispo < pf) {
-          etCls = 'need-card err';
-          etMsg += `<br>⚠️ Manque ${fmt(pf - etDispo)} étiquettes`;
-        } else if (etStkPack > 0 && etDispo >= pf) {
-          etCls = 'need-card ok';
-          etMsg += `<br>✔️ OK (+${fmt(etDispo - pf)})`;
-        }
-
-        // Capsules
-        const cBox = Number(l.capPerBox) || 0;
-        const cNbBox = Number(l.capNbBox) || 0;
-        const cNeedBox = cBox > 0 ? Math.ceil(pf / cBox) : 0;
-        const cDispo = cBox * cNbBox;
-        const cTag = (l.capRef || '').trim() ? ` [${l.capRef.trim()}]` : '';
-        let cCls = 'need-card';
-        let cMsg = `🔘 <strong>Capsules${cTag}</strong> : besoin ${fmt(pf)}` + (cBox > 0 ? ` (${fmt(cNeedBox)} bte)` : '');
-        if (cDispo > 0 && cDispo < pf) {
-          cCls = 'need-card err';
-          cMsg += `<br>⚠️ Manque ${fmt(pf - cDispo)} capsules`;
-        } else if (cDispo >= pf && cDispo > 0) {
-          cCls = 'need-card ok';
-          cMsg += `<br>✔️ OK (+${fmt(cDispo - pf)})`;
-        }
-
-        // Trays
-        const trFmt = Number(l.trFmt) || 12;
-        const trPal = Number(l.trPerPal) || 0;
-        const trNbPal = Number(l.trNbPal) || 0;
-        const trNeed = pf > 0 ? Math.ceil(pf / trFmt) : 0;
-        const trDispo = trPal * trNbPal;
-        const trTag = (l.trRef || '').trim() ? ` [${l.trRef.trim()}]` : '';
-        let trCls = 'need-card';
-        let trMsg = `📦 <strong>Trays${trTag} (x${trFmt})</strong> : besoin ${fmt(trNeed)} trays`;
-        if (trDispo > 0 && trDispo < trNeed) {
-          trCls = 'need-card err';
-          trMsg += `<br>⚠️ Manque ${fmt(trNeed - trDispo)} trays`;
-        } else if (trDispo >= trNeed && trDispo > 0) {
-          trCls = 'need-card ok';
-          trMsg += `<br>✔️ OK (+${fmt(trDispo - trNeed)})`;
-        }
+        const calc = computeLineNeedsHtml(l);
+        const fruitText = (l.fruit || '').trim();
+        const fruitBadge = fruitText ? `<span class="pill-fruit">🍓 ${fruitText}</span>` : '';
 
         const card = document.createElement('div');
         card.className = 'line-card';
         card.innerHTML = `
           <div class="line-header">
             <div class="line-identity">
-              <span class="pill-num">Ligne ${idx + 1}</span>
-              <span class="pill-fruit">🍓 ${fName}</span>
-              <span class="pill-total">${fmt(pf)} PF</span>
+              ${fruitBadge}
+              <span class="pill-total">${fmt(calc.pf)} PF</span>
             </div>
             <div class="line-tools">
               <button type="button" class="btn btn-sec btn-mini" onclick="openFormModal(${idx})">✏️ Modifier</button>
-              <div class="app-stepper">
+              <div class="mini-stepper">
                 <span>App:</span>
-                <button type="button" class="app-step-btn" onclick="stepLineApps(${idx}, -1)">-</button>
+                <button type="button" class="mini-step-btn" onclick="stepLineApps(${idx}, -1)">-</button>
                 <span>${Number(l.nbApp) || 0}</span>
-                <button type="button" class="app-step-btn" onclick="stepLineApps(${idx}, 1)">+</button>
+                <button type="button" class="mini-step-btn" onclick="stepLineApps(${idx}, 1)">+</button>
               </div>
               <button type="button" class="btn btn-del btn-mini" onclick="deleteLine(${idx})">🗑️</button>
+              <div class="mini-stepper">
+                <button type="button" class="mini-step-btn" onclick="stepLineApps(${idx}, -1)">-</button>
+                <button type="button" class="mini-step-btn" onclick="stepLineApps(${idx}, 1)">+</button>
+              </div>
             </div>
           </div>
-          <div style="font-size:0.84rem; color:var(--muted); margin-bottom:10px;">
-            Verre/app : <strong>${l.verPerApp || 0}</strong> × App : <strong>${l.nbApp || 0}</strong>
+          <div class="line-meta">
+            <span>Verre/app : <strong>${l.verPerApp || 0}</strong> × App : <strong>${l.nbApp || 0}</strong></span>
           </div>
-          <div class="needs-grid">
-            <div class="${etCls}">${etMsg}</div>
-            <div class="${cCls}">${cMsg}</div>
-            <div class="${trCls}">${trMsg}</div>
-          </div>
+          <div class="needs-grid">${calc.html}</div>
         `;
         container.appendChild(card);
       });
     }
 
+    function readModalFormData() {
+      const checkedFmt = document.querySelector('input[name="m_fmt"]:checked');
+      return {
+        fruit: document.getElementById('m-fruit').value.trim(),
+        verPerApp: document.getElementById('m-ver-app').value,
+        nbApp: document.getElementById('m-nb-app').value,
+        etRef: document.getElementById('m-et-ref').value,
+        etPerPack: document.getElementById('m-et-pack').value,
+        etStkPack: document.getElementById('m-et-stk').value,
+        capRef: document.getElementById('m-cap-ref').value,
+        capPerBox: document.getElementById('m-cap-box').value,
+        capNbBox: document.getElementById('m-cap-nb-box').value,
+        trRef: document.getElementById('m-tr-ref').value,
+        trPerPal: document.getElementById('m-tr-pal').value,
+        trNbPal: document.getElementById('m-tr-nb-pal').value,
+        trFmt: checkedFmt ? Number(checkedFmt.value) : 12
+      };
+    }
+
+    function stepModalApps(delta) {
+      const inp = document.getElementById('m-nb-app');
+      const current = Number(inp.value) || 0;
+      const next = Math.max(0, current + delta);
+      inp.value = next;
+      updateLivePreview();
+    }
+
+    function updateLivePreview() {
+      const data = readModalFormData();
+      const calc = computeLineNeedsHtml(data);
+      document.getElementById('m-pf-preview').textContent = `Calcul auto : ${fmt(calc.pf)} PF`;
+      document.getElementById('m-needs-preview').innerHTML = calc.html;
+    }
+
     function openFormModal(idx) {
       editingIndex = idx;
       const isEdit = idx !== null && state.lines[idx];
-      const prev = state.lines[state.lines.length - 1];
-      const base = isEdit ? state.lines[idx] : {
-        ...createDefaultLine(state.lines.length),
-        verPerApp: prev ? (prev.verPerApp || 3500) : 3500,
-        etRef: prev ? prev.etRef : '',
-        etPerPack: prev ? (prev.etPerPack || 5000) : 5000
-      };
+      const base = isEdit ? state.lines[idx] : createEmptyLine();
 
-      document.getElementById('m-title').textContent = isEdit
-        ? `✏️ Modifier Ligne ${idx + 1}`
-        : `▶️ Nouvelle ligne ${state.lines.length + 1}`;
-
-      document.getElementById('m-fruit').value = base.fruit || defaultFruitName(isEdit ? idx : state.lines.length);
+      document.getElementById('m-title').textContent = isEdit ? '✏️ Modifier ligne' : '▶️ Nouvelle ligne';
+      document.getElementById('m-fruit').value = base.fruit || '';
       document.getElementById('m-ver-app').value = base.verPerApp !== '' ? base.verPerApp : 3500;
-      document.getElementById('m-nb-app').value = base.nbApp || 1;
+      document.getElementById('m-nb-app').value = base.nbApp !== '' ? base.nbApp : 1;
 
       document.getElementById('m-et-ref').value = base.etRef || '';
-      document.getElementById('m-et-pack').value = base.etPerPack || 5000;
-      document.getElementById('m-et-stk').value = base.etStkPack || '';
+      document.getElementById('m-et-pack').value = base.etPerPack !== '' ? base.etPerPack : 5000;
+      document.getElementById('m-et-stk').value = base.etStkPack !== '' ? base.etStkPack : '';
 
       document.getElementById('m-cap-ref').value = base.capRef || '';
-      document.getElementById('m-cap-box').value = base.capPerBox || 400;
-      document.getElementById('m-cap-nb-box').value = base.capNbBox || 1;
+      document.getElementById('m-cap-box').value = base.capPerBox !== '' ? base.capPerBox : 400;
+      document.getElementById('m-cap-nb-box').value = base.capNbBox !== '' ? base.capNbBox : 1;
 
       document.getElementById('m-tr-ref').value = base.trRef || '';
-      document.getElementById('m-tr-pal').value = base.trPerPal || 3000;
-      document.getElementById('m-tr-nb-pal').value = base.trNbPal || 1;
+      document.getElementById('m-tr-pal').value = base.trPerPal !== '' ? base.trPerPal : 3000;
+      document.getElementById('m-tr-nb-pal').value = base.trNbPal !== '' ? base.trNbPal : 1;
 
       const targetFmt = Number(base.trFmt) || 12;
       document.querySelectorAll('input[name="m_fmt"]').forEach(r => {
         r.checked = Number(r.value) === targetFmt;
       });
 
+      updateLivePreview();
       document.getElementById('form-modal').classList.add('open');
     }
 
@@ -893,25 +931,21 @@
     }
 
     function saveFormModal() {
-      const idxForDefault = editingIndex !== null ? editingIndex : state.lines.length;
-      const typedFruit = document.getElementById('m-fruit').value.trim();
-      const checkedFmt = document.querySelector('input[name="m_fmt"]:checked');
-      const rawVerApp = document.getElementById('m-ver-app').value;
-
+      const data = readModalFormData();
       const newLine = {
-        fruit: typedFruit || defaultFruitName(idxForDefault),
-        verPerApp: rawVerApp === '' ? 3500 : rawVerApp,
-        nbApp: document.getElementById('m-nb-app').value || 1,
-        etRef: document.getElementById('m-et-ref').value,
-        etPerPack: document.getElementById('m-et-pack').value || 5000,
-        etStkPack: document.getElementById('m-et-stk').value,
-        capRef: document.getElementById('m-cap-ref').value,
-        capPerBox: document.getElementById('m-cap-box').value || 400,
-        capNbBox: document.getElementById('m-cap-nb-box').value || 1,
-        trRef: document.getElementById('m-tr-ref').value,
-        trPerPal: document.getElementById('m-tr-pal').value || 3000,
-        trNbPal: document.getElementById('m-tr-nb-pal').value || 1,
-        trFmt: checkedFmt ? Number(checkedFmt.value) : 12
+        fruit: data.fruit,
+        verPerApp: data.verPerApp === '' ? 3500 : data.verPerApp,
+        nbApp: data.nbApp === '' ? 0 : data.nbApp,
+        etRef: data.etRef,
+        etPerPack: data.etPerPack === '' ? 5000 : data.etPerPack,
+        etStkPack: data.etStkPack === '' ? 0 : data.etStkPack,
+        capRef: data.capRef,
+        capPerBox: data.capPerBox === '' ? 0 : data.capPerBox,
+        capNbBox: data.capNbBox === '' ? 0 : data.capNbBox,
+        trRef: data.trRef,
+        trPerPal: data.trPerPal === '' ? 0 : data.trPerPal,
+        trNbPal: data.trNbPal === '' ? 0 : data.trNbPal,
+        trFmt: data.trFmt || 12
       };
 
       if (editingIndex !== null && state.lines[editingIndex]) {
@@ -946,21 +980,13 @@
       const vInfo = document.getElementById('g-ver-status').textContent;
       let cardsHtml = '';
 
-      state.lines.forEach((l, idx) => {
-        const pf = lineTotal(l);
-        const trFmt = Number(l.trFmt) || 12;
-        const trNeed = pf > 0 ? Math.ceil(pf / trFmt) : 0;
-        const cBox = Number(l.capPerBox) || 0;
-        const cNeedBox = cBox > 0 ? Math.ceil(pf / cBox) : 0;
-        const etPack = Number(l.etPerPack) || 0;
-        const etNeedPack = etPack > 0 ? Math.ceil(pf / etPack) : 0;
-
+      state.lines.forEach((l) => {
+        const calc = computeLineNeedsHtml(l);
+        const fName = (l.fruit || '').trim() || 'Ligne';
         cardsHtml += `
           <div class="p-card">
-            <strong>Ligne ${idx + 1} — ${fruitLabel(l, idx)}</strong> : <strong>${fmt(pf)} PF</strong> (${l.verPerApp || 0} verre/app × ${l.nbApp || 0} app)<br>
-            🏷️ Ét. [${l.etRef || '-'}]: besoin ${fmt(pf)} (${fmt(etNeedPack)} pqt à ${fmt(etPack)}) •
-            🔘 Cap. [${l.capRef || '-'}]: besoin ${fmt(pf)} (${fmt(cNeedBox)} bte à ${fmt(cBox)}) •
-            📦 Tray [${l.trRef || '-'}] (x${trFmt}): besoin ${fmt(trNeed)} trays
+            <strong>${fName}</strong> : <strong>${fmt(calc.pf)} PF</strong> (${l.verPerApp || 0} verre/app × ${l.nbApp || 0} app)<br>
+            ${calc.html.replace(/<[^>]+>/g, ' ')}
           </div>
         `;
       });
