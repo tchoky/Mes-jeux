@@ -37,7 +37,7 @@
       margin: 0 auto;
     }
 
-    /* Bandeau tout en haut : Cadence + Horloge / Heure actuelle */
+    /* Bandeau tout en haut : Horloge tout à gauche, valeur cadence seule à droite */
     .cadence-bar {
       background: var(--card);
       border: 1px solid var(--border);
@@ -52,17 +52,6 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
     }
 
-    .cadence-info {
-      font-size: 0.9rem;
-      font-weight: 800;
-      color: var(--text);
-    }
-
-    .cadence-badge {
-      color: var(--primary);
-      font-weight: 900;
-    }
-
     .clock-btn {
       display: inline-flex;
       align-items: center;
@@ -72,13 +61,19 @@
       border: 1px solid #94a3b8;
       background: #f8fafc;
       color: var(--text);
-      font-size: 0.88rem;
+      font-size: 0.9rem;
       font-weight: 800;
       cursor: pointer;
     }
 
     .clock-btn:hover {
       background: #e2e8f0;
+    }
+
+    .cadence-badge {
+      color: var(--primary);
+      font-size: 1rem;
+      font-weight: 900;
     }
 
     /* En-tête Total PF + +/- sur la première page */
@@ -187,6 +182,17 @@
       font-size: 0.98rem;
       width: 100%;
       background: #fff;
+    }
+
+    .field input.pref-input {
+      background: #e2e8f0;
+      color: #64748b;
+      font-weight: 800;
+    }
+
+    .field input.pref-input.edited {
+      background: #ffffff;
+      color: var(--text);
     }
 
     .ref-row {
@@ -516,15 +522,13 @@
 </head>
 <body>
 
-  <!-- TOUT EN HAUT : CADENCE + HORLOGE / HEURE ACTUELLE -->
+  <!-- TOUT EN HAUT : HORLOGE TOUT À GAUCHE, CADENCE SEULE À DROITE -->
   <div class="cadence-bar">
-    <div class="cadence-info">
-      Cadence : <span class="cadence-badge" id="cadence-val">0 app/h</span>
-    </div>
     <button type="button" class="clock-btn" onclick="openClockModal()">
       <span>🕒</span>
       <span id="live-clock-text">--:--</span>
     </button>
+    <div class="cadence-badge" id="cadence-val">0 app/h</div>
   </div>
 
   <!-- PREMIÈRE PAGE : TOTAL PF + +/- -->
@@ -586,7 +590,7 @@
     <button type="button" class="btn btn-pdf" onclick="printReport()">🖨️ PDF</button>
   </div>
 
-  <!-- MODALE AJOUT : FRUIT (EFFACÉ D'OFFICE AU CLIC) + NB APP -->
+  <!-- MODALE AJOUT : FRUIT + NB APP -->
   <div class="modal-bg" id="add-modal">
     <div class="modal-panel">
       <div class="modal-head">
@@ -614,7 +618,7 @@
     </div>
   </div>
 
-  <!-- MODALE HORLOGE : HEURE DÉBUT PROD, HEURE FIN PROD, NB APP REMPLI -->
+  <!-- MODALE HORLOGE -->
   <div class="modal-bg" id="clock-modal">
     <div class="modal-panel">
       <div class="modal-head">
@@ -642,7 +646,7 @@
     </div>
   </div>
 
-  <!-- MODALE CLIC SUR LIGNE : NOMBRE PAR BOÎTE & NB DE BOÎTES -->
+  <!-- MODALE CLIC SUR LIGNE CONSOMMABLE : PREMIÈRE CASE CCT (GRISÉ) / CRC -->
   <div class="modal-bg" id="cons-modal">
     <div class="modal-panel">
       <div class="modal-head">
@@ -650,6 +654,13 @@
         <button type="button" class="btn btn-sec btn-mini" onclick="closeConsModal()">✕</button>
       </div>
       <div style="display:flex; flex-direction:column; gap:10px;">
+        <div class="field" id="cons-ref-wrap" style="display:none;">
+          <label id="cons-ref-label">Réf</label>
+          <div class="ref-row">
+            <input type="text" inputmode="numeric" id="cons-ref-val" placeholder="">
+            <button type="button" class="abc-btn" id="cons-ref-abc" onclick="toggleAbc('cons-ref-val', this)">ABC</button>
+          </div>
+        </div>
         <div class="field">
           <label id="cons-per-box-label">Nombre par boîte</label>
           <input type="number" inputmode="numeric" pattern="[0-9]*" id="cons-per-box" placeholder="0">
@@ -677,7 +688,7 @@
   <div id="print-area"></div>
 
   <script>
-    const STORAGE_KEY = 'compteurs_logo_fin_v1';
+    const STORAGE_KEY = 'compteurs_cct_crc_v1';
 
     let state = {
       prod: { startTime: '', endTime: '', doneApps: '' },
@@ -703,8 +714,10 @@
         nbApp: nbApp,
         etPerPack: 5000,
         etStkPack: 0,
+        capRef: 'CRC',
         capPerBox: 400,
         capNbBox: 0,
+        trRef: 'CCT',
         trPerPal: 3000,
         trNbPal: 0,
         trFmt: 12
@@ -844,6 +857,13 @@
       });
     }
 
+    function bindPrefRefInput() {
+      const refInp = document.getElementById('cons-ref-val');
+      refInp.addEventListener('input', () => {
+        refInp.classList.add('edited');
+      });
+    }
+
     function stepGlassPallets(delta) {
       const current = Number(state.verre.stkPal) || 0;
       const next = Math.max(0, current + delta);
@@ -980,12 +1000,14 @@
           }
         }
 
-        // 2. Boîtes
+        // 2. Boîtes (CRC)
         const cBox = Number(l.capPerBox) || 400;
         const cNbBox = Number(l.capNbBox) || 0;
         const cNeed = pf > 0 && cBox > 0 ? Math.ceil(pf / cBox) : 0;
+        const cRefTxt = (l.capRef || '').trim();
+        const cRefBadge = cRefTxt && cRefTxt.toUpperCase() !== 'CRC' ? `[${cRefTxt}] ` : '';
         let cCls = 'cons-row';
-        let cMsg = `<strong>${fmt(cNeed)}</strong> ${plural(cNeed, 'boîte', 'boîtes')} de ${fmt(cBox)}`;
+        let cMsg = `${cRefBadge}<strong>${fmt(cNeed)}</strong> ${plural(cNeed, 'boîte', 'boîtes')} de ${fmt(cBox)}`;
         if (cNeed > 0) {
           const diffC = cNbBox - cNeed;
           if (diffC < 0) {
@@ -1001,14 +1023,16 @@
           }
         }
 
-        // 3. Palettes / format
+        // 3. Palettes / cartons (CCT)
         const trFmt = Number(l.trFmt) || 12;
         const trPal = Number(l.trPerPal) || 3000;
         const trNbPal = Number(l.trNbPal) || 0;
         const trUnits = pf > 0 ? Math.ceil(pf / trFmt) : 0;
         const trNeed = trUnits > 0 && trPal > 0 ? Math.ceil(trUnits / trPal) : 0;
+        const trRefTxt = (l.trRef || '').trim();
+        const trRefBadge = trRefTxt && trRefTxt.toUpperCase() !== 'CCT' ? `[${trRefTxt}] ` : '';
         let trCls = 'cons-row';
-        let trMsg = `<strong>${fmt(trNeed)}</strong> ${plural(trNeed, 'palette', 'palettes')} de ${fmt(trPal)} (x${trFmt})`;
+        let trMsg = `${trRefBadge}<strong>${fmt(trNeed)}</strong> ${plural(trNeed, 'palette', 'palettes')} de ${fmt(trPal)} (x${trFmt})`;
         if (trNeed > 0) {
           const diffTr = trNbPal - trNeed;
           if (diffTr < 0) {
@@ -1140,8 +1164,16 @@
       if (!l) return;
       activeConsTarget = { lineIdx, type };
 
+      const refWrap = document.getElementById('cons-ref-wrap');
+      const refInp = document.getElementById('cons-ref-val');
+      const refAbc = document.getElementById('cons-ref-abc');
       const fmtWrap = document.getElementById('cons-fmt-wrap');
+
+      refWrap.style.display = 'none';
       fmtWrap.style.display = 'none';
+      refInp.className = 'pref-input';
+      refInp.inputMode = 'numeric';
+      refAbc.classList.remove('active');
 
       if (type === 'et') {
         document.getElementById('cons-title').textContent = 'Paquets';
@@ -1151,12 +1183,28 @@
         document.getElementById('cons-nb-box').value = l.etStkPack || 0;
       } else if (type === 'cap') {
         document.getElementById('cons-title').textContent = 'Boîtes';
+        refWrap.style.display = 'flex';
+        document.getElementById('cons-ref-label').textContent = 'CRC';
+        const curCapRef = (l.capRef || 'CRC').trim();
+        refInp.value = curCapRef;
+        refInp.placeholder = 'CRC';
+        if (curCapRef.toUpperCase() !== 'CRC' && curCapRef !== '') {
+          refInp.classList.add('edited');
+        }
         document.getElementById('cons-per-box-label').textContent = 'Nombre par boîte';
         document.getElementById('cons-nb-box-label').textContent = 'Nombre de boîtes';
         document.getElementById('cons-per-box').value = l.capPerBox || 400;
         document.getElementById('cons-nb-box').value = l.capNbBox || 0;
       } else if (type === 'tr') {
-        document.getElementById('cons-title').textContent = 'Palettes';
+        document.getElementById('cons-title').textContent = 'Cartons / Palettes';
+        refWrap.style.display = 'flex';
+        document.getElementById('cons-ref-label').textContent = 'CCT';
+        const curTrRef = (l.trRef || 'CCT').trim();
+        refInp.value = curTrRef;
+        refInp.placeholder = 'CCT';
+        if (curTrRef.toUpperCase() !== 'CCT' && curTrRef !== '') {
+          refInp.classList.add('edited');
+        }
         document.getElementById('cons-per-box-label').textContent = 'Nombre par palette';
         document.getElementById('cons-nb-box-label').textContent = 'Nombre de palettes';
         document.getElementById('cons-per-box').value = l.trPerPal || 3000;
@@ -1184,14 +1232,17 @@
 
       const perBoxVal = Math.max(0, Number(document.getElementById('cons-per-box').value) || 0);
       const nbBoxVal = Math.max(0, Number(document.getElementById('cons-nb-box').value) || 0);
+      const refVal = document.getElementById('cons-ref-val').value.trim();
 
       if (type === 'et') {
         l.etPerPack = perBoxVal;
         l.etStkPack = nbBoxVal;
       } else if (type === 'cap') {
+        l.capRef = refVal || 'CRC';
         l.capPerBox = perBoxVal;
         l.capNbBox = nbBoxVal;
       } else if (type === 'tr') {
+        l.trRef = refVal || 'CCT';
         l.trPerPal = perBoxVal;
         l.trNbPal = nbBoxVal;
         const ch = document.querySelector('input[name="cons_fmt"]:checked');
@@ -1236,15 +1287,15 @@
           <div class="p-card">
             <strong>${fruitDisplay(l, i)}</strong> (${getVerPerApp()} × ${l.nbApp || 0} app = ${fmt(pf)})<br>
             ${fmt(l.etPerPack || 5000)}/pqt (stk ${l.etStkPack || 0}) •
-            ${fmt(l.capPerBox || 400)}/bte (stk ${l.capNbBox || 0}) •
-            ${fmt(l.trPerPal || 3000)}/pal x${l.trFmt || 12} (stk ${l.trNbPal || 0})
+            [${l.capRef || 'CRC'}] ${fmt(l.capPerBox || 400)}/bte (stk ${l.capNbBox || 0}) •
+            [${l.trRef || 'CCT'}] ${fmt(l.trPerPal || 3000)}/pal x${l.trFmt || 12} (stk ${l.trNbPal || 0})
           </div>
         `;
       });
 
       area.innerHTML = `
         <div style="display:flex; justify-content:space-between; border-bottom:2px solid #000; padding-bottom:8px; margin-bottom:10px;">
-          <div><strong>Total PF : ${fmt(grandTotal())}</strong> • Cadence : ${cadTxt}</div>
+          <div><strong>Total PF : ${fmt(grandTotal())}</strong> • ${cadTxt}</div>
           <div>${now}</div>
         </div>
         <div class="p-card"><strong>Verre :</strong> ${vInfo}</div>
@@ -1256,6 +1307,7 @@
     loadState();
     bindFixedGlassInputs();
     bindFruitAutoClear();
+    bindPrefRefInput();
     updateLiveClockDisplay();
     setInterval(() => {
       updateLiveClockDisplay();
