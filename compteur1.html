@@ -60,6 +60,18 @@
       color: var(--primary);
     }
 
+    .empty-hint {
+      background: var(--card-bg);
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      padding: 18px 12px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
     .line-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
@@ -106,7 +118,6 @@
       border-radius: 5px;
     }
 
-    /* Tout sur une même ligne (défilement horizontal si écran étroit) */
     .one-row {
       display: flex;
       flex-direction: row;
@@ -329,7 +340,6 @@
       .p-box { border: 1px solid #bbb; border-radius: 6px; padding: 8px; margin-bottom: 10px; page-break-inside: avoid; }
       .p-tbl { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-top: 4px; }
       .p-tbl th, .p-tbl td { border: 1px solid #ccc; padding: 4px 6px; text-align: left; }
-      .p-err { color: #dc2626 !important; font-weight: bold; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     }
   </style>
 </head>
@@ -340,7 +350,7 @@
     <div class="top-total" id="top-total">0</div>
   </div>
 
-  <!-- LIGNES UNIQUEMENT -->
+  <!-- VIDE AU DÉPART ET APRÈS RESET -->
   <div id="lines-wrap"></div>
 
   <!-- BOUTONS START À CÔTÉ DE RESET (+ PDF) -->
@@ -381,12 +391,12 @@
         </div>
       </div>
 
-      <!-- 2. NB APP -->
+      <!-- 2. NB APP (PAR DÉFAUT 1) -->
       <div class="step-pane" id="st-2">
         <div class="step-q">2. Combien d'app ?</div>
         <div class="f-box">
           <label>Nb app</label>
-          <input type="number" inputmode="numeric" pattern="[0-9]*" id="st-nb-app" placeholder="0">
+          <input type="number" inputmode="numeric" pattern="[0-9]*" id="st-nb-app" placeholder="1">
         </div>
         <div class="modal-btns">
           <button type="button" class="act-btn btn-sec" onclick="closeStart()">Annuler</button>
@@ -394,9 +404,9 @@
         </div>
       </div>
 
-      <!-- 3. NB CAPSULE PAR BOÎTE (MÊME CAPSULE OU NOUVELLE) -->
+      <!-- 3. CAPSULE (PAR DÉFAUT 400 PAR BOÎTE ET 1 BOÎTE) -->
       <div class="step-pane" id="st-3">
-        <div class="step-q">3. Capsule : même capsule ou nouveau nb capsule / boîte ?</div>
+        <div class="step-q">3. Capsule : même capsule ou nouveau (400 / boîte, 1 boîte) ?</div>
         <div id="st-cap-prev" style="font-size:0.78rem; color:var(--text-muted); margin-bottom:8px;"></div>
         <div id="st-cap-form" style="display:none;">
           <div class="one-row">
@@ -409,11 +419,11 @@
             </div>
             <div class="f-box">
               <label>Cap / boîte</label>
-              <input type="number" inputmode="numeric" pattern="[0-9]*" id="st-cap-box" placeholder="0">
+              <input type="number" inputmode="numeric" pattern="[0-9]*" id="st-cap-box" value="400">
             </div>
             <div class="f-box">
-              <label>Bte / pal</label>
-              <input type="number" inputmode="numeric" pattern="[0-9]*" id="st-cap-pal" placeholder="0">
+              <label>Nb boîtes</label>
+              <input type="number" inputmode="numeric" pattern="[0-9]*" id="st-cap-pal" value="1">
             </div>
           </div>
         </div>
@@ -426,9 +436,9 @@
         </div>
       </div>
 
-      <!-- 4. NOMBRE DE TRAY PAR PALETTE (MÊME TRAY OU NOUVEAU) -->
+      <!-- 4. TRAY (PAR DÉFAUT 12, 1 PALETTE ET 3000 PAR PALETTE) -->
       <div class="step-pane" id="st-4">
-        <div class="step-q">4. Tray : même tray ou nouveau nombre de tray / palette ?</div>
+        <div class="step-q">4. Tray : même tray ou nouveau (3000 / pal, 1 pal, format 12) ?</div>
         <div id="st-tray-prev" style="font-size:0.78rem; color:var(--text-muted); margin-bottom:8px;"></div>
         <div id="st-tray-form" style="display:none;">
           <div class="one-row">
@@ -441,14 +451,18 @@
             </div>
             <div class="f-box">
               <label>Tray / pal</label>
-              <input type="number" inputmode="numeric" pattern="[0-9]*" id="st-tray-pal" placeholder="0">
+              <input type="number" inputmode="numeric" pattern="[0-9]*" id="st-tray-pal" value="3000">
+            </div>
+            <div class="f-box">
+              <label>Nb pal</label>
+              <input type="number" inputmode="numeric" pattern="[0-9]*" id="st-tray-stk" value="1">
             </div>
             <div class="f-box fmt-box">
               <label>Fmt</label>
               <div class="fmt-pills">
-                <label class="fmt-pill"><input type="radio" name="st_tray_fmt" value="6" checked><span>6</span></label>
+                <label class="fmt-pill"><input type="radio" name="st_tray_fmt" value="6"><span>6</span></label>
                 <label class="fmt-pill"><input type="radio" name="st_tray_fmt" value="8"><span>8</span></label>
-                <label class="fmt-pill"><input type="radio" name="st_tray_fmt" value="12"><span>12</span></label>
+                <label class="fmt-pill"><input type="radio" name="st_tray_fmt" value="12" checked><span>12</span></label>
               </div>
             </div>
           </div>
@@ -467,7 +481,7 @@
   <div id="print-report"></div>
 
   <script>
-    const KEY = 'compteurs_fruit_start_v1';
+    const KEY = 'compteurs_start_vide_v1';
 
     let state = {
       lines: []
@@ -483,20 +497,20 @@
       return {
         fruit: getDefaultFruitName(index),
         verPerApp: '',
-        nbApp: '',
+        nbApp: 1,
         verRef: '',
         verPerPal: '',
         verStkPal: '',
         etRef: '',
         etPerPack: 5000,
         etStkPqt: '',
-        cap: { ref: '', perBox: '', boxesPerPal: '', stkPal: '' },
-        tray: { ref: '', perPal: '', packSize: 6, stkPal: '' }
+        cap: { ref: '', perBox: 400, boxesPerPal: 1, stkPal: '' },
+        tray: { ref: '', perPal: 3000, packSize: 12, stkPal: 1 }
       };
     }
 
     function defState() {
-      return { lines: [defLine(0)] };
+      return { lines: [] };
     }
 
     function load() {
@@ -504,7 +518,7 @@
         const raw = localStorage.getItem(KEY);
         if (raw) {
           const p = JSON.parse(raw);
-          if (Array.isArray(p.lines) && p.lines.length) {
+          if (Array.isArray(p.lines)) {
             state = p;
             state.lines.forEach((l, i) => {
               if (!l.fruit || !String(l.fruit).trim()) {
@@ -615,6 +629,11 @@
       const wrap = document.getElementById('lines-wrap');
       wrap.innerHTML = '';
 
+      if (!state.lines.length) {
+        wrap.innerHTML = `<div class="empty-hint">Aucune ligne. Appuyez sur <strong>▶️ Start</strong> pour commencer.</div>`;
+        return;
+      }
+
       state.lines.forEach((l, idx) => {
         const card = document.createElement('div');
         card.className = 'line-card';
@@ -647,17 +666,14 @@
         left.appendChild(sub);
         head.appendChild(left);
 
-        if (state.lines.length > 1) {
-          const del = document.createElement('button');
-          del.type = 'button';
-          del.className = 'act-btn btn-del';
-          del.textContent = '×';
-          del.onclick = () => { state.lines.splice(idx, 1); save(); renderLines(); refresh(); };
-          head.appendChild(del);
-        }
+        const del = document.createElement('button');
+        del.type = 'button';
+        del.className = 'act-btn btn-del';
+        del.textContent = '×';
+        del.onclick = () => { state.lines.splice(idx, 1); save(); renderLines(); refresh(); };
+        head.appendChild(del);
         card.appendChild(head);
 
-        // TOUT SUR UNE MÊME LIGNE
         const row = document.createElement('div');
         row.className = 'one-row';
 
@@ -665,25 +681,22 @@
         row.appendChild(numInp('Ver/app', l.verPerApp, (v) => { state.lines[idx].verPerApp = v; }));
         row.appendChild(numInp('App', l.nbApp, (v) => { state.lines[idx].nbApp = v; }));
 
-        // Verre (réf V, verre/pal, stk pal)
         row.appendChild(refInp('Réf V', l.verRef, (v) => { state.lines[idx].verRef = v; }));
         row.appendChild(numInp('Ver/pal', l.verPerPal, (v) => { state.lines[idx].verPerPal = v; }));
         row.appendChild(numInp('Stk V pal', l.verStkPal, (v) => { state.lines[idx].verStkPal = v; }));
 
-        // Étiquette (réf eti, 5000 par défaut, stk pqt)
         row.appendChild(refInp('Réf eti', l.etRef, (v) => { state.lines[idx].etRef = v; }));
         row.appendChild(numInp('Ét/pqt', l.etPerPack, (v) => { state.lines[idx].etPerPack = v; }));
         row.appendChild(numInp('Stk ét pqt', l.etStkPqt, (v) => { state.lines[idx].etStkPqt = v; }));
 
-        // Capsule (réf CRC, cap/bte, bte/pal, stk pal)
         row.appendChild(refInp('Réf CRC', l.cap.ref, (v) => { state.lines[idx].cap.ref = v; }));
         row.appendChild(numInp('Cap/bte', l.cap.perBox, (v) => { state.lines[idx].cap.perBox = v; }));
-        row.appendChild(numInp('Bte/pal', l.cap.boxesPerPal, (v) => { state.lines[idx].cap.boxesPerPal = v; }));
+        row.appendChild(numInp('Nb bte', l.cap.boxesPerPal, (v) => { state.lines[idx].cap.boxesPerPal = v; }));
         row.appendChild(numInp('Stk C pal', l.cap.stkPal, (v) => { state.lines[idx].cap.stkPal = v; }));
 
-        // Tray (réf cct, tray/pal, fmt 6/8/12, stk pal)
         row.appendChild(refInp('Réf cct', l.tray.ref, (v) => { state.lines[idx].tray.ref = v; }));
         row.appendChild(numInp('Tray/pal', l.tray.perPal, (v) => { state.lines[idx].tray.perPal = v; }));
+        row.appendChild(numInp('Nb pal', l.tray.stkPal, (v) => { state.lines[idx].tray.stkPal = v; }));
 
         const fd = document.createElement('div');
         fd.className = 'f-box fmt-box';
@@ -709,8 +722,6 @@
         });
         fd.appendChild(fp);
         row.appendChild(fd);
-
-        row.appendChild(numInp('Stk T pal', l.tray.stkPal, (v) => { state.lines[idx].tray.stkPal = v; }));
 
         card.appendChild(row);
 
@@ -770,47 +781,44 @@
           }
         }
 
-        // 3. Besoin Capsule
+        // 3. Besoin Capsule (400 par boîte, 1 boîte par défaut)
         const cBox = Number(l.cap.perBox) || 0;
-        const cBtePal = Number(l.cap.boxesPerPal) || 0;
-        const cPerPal = cBox * cBtePal;
+        const cNbBte = Number(l.cap.boxesPerPal) || 0;
+        const cDispo = cBox * cNbBte;
         const cNeedBte = cBox > 0 ? Math.ceil(pf / cBox) : 0;
-        const cNeedPal = cPerPal > 0 ? Math.ceil(pf / cPerPal) : 0;
         const cStkPal = Number(l.cap.stkPal) || 0;
-        const cStkU = cStkPal * cPerPal;
         const cTag = (l.cap.ref || '').trim() ? ` [${l.cap.ref.trim()}]` : '';
         let cClass = 'need-chip';
-        let cTxt = `🔘 Cap.${cTag}: ${fmt(pf)}`
-          + (cBox > 0 ? ` (${fmt(cNeedBte)} bte` : '')
-          + (cPerPal > 0 ? ` / ${fmt(cNeedPal)} pal)` : (cBox > 0 ? ')' : ''));
-        if (cStkPal > 0) {
-          if (cStkU < pf) {
+        let cTxt = `🔘 Cap.${cTag}: besoin ${fmt(pf)} cap.` + (cBox > 0 ? ` (${fmt(cNeedBte)} bte à ${fmt(cBox)})` : '');
+        if (cDispo > 0 && cDispo < pf) {
+          cClass = 'need-chip err';
+          cTxt += ` — Manque ${fmt(pf - cDispo)} cap. (sur ${fmt(cDispo)})`;
+        } else if (cStkPal > 0) {
+          const cStkTot = cStkPal * (cDispo || 1);
+          if (cStkTot < pf) {
             cClass = 'need-chip err';
-            cTxt += ` — Manque ${fmt(pf - cStkU)} cap.`;
+            cTxt += ` — Manque ${fmt(pf - cStkTot)} cap.`;
           } else {
             cClass = 'need-chip ok';
-            cTxt += ` — OK (+${fmt(cStkU - pf)})`;
+            cTxt += ` — OK`;
           }
         }
 
-        // 4. Besoin Tray
-        const fmtN = Number(l.tray.packSize) || 6;
-        const trPal = Number(l.tray.perPal) || 0;
+        // 4. Besoin Tray (3000 par palette, 1 palette, format 12 par défaut)
+        const fmtN = Number(l.tray.packSize) || 12;
+        const trPerPal = Number(l.tray.perPal) || 0;
+        const trNbPal = Number(l.tray.stkPal) || 0;
         const trNeed = pf > 0 ? Math.ceil(pf / fmtN) : 0;
-        const trNeedPal = trPal > 0 ? Math.ceil(trNeed / trPal) : 0;
-        const trStkPal = Number(l.tray.stkPal) || 0;
-        const trStkU = trStkPal * trPal;
+        const trDispo = trPerPal * trNbPal;
         const trTag = (l.tray.ref || '').trim() ? ` [${l.tray.ref.trim()}]` : '';
         let trClass = 'need-chip';
-        let trTxt = `📦 Tray${trTag} (x${fmtN}): ${fmt(trNeed)} tr.` + (trPal > 0 ? ` (${fmt(trNeedPal)} pal)` : '');
-        if (trStkPal > 0) {
-          if (trStkU < trNeed) {
-            trClass = 'need-chip err';
-            trTxt += ` — Manque ${fmt(trNeed - trStkU)} tr.`;
-          } else {
-            trClass = 'need-chip ok';
-            trTxt += ` — OK (+${fmt(trStkU - trNeed)})`;
-          }
+        let trTxt = `📦 Tray${trTag} (x${fmtN}): besoin ${fmt(trNeed)} tr.` + (trPerPal > 0 ? ` (${fmt(trPerPal)}/pal)` : '');
+        if (trDispo > 0 && trDispo < trNeed) {
+          trClass = 'need-chip err';
+          trTxt += ` — Manque ${fmt(trNeed - trDispo)} tr. (sur ${fmt(trDispo)})`;
+        } else if (trDispo >= trNeed && trDispo > 0) {
+          trClass = 'need-chip ok';
+          trTxt += ` — OK (+${fmt(trDispo - trNeed)})`;
         }
 
         const nBox = document.getElementById(`needs_${idx}`);
@@ -840,31 +848,48 @@
       draft = {
         fruit: defaultFruit,
         verPerApp: prev.verPerApp || '',
-        nbApp: '',
+        nbApp: 1,
         verRef: prev.verRef || '',
         verPerPal: prev.verPerPal || '',
         verStkPal: '',
         etRef: prev.etRef || '',
         etPerPack: prev.etPerPack || 5000,
         etStkPqt: '',
-        cap: { ...prev.cap, stkPal: '' },
-        tray: { ...prev.tray, stkPal: '' }
+        cap: {
+          ref: prev.cap ? prev.cap.ref : '',
+          perBox: prev.cap ? prev.cap.perBox : 400,
+          boxesPerPal: prev.cap ? prev.cap.boxesPerPal : 1,
+          stkPal: ''
+        },
+        tray: {
+          ref: prev.tray ? prev.tray.ref : '',
+          perPal: prev.tray ? prev.tray.perPal : 3000,
+          packSize: prev.tray ? prev.tray.packSize : 12,
+          stkPal: prev.tray ? prev.tray.stkPal : 1
+        }
       };
 
       document.getElementById('st-title').textContent = `▶️ Ligne ${nextIdx + 1}`;
       document.getElementById('st-fruit').value = defaultFruit;
       document.getElementById('st-fruit').placeholder = defaultFruit;
       document.getElementById('st-ver-app').value = prev.verPerApp || '';
-      document.getElementById('st-nb-app').value = '';
+      document.getElementById('st-nb-app').value = 1;
 
       document.getElementById('st-cap-prev').textContent =
-        `Actuel : Réf [${prev.cap.ref || '-'}] • Cap/bte: ${prev.cap.perBox || 0} • Bte/pal: ${prev.cap.boxesPerPal || 0}`;
+        `Actuel : Réf [${draft.cap.ref || '-'}] • Cap/bte: ${draft.cap.perBox || 400} • Nb bte: ${draft.cap.boxesPerPal || 1}`;
+      document.getElementById('st-cap-box').value = 400;
+      document.getElementById('st-cap-pal').value = 1;
       document.getElementById('st-cap-form').style.display = 'none';
       document.getElementById('st-cap-choice').style.display = 'flex';
       document.getElementById('st-cap-next').style.display = 'none';
 
       document.getElementById('st-tray-prev').textContent =
-        `Actuel : Réf [${prev.tray.ref || '-'}] • Tray/pal: ${prev.tray.perPal || 0} • Fmt: ${prev.tray.packSize || 6}`;
+        `Actuel : Réf [${draft.tray.ref || '-'}] • Tray/pal: ${draft.tray.perPal || 3000} • Nb pal: ${draft.tray.stkPal || 1} • Fmt: ${draft.tray.packSize || 12}`;
+      document.getElementById('st-tray-pal').value = 3000;
+      document.getElementById('st-tray-stk').value = 1;
+      document.querySelectorAll('input[name="st_tray_fmt"]').forEach(r => {
+        r.checked = Number(r.value) === 12;
+      });
       document.getElementById('st-tray-form').style.display = 'none';
       document.getElementById('st-tray-choice').style.display = 'flex';
       document.getElementById('st-tray-finish').style.display = 'none';
@@ -894,7 +919,8 @@
     }
 
     function goSt3() {
-      draft.nbApp = document.getElementById('st-nb-app').value;
+      const v = document.getElementById('st-nb-app').value;
+      draft.nbApp = v === '' ? 1 : v;
       showSt(3);
     }
 
@@ -903,8 +929,8 @@
         showSt(4);
       } else {
         document.getElementById('st-cap-ref').value = '';
-        document.getElementById('st-cap-box').value = '';
-        document.getElementById('st-cap-pal').value = '';
+        document.getElementById('st-cap-box').value = 400;
+        document.getElementById('st-cap-pal').value = 1;
         document.getElementById('st-cap-form').style.display = 'block';
         document.getElementById('st-cap-choice').style.display = 'none';
         document.getElementById('st-cap-next').style.display = 'flex';
@@ -914,8 +940,8 @@
     function saveCapAndGoSt4() {
       draft.cap = {
         ref: document.getElementById('st-cap-ref').value,
-        perBox: document.getElementById('st-cap-box').value,
-        boxesPerPal: document.getElementById('st-cap-pal').value,
+        perBox: document.getElementById('st-cap-box').value || 400,
+        boxesPerPal: document.getElementById('st-cap-pal').value || 1,
         stkPal: ''
       };
       showSt(4);
@@ -926,7 +952,11 @@
         finishStart();
       } else {
         document.getElementById('st-tray-ref').value = '';
-        document.getElementById('st-tray-pal').value = '';
+        document.getElementById('st-tray-pal').value = 3000;
+        document.getElementById('st-tray-stk').value = 1;
+        document.querySelectorAll('input[name="st_tray_fmt"]').forEach(r => {
+          r.checked = Number(r.value) === 12;
+        });
         document.getElementById('st-tray-form').style.display = 'block';
         document.getElementById('st-tray-choice').style.display = 'none';
         document.getElementById('st-tray-finish').style.display = 'flex';
@@ -937,9 +967,9 @@
       const ch = document.querySelector('input[name="st_tray_fmt"]:checked');
       draft.tray = {
         ref: document.getElementById('st-tray-ref').value,
-        perPal: document.getElementById('st-tray-pal').value,
-        packSize: ch ? Number(ch.value) : 6,
-        stkPal: ''
+        perPal: document.getElementById('st-tray-pal').value || 3000,
+        packSize: ch ? Number(ch.value) : 12,
+        stkPal: document.getElementById('st-tray-stk').value || 1
       };
       finishStart();
     }
@@ -966,7 +996,7 @@
       const now = new Date().toLocaleString('fr-FR');
       let rows = '';
       state.lines.forEach((l, i) => {
-        rows += `<tr><td>L${i + 1}</td><td>${displayFruit(l, i)}</td><td>${l.verPerApp || 0}</td><td>${l.nbApp || 0}</td><td><strong>${fmt(linePF(l))}</strong></td><td>${l.cap.ref || '-'} (${l.cap.perBox || 0}/bte)</td><td>${l.tray.ref || '-'} (${l.tray.perPal || 0}/pal, x${l.tray.packSize || 6})</td></tr>`;
+        rows += `<tr><td>L${i + 1}</td><td>${displayFruit(l, i)}</td><td>${l.verPerApp || 0}</td><td>${l.nbApp || 0}</td><td><strong>${fmt(linePF(l))}</strong></td><td>${l.cap.ref || '-'} (${l.cap.perBox || 0}/bte)</td><td>${l.tray.ref || '-'} (${l.tray.perPal || 0}/pal, x${l.tray.packSize || 12})</td></tr>`;
       });
       rep.innerHTML = `
         <div style="display:flex; justify-content:space-between; border-bottom:2px solid #000; padding-bottom:6px; margin-bottom:10px;">
