@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gestionnaire de Compteurs - Groupes & Besoins</title>
+  <title>Compteurs 5-3-2-4-1 sur une même ligne</title>
   <style>
     :root {
       --primary: #2563eb;
@@ -12,10 +12,9 @@
       --card-bg: #ffffff;
       --text: #1e293b;
       --text-muted: #64748b;
-      --border: #e2e8f0;
+      --border: #cbd5e1;
       --danger: #dc2626;
       --danger-bg: #fef2f2;
-      --danger-border: #fecaca;
       --success: #16a34a;
       --success-bg: #f0fdf4;
       --success-border: #bbf7d0;
@@ -31,403 +30,257 @@
     }
 
     body {
-      background-color: var(--bg);
+      background: var(--bg);
       color: var(--text);
-      padding: 16px;
-      max-width: 1100px;
-      margin: 0 auto;
+      padding: 10px;
     }
 
-    header {
-      text-align: center;
-      margin-bottom: 18px;
-    }
-
-    header h1 {
-      font-size: 1.55rem;
-      margin-bottom: 4px;
-    }
-
-    header p {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-    }
-
-    /* Total Général tout en haut */
-    .grand-total-bar {
+    .top-bar {
       background: var(--card-bg);
       border: 2px solid var(--primary);
-      border-radius: 12px;
-      padding: 16px 20px;
-      margin-bottom: 20px;
+      border-radius: 8px;
+      padding: 8px 14px;
+      margin-bottom: 10px;
       display: flex;
-      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
       gap: 12px;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
     }
 
-    .grand-total-label {
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: var(--text-muted);
+    .top-title {
+      font-size: 0.85rem;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      color: var(--text-muted);
     }
 
-    .grand-total-value {
-      font-size: 2rem;
+    .top-total {
+      font-size: 1.5rem;
       font-weight: 900;
       color: var(--primary);
     }
 
-    .section-block {
+    /* TOUS LES COMPTEURS (5, 3, 2, 4, 1) SUR UNE MÊME LIGNE HORIZONTALE */
+    .horizontal-strip {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      align-items: stretch;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+    }
+
+    .col-block {
       background: var(--card-bg);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 18px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+      border-radius: 8px;
+      padding: 10px;
+      min-width: 250px;
+      flex: 1 0 250px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 8px;
     }
 
-    .section-header {
+    .col-head {
       display: flex;
-      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      gap: 10px;
-      padding-bottom: 12px;
-      margin-bottom: 14px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .section-title {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 1.2rem;
+      gap: 6px;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 6px;
       font-weight: 800;
+      font-size: 0.95rem;
     }
 
-    .section-total-badge {
-      background: var(--info-bg);
-      color: #1e40af;
-      border: 1px solid var(--info-border);
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-weight: 800;
-      font-size: 1rem;
-    }
-
-    /* Groupes Fruit 1, Fruit 2... */
-    .group-card {
+    .group-box {
       background: #f8fafc;
       border: 1px solid #cbd5e1;
-      border-radius: 10px;
-      padding: 12px;
-      margin-bottom: 14px;
+      border-radius: 6px;
+      padding: 6px;
+      margin-bottom: 6px;
     }
 
     .group-top {
       display: flex;
-      flex-wrap: wrap;
       align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 10px;
+      gap: 4px;
+      margin-bottom: 5px;
     }
 
-    .group-name-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex: 1 1 200px;
-    }
-
-    .group-name-input {
-      padding: 8px 12px;
+    .group-name {
+      padding: 4px 6px;
       border: 1px solid #94a3b8;
-      border-radius: 6px;
-      font-size: 1rem;
+      border-radius: 4px;
+      font-size: 0.82rem;
       font-weight: 700;
-      background: white;
-      color: var(--text);
-      max-width: 240px;
-      width: 100%;
-    }
-
-    .group-subtotal {
-      font-weight: 800;
-      color: var(--text);
-      background: white;
-      border: 1px solid var(--border);
-      padding: 6px 12px;
-      border-radius: 6px;
-    }
-
-    /* Lignes sur une même ligne (wrap propre sur petit écran) */
-    .inline-line {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: flex-end;
-      gap: 10px;
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px;
-      margin-bottom: 8px;
-    }
-
-    .field-box {
-      display: flex;
-      flex-direction: column;
-      flex: 1 1 120px;
-      min-width: 105px;
-    }
-
-    .field-box.ref-box {
-      flex: 0 1 130px;
-      min-width: 100px;
-    }
-
-    .field-box.radio-box {
-      flex: 1 1 180px;
-    }
-
-    .field-box label {
-      font-size: 0.76rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      margin-bottom: 4px;
-      white-space: nowrap;
-    }
-
-    .field-box input[type="number"],
-    .field-box input[type="text"] {
-      padding: 8px 10px;
-      border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      font-size: 0.98rem;
-      width: 100%;
+      width: 95px;
       background: #fff;
     }
 
-    .radio-row {
-      display: flex;
-      gap: 6px;
-    }
-
-    .radio-pill {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      border: 1px solid #cbd5e1;
-      background: #f8fafc;
-      padding: 7px 8px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.92rem;
-      font-weight: 600;
-    }
-
-    .radio-pill input:checked + span {
-      color: var(--primary);
+    .group-sub {
+      font-size: 0.8rem;
       font-weight: 800;
-    }
-
-    .line-result {
-      font-weight: 800;
-      font-size: 1rem;
-      padding: 8px 12px;
-      background: #f1f5f9;
-      border-radius: 6px;
-      border: 1px solid #cbd5e1;
+      padding: 4px 6px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
       white-space: nowrap;
     }
 
-    /* Besoins calculés pour 3, 2, 4, 1 */
-    .need-box {
-      margin-top: 10px;
-      padding: 12px 14px;
-      border-radius: 8px;
-      background: var(--info-bg);
-      border: 1px solid var(--info-border);
-      font-size: 0.95rem;
-      line-height: 1.45;
+    /* Ligne de champs compacte */
+    .compact-row {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: flex-end;
+      gap: 4px;
+      margin-bottom: 4px;
     }
 
-    .need-box.alert-missing {
+    .c-field {
+      display: flex;
+      flex-direction: column;
+      min-width: 56px;
+      flex: 1 1 56px;
+    }
+
+    .c-field.ref-f {
+      min-width: 58px;
+      flex: 0 0 64px;
+    }
+
+    .c-field label {
+      font-size: 0.66rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+      white-space: nowrap;
+    }
+
+    .c-field input[type="number"],
+    .c-field input[type="text"] {
+      padding: 4px 6px;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      width: 100%;
+    }
+
+    .rad-mini {
+      display: flex;
+      gap: 3px;
+    }
+
+    .rad-mini label {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      padding: 3px 5px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .rad-mini input:checked + span {
+      color: var(--primary);
+    }
+
+    .mini-res {
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 4px 6px;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .need-pill {
+      padding: 6px 8px;
+      border-radius: 6px;
+      background: var(--info-bg);
+      border: 1px solid var(--info-border);
+      font-size: 0.78rem;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .need-pill.err {
       background: var(--danger-bg);
       border-color: var(--danger);
       color: var(--danger);
     }
 
-    .need-box.alert-ok {
+    .need-pill.ok {
       background: var(--success-bg);
       border-color: var(--success-border);
       color: var(--success);
     }
 
-    .need-main {
-      font-weight: 800;
-      font-size: 1.02rem;
-    }
-
-    /* Boutons */
     button {
-      padding: 9px 14px;
-      border-radius: 8px;
+      padding: 4px 8px;
+      border-radius: 5px;
       border: none;
-      font-size: 0.92rem;
+      font-size: 0.76rem;
       font-weight: 700;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: background 0.15s;
+      gap: 3px;
+      white-space: nowrap;
     }
 
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background: var(--primary-hover);
-    }
-
-    .btn-add {
-      background: var(--success);
-      color: white;
-    }
-
-    .btn-add:hover {
-      background: #15803d;
-    }
-
-    .btn-danger {
-      background: var(--danger);
-      color: white;
-    }
-
-    .btn-danger:hover {
-      background: #b91c1c;
-    }
-
-    .btn-remove {
-      background: #fee2e2;
-      color: var(--danger);
-      padding: 8px 10px;
-    }
-
-    .btn-remove:hover {
-      background: #fecaca;
-    }
+    .btn-primary { background: var(--primary); color: #fff; padding: 8px 14px; font-size: 0.88rem; }
+    .btn-add { background: var(--success); color: #fff; }
+    .btn-danger { background: var(--danger); color: #fff; padding: 8px 14px; font-size: 0.88rem; }
+    .btn-del { background: #fee2e2; color: var(--danger); padding: 4px 6px; }
 
     .actions-bar {
       display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
+      gap: 10px;
       justify-content: center;
-      margin: 24px 0 12px;
+      margin-top: 12px;
     }
 
-    /* Impression / PDF */
-    #print-report {
-      display: none;
-    }
+    #print-report { display: none; }
 
     @media print {
-      body {
-        background: white;
-        padding: 0;
-        max-width: 100%;
-      }
-      header, .grand-total-bar, #main-app, .actions-bar {
-        display: none !important;
-      }
-      #print-report {
-        display: block !important;
-      }
-      .print-header {
-        border-bottom: 2px solid #000;
-        padding-bottom: 10px;
-        margin-bottom: 16px;
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-      }
-      .print-block {
-        border: 1px solid #bbb;
-        border-radius: 6px;
-        padding: 10px 12px;
-        margin-bottom: 14px;
-        page-break-inside: avoid;
-      }
-      .print-block h3 {
-        margin-bottom: 6px;
-        font-size: 1.05rem;
-      }
-      .print-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 0.88rem;
-        margin-top: 6px;
-      }
-      .print-table th, .print-table td {
-        border: 1px solid #ccc;
-        padding: 5px 8px;
-        text-align: left;
-      }
-      .print-table th {
-        background: #f1f5f9;
-      }
-      .print-err {
-        color: #dc2626 !important;
-        font-weight: bold;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
-      .print-ok {
-        color: #16a34a !important;
-        font-weight: bold;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
+      body { background: #fff; padding: 0; }
+      .top-bar, .horizontal-strip, .actions-bar { display: none !important; }
+      #print-report { display: block !important; }
+      .p-box { border: 1px solid #bbb; border-radius: 6px; padding: 8px; margin-bottom: 10px; page-break-inside: avoid; }
+      .p-tbl { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 4px; }
+      .p-tbl th, .p-tbl td { border: 1px solid #ccc; padding: 4px 6px; text-align: left; }
+      .p-err { color: #dc2626 !important; font-weight: bold; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .p-ok { color: #16a34a !important; font-weight: bold; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>📊 Gestionnaire de Compteurs</h1>
-    <p>Groupes Produit Fini (5) et calcul des besoins en Étiquettes (3), Capsules (2), Trays (4) et Bocaux (1)</p>
-  </header>
-
-  <!-- TOTAL GÉNÉRAL TOUT EN HAUT -->
-  <div class="grand-total-bar">
-    <div>
-      <div class="grand-total-label">Total Général Produit Fini (tous groupes)</div>
-      <div id="grand-total-detail" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;"></div>
-    </div>
-    <div class="grand-total-value" id="grand-total-value">0</div>
+  <div class="top-bar">
+    <div class="top-title">Total PF (5)</div>
+    <div class="top-total" id="top-total">0</div>
   </div>
 
-  <div id="main-app"></div>
+  <!-- 5, 3, 2, 4, 1 SUR UNE MÊME LIGNE -->
+  <div class="horizontal-strip" id="strip"></div>
 
   <div class="actions-bar">
-    <button class="btn-primary" onclick="printSummary()">🖨️ Imprimer / Résumé PDF</button>
-    <button class="btn-danger" onclick="resetAll()">🔄 Reset à zéro</button>
+    <button class="btn-primary" onclick="printSummary()">🖨️ PDF</button>
+    <button class="btn-danger" onclick="resetAll()">🔄 Reset</button>
   </div>
 
   <div id="print-report"></div>
 
   <script>
-    const STORAGE_KEY = 'compteurs_groupes_v2';
+    const KEY = 'compteurs_53241_ligne_v1';
 
     let state = {
       groups: [],
@@ -439,17 +292,17 @@
       }
     };
 
-    function getDefaultGroup(index) {
+    function defGroup(idx) {
       return {
-        id: 'grp_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-        name: `Fruit ${index + 1}`,
+        id: 'g_' + Date.now() + '_' + Math.random().toString(36).slice(2, 5),
+        name: `Fruit ${idx + 1}`,
         rows: [{ nbApp: '', nbPerApp: '' }]
       };
     }
 
-    function getDefaultState() {
+    function defState() {
       return {
-        groups: [getDefaultGroup(0)],
+        groups: [defGroup(0)],
         components: {
           etiquettes: { ref: '', perPack: '', stockPacks: '' },
           capsules:   { ref: '', perBox: '', boxesPerPallet: '', stockPallets: '' },
@@ -459,593 +312,398 @@
       };
     }
 
-    function loadState() {
+    function load() {
       try {
-        const raw = localStorage.getItem(STORAGE_KEY);
+        const raw = localStorage.getItem(KEY);
         if (raw) {
-          const parsed = JSON.parse(raw);
-          state = Object.assign(getDefaultState(), parsed);
-          state.components = Object.assign(getDefaultState().components, parsed.components || {});
-          if (!Array.isArray(state.groups) || state.groups.length === 0) {
-            state.groups = [getDefaultGroup(0)];
-          }
+          const p = JSON.parse(raw);
+          state = Object.assign(defState(), p);
+          state.components = Object.assign(defState().components, p.components || {});
+          if (!Array.isArray(state.groups) || !state.groups.length) state.groups = [defGroup(0)];
           return;
         }
-      } catch (e) {
-        console.error(e);
-      }
-      state = getDefaultState();
+      } catch (e) {}
+      state = defState();
     }
 
-    function saveState() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    function save() {
+      localStorage.setItem(KEY, JSON.stringify(state));
     }
 
-    function formatNum(n) {
+    function fmt(n) {
       return Math.ceil(Number(n) || 0).toLocaleString('fr-FR');
     }
 
-    function formatExact(n) {
-      const num = Number(n) || 0;
-      return Number.isInteger(num) ? num.toLocaleString('fr-FR') : num.toLocaleString('fr-FR', { maximumFractionDigits: 2 });
+    function rowPF(r) {
+      return (Number(r.nbApp) || 0) * (Number(r.nbPerApp) || 0);
     }
 
-    function calcRowFinished(row) {
-      return (Number(row.nbApp) || 0) * (Number(row.nbPerApp) || 0);
+    function grpPF(g) {
+      return (g.rows || []).reduce((s, r) => s + rowPF(r), 0);
     }
 
-    function calcGroupTotal(group) {
-      return (group.rows || []).reduce((acc, r) => acc + calcRowFinished(r), 0);
+    function totPF() {
+      return state.groups.reduce((s, g) => s + grpPF(g), 0);
     }
 
-    function calcGrandTotal() {
-      return state.groups.reduce((acc, g) => acc + calcGroupTotal(g), 0);
+    function gName(g, i) {
+      const t = (g.name || '').trim();
+      return t ? t : `Fruit ${i + 1}`;
     }
 
-    function getGroupDisplayName(group, idx) {
-      const trimmed = (group.name || '').trim();
-      return trimmed ? trimmed : `Fruit ${idx + 1}`;
-    }
-
-    // Calcule les besoins à partir du total produit fini (5)
-    function computeComponentNeed(key, finishedTotal) {
+    function calcNeed(key, pf) {
       const c = state.components[key];
-      const refLabel = (c.ref || '').trim();
-      const refSuffix = refLabel ? ` [${refLabel}]` : '';
+      const tag = (c.ref || '').trim() ? ` [${(c.ref || '').trim()}]` : '';
 
       if (key === 'etiquettes') {
-        const perPack = Number(c.perPack) || 0;
-        const stockPacks = Number(c.stockPacks) || 0;
-        const stockUnits = stockPacks * perPack;
-        const needUnits = finishedTotal;
-        const needPacks = perPack > 0 ? Math.ceil(needUnits / perPack) : 0;
-        const missingUnits = Math.max(0, needUnits - stockUnits);
-        const missingPacks = perPack > 0 ? Math.max(0, needPacks - stockPacks) : 0;
+        const perP = Number(c.perPack) || 0;
+        const stkP = Number(c.stockPacks) || 0;
+        const stkU = stkP * perP;
+        const needP = perP > 0 ? Math.ceil(pf / perP) : 0;
+        const missU = Math.max(0, pf - stkU);
+        const missP = perP > 0 ? Math.max(0, needP - stkP) : 0;
         return {
-          refSuffix,
-          summaryText: perPack > 0
-            ? `Besoin pour ${formatNum(finishedTotal)} PF : <strong>${formatNum(needUnits)} étiquettes${refSuffix}</strong> soit <strong>${formatNum(needPacks)} paquets</strong> (à ${formatNum(perPack)}/paquet).`
-            : `Besoin pour ${formatNum(finishedTotal)} PF : <strong>${formatNum(needUnits)} étiquettes${refSuffix}</strong> (renseignez le nb d'étiquettes/paquet pour calculer le nb de paquets).`,
-          hasStock: stockPacks > 0,
-          stockText: `Stock renseigné : ${formatNum(stockPacks)} paquets (${formatNum(stockUnits)} étiquettes).`,
-          missingUnits,
-          missingText: perPack > 0
-            ? `⚠️ Il manque ${formatNum(missingUnits)} étiquettes${refSuffix} (${formatNum(missingPacks)} paquets).`
-            : `⚠️ Il manque ${formatNum(missingUnits)} étiquettes${refSuffix}.`,
-          okText: `✔️ Stock suffisant (${formatNum(stockUnits - needUnits)} étiquettes${refSuffix} d'avance).`
+          txt: `Besoin${tag}: ${fmt(pf)} ét.` + (perP > 0 ? ` (${fmt(needP)} pqt)` : ''),
+          hasStk: stkP > 0,
+          missU,
+          missTxt: `Manque: ${fmt(missU)} ét.` + (perP > 0 ? ` (${fmt(missP)} pqt)` : ''),
+          okTxt: `OK (+${fmt(stkU - pf)} ét.)`
         };
       }
 
       if (key === 'capsules') {
-        const perBox = Number(c.perBox) || 0;
-        const boxesPerPallet = Number(c.boxesPerPallet) || 0;
-        const perPallet = perBox * boxesPerPallet;
-        const stockPallets = Number(c.stockPallets) || 0;
-        const stockUnits = stockPallets * perPallet;
-        const needUnits = finishedTotal;
-        const needBoxes = perBox > 0 ? Math.ceil(needUnits / perBox) : 0;
-        const needPallets = perPallet > 0 ? Math.ceil(needUnits / perPallet) : 0;
-        const missingUnits = Math.max(0, needUnits - stockUnits);
-        const missingPallets = perPallet > 0 ? Math.max(0, needPallets - stockPallets) : 0;
+        const perB = Number(c.perBox) || 0;
+        const btePal = Number(c.boxesPerPallet) || 0;
+        const perPal = perB * btePal;
+        const stkPal = Number(c.stockPallets) || 0;
+        const stkU = stkPal * perPal;
+        const needB = perB > 0 ? Math.ceil(pf / perB) : 0;
+        const needPal = perPal > 0 ? Math.ceil(pf / perPal) : 0;
+        const missU = Math.max(0, pf - stkU);
+        const missPal = perPal > 0 ? Math.max(0, needPal - stkPal) : 0;
         return {
-          refSuffix,
-          summaryText: `Besoin pour ${formatNum(finishedTotal)} PF : <strong>${formatNum(needUnits)} capsules${refSuffix}</strong>`
-            + (perBox > 0 ? ` = <strong>${formatNum(needBoxes)} boîtes</strong>` : '')
-            + (perPallet > 0 ? ` = <strong>${formatNum(needPallets)} palettes</strong>` : '') + '.',
-          hasStock: stockPallets > 0,
-          stockText: `Stock renseigné : ${formatNum(stockPallets)} palettes (${formatNum(stockUnits)} capsules).`,
-          missingUnits,
-          missingText: perPallet > 0
-            ? `⚠️ Il manque ${formatNum(missingUnits)} capsules${refSuffix} (${formatNum(missingPallets)} palettes).`
-            : `⚠️ Il manque ${formatNum(missingUnits)} capsules${refSuffix}.`,
-          okText: `✔️ Stock suffisant (${formatNum(stockUnits - needUnits)} capsules${refSuffix} d'avance).`
+          txt: `Besoin${tag}: ${fmt(pf)} cap.` + (perB > 0 ? ` / ${fmt(needB)} bte` : '') + (perPal > 0 ? ` / ${fmt(needPal)} pal` : ''),
+          hasStk: stkPal > 0,
+          missU,
+          missTxt: `Manque: ${fmt(missU)} cap.` + (perPal > 0 ? ` (${fmt(missPal)} pal)` : ''),
+          okTxt: `OK (+${fmt(stkU - pf)} cap.)`
         };
       }
 
       if (key === 'trays') {
-        const perPallet = Number(c.perPallet) || 0;
-        const packSize = Number(c.packSize) || 6;
-        const stockPallets = Number(c.stockPallets) || 0;
-        // Nb de produits finis couverts par 1 tray = packSize (6, 8 ou 12)
-        const needTrays = finishedTotal > 0 ? Math.ceil(finishedTotal / packSize) : 0;
-        const needPallets = perPallet > 0 ? Math.ceil(needTrays / perPallet) : 0;
-        const stockTrays = stockPallets * perPallet;
-        const missingTrays = Math.max(0, needTrays - stockTrays);
-        const missingPallets = perPallet > 0 ? Math.max(0, needPallets - stockPallets) : 0;
+        const perPal = Number(c.perPallet) || 0;
+        const fmtN = Number(c.packSize) || 6;
+        const stkPal = Number(c.stockPallets) || 0;
+        const needTr = pf > 0 ? Math.ceil(pf / fmtN) : 0;
+        const needPal = perPal > 0 ? Math.ceil(needTr / perPal) : 0;
+        const stkTr = stkPal * perPal;
+        const missTr = Math.max(0, needTr - stkTr);
+        const missPal = perPal > 0 ? Math.max(0, needPal - stkPal) : 0;
         return {
-          refSuffix,
-          summaryText: `Besoin pour ${formatNum(finishedTotal)} PF (format ${packSize}) : <strong>${formatNum(needTrays)} trays${refSuffix}</strong>`
-            + (perPallet > 0 ? ` = <strong>${formatNum(needPallets)} palettes</strong>` : '') + '.',
-          hasStock: stockPallets > 0,
-          stockText: `Stock renseigné : ${formatNum(stockPallets)} palettes (${formatNum(stockTrays)} trays).`,
-          missingUnits: missingTrays,
-          missingText: perPallet > 0
-            ? `⚠️ Il manque ${formatNum(missingTrays)} trays${refSuffix} (${formatNum(missingPallets)} palettes).`
-            : `⚠️ Il manque ${formatNum(missingTrays)} trays${refSuffix}.`,
-          okText: `✔️ Stock suffisant (${formatNum(stockTrays - needTrays)} trays${refSuffix} d'avance).`
+          txt: `Besoin${tag} (x${fmtN}): ${fmt(needTr)} tr.` + (perPal > 0 ? ` / ${fmt(needPal)} pal` : ''),
+          hasStk: stkPal > 0,
+          missU: missTr,
+          missTxt: `Manque: ${fmt(missTr)} tr.` + (perPal > 0 ? ` (${fmt(missPal)} pal)` : ''),
+          okTxt: `OK (+${fmt(stkTr - needTr)} tr.)`
         };
       }
 
-      // bocaux (1)
-      const perPallet = Number(c.perPallet) || 0;
-      const stockPallets = Number(c.stockPallets) || 0;
-      const needUnits = finishedTotal;
-      const needPallets = perPallet > 0 ? Math.ceil(needUnits / perPallet) : 0;
-      const stockUnits = stockPallets * perPallet;
-      const missingUnits = Math.max(0, needUnits - stockUnits);
-      const missingPallets = perPallet > 0 ? Math.max(0, needPallets - stockPallets) : 0;
+      const perPal = Number(c.perPallet) || 0;
+      const stkPal = Number(c.stockPallets) || 0;
+      const needPal = perPal > 0 ? Math.ceil(pf / perPal) : 0;
+      const stkU = stkPal * perPal;
+      const missU = Math.max(0, pf - stkU);
+      const missPal = perPal > 0 ? Math.max(0, needPal - stkPal) : 0;
       return {
-        refSuffix,
-        summaryText: `Besoin pour ${formatNum(finishedTotal)} PF : <strong>${formatNum(needUnits)} bocaux${refSuffix}</strong>`
-          + (perPallet > 0 ? ` = <strong>${formatNum(needPallets)} palettes</strong>` : '') + '.',
-        hasStock: stockPallets > 0,
-        stockText: `Stock renseigné : ${formatNum(stockPallets)} palettes (${formatNum(stockUnits)} bocaux).`,
-        missingUnits,
-        missingText: perPallet > 0
-          ? `⚠️ Il manque ${formatNum(missingUnits)} bocaux${refSuffix} (${formatNum(missingPallets)} palettes).`
-          : `⚠️ Il manque ${formatNum(missingUnits)} bocaux${refSuffix}.`,
-        okText: `✔️ Stock suffisant (${formatNum(stockUnits - needUnits)} bocaux${refSuffix} d'avance).`
+        txt: `Besoin${tag}: ${fmt(pf)} boc.` + (perPal > 0 ? ` / ${fmt(needPal)} pal` : ''),
+        hasStk: stkPal > 0,
+        missU,
+        missTxt: `Manque: ${fmt(missU)} boc.` + (perPal > 0 ? ` (${fmt(missPal)} pal)` : ''),
+        okTxt: `OK (+${fmt(stkU - pf)} boc.)`
       };
     }
 
-    function updateGrandTotalHeader() {
-      const total = calcGrandTotal();
-      document.getElementById('grand-total-value').textContent = formatNum(total);
-      document.getElementById('grand-total-detail').textContent =
-        `${state.groups.length} groupe(s) • Base de calcul pour 3, 2, 4 et 1`;
-    }
+    function refresh() {
+      const pf = totPF();
+      document.getElementById('top-total').textContent = fmt(pf);
 
-    function refreshCalculations() {
-      const grandTotal = calcGrandTotal();
-      updateGrandTotalHeader();
-
-      state.groups.forEach((grp, gIdx) => {
-        const gTot = calcGroupTotal(grp);
-        const gEl = document.getElementById(`group_total_${gIdx}`);
-        if (gEl) gEl.textContent = `Total ${getGroupDisplayName(grp, gIdx)} : ${formatNum(gTot)}`;
-
-        grp.rows.forEach((row, rIdx) => {
-          const rEl = document.getElementById(`row_sub_${gIdx}_${rIdx}`);
-          if (rEl) rEl.textContent = `= ${formatNum(calcRowFinished(row))}`;
+      state.groups.forEach((g, gi) => {
+        const ge = document.getElementById(`gt_${gi}`);
+        if (ge) ge.textContent = `= ${fmt(grpPF(g))}`;
+        g.rows.forEach((r, ri) => {
+          const re = document.getElementById(`rs_${gi}_${ri}`);
+          if (re) re.textContent = `= ${fmt(rowPF(r))}`;
         });
       });
 
-      ['etiquettes', 'capsules', 'trays', 'bocaux'].forEach(key => {
-        const box = document.getElementById(`need_box_${key}`);
-        if (!box) return;
-        const info = computeComponentNeed(key, grandTotal);
-
-        box.className = 'need-box';
-        if (info.hasStock) {
-          if (info.missingUnits > 0) {
-            box.classList.add('alert-missing');
-            box.innerHTML = `
-              <div class="need-main">${info.summaryText}</div>
-              <div>${info.stockText}</div>
-              <div style="margin-top:4px; font-weight:800;">${info.missingText}</div>
-            `;
+      ['etiquettes', 'capsules', 'trays', 'bocaux'].forEach(k => {
+        const el = document.getElementById(`nd_${k}`);
+        if (!el) return;
+        const info = calcNeed(k, pf);
+        el.className = 'need-pill';
+        if (info.hasStk) {
+          if (info.missU > 0) {
+            el.classList.add('err');
+            el.textContent = `${info.txt} • ${info.missTxt}`;
           } else {
-            box.classList.add('alert-ok');
-            box.innerHTML = `
-              <div class="need-main">${info.summaryText}</div>
-              <div>${info.stockText}</div>
-              <div style="margin-top:4px; font-weight:800;">${info.okText}</div>
-            `;
+            el.classList.add('ok');
+            el.textContent = `${info.txt} • ${info.okTxt}`;
           }
         } else {
-          box.innerHTML = `<div class="need-main">${info.summaryText}</div>`;
+          el.textContent = info.txt;
         }
       });
     }
 
-    function renderApp() {
-      const app = document.getElementById('main-app');
-      app.innerHTML = '';
+    function numInp(lbl, val, fn) {
+      const d = document.createElement('div');
+      d.className = 'c-field';
+      const l = document.createElement('label');
+      l.textContent = lbl;
+      const i = document.createElement('input');
+      i.type = 'number';
+      i.min = '0';
+      i.step = 'any';
+      i.placeholder = '0';
+      i.value = val;
+      i.oninput = (e) => { fn(e.target.value); save(); refresh(); };
+      d.appendChild(l);
+      d.appendChild(i);
+      return d;
+    }
 
-      // 1. SECTION 5 : PRODUIT FINI AVEC GROUPES (Fruit 1, Fruit 2...)
-      const sec5 = document.createElement('div');
-      sec5.className = 'section-block';
-      sec5.innerHTML = `
-        <div class="section-header">
-          <div class="section-title"><span>✅</span> <span>5. Compteur de produit fini (Groupes)</span></div>
-          <button class="btn-add" onclick="addGroup()">➕ Ajouter un groupe</button>
-        </div>
-      `;
+    function refInp(lbl, val, fn) {
+      const d = document.createElement('div');
+      d.className = 'c-field ref-f';
+      const l = document.createElement('label');
+      l.textContent = lbl;
+      const i = document.createElement('input');
+      i.type = 'text';
+      i.placeholder = lbl.replace('Réf ', '');
+      i.value = val;
+      i.oninput = (e) => { fn(e.target.value); save(); refresh(); };
+      d.appendChild(l);
+      d.appendChild(i);
+      return d;
+    }
 
-      state.groups.forEach((group, gIdx) => {
-        const gCard = document.createElement('div');
-        gCard.className = 'group-card';
+    function render() {
+      const strip = document.getElementById('strip');
+      strip.innerHTML = '';
 
-        const top = document.createElement('div');
-        top.className = 'group-top';
+      // 5. PF (groupes)
+      const c5 = document.createElement('div');
+      c5.className = 'col-block';
+      c5.style.minWidth = '310px';
+      c5.style.flex = '1.3 0 310px';
 
-        const nameWrap = document.createElement('div');
-        nameWrap.className = 'group-name-wrap';
+      const h5 = document.createElement('div');
+      h5.className = 'col-head';
+      h5.innerHTML = `<span>✅ 5. PF</span>`;
+      const addGBtn = document.createElement('button');
+      addGBtn.className = 'btn-add';
+      addGBtn.textContent = '+ Grp';
+      addGBtn.onclick = () => { state.groups.push(defGroup(state.groups.length)); save(); render(); };
+      h5.appendChild(addGBtn);
+      c5.appendChild(h5);
 
-        const nameInput = document.createElement('input');
-        nameInput.type = 'text';
-        nameInput.className = 'group-name-input';
-        nameInput.placeholder = `Fruit ${gIdx + 1}`;
-        nameInput.value = group.name;
-        nameInput.oninput = (e) => {
-          state.groups[gIdx].name = e.target.value;
-          saveState();
-          refreshCalculations();
-        };
-        nameWrap.appendChild(nameInput);
+      const gList = document.createElement('div');
+      state.groups.forEach((g, gi) => {
+        const gb = document.createElement('div');
+        gb.className = 'group-box';
 
-        const gTotBadge = document.createElement('div');
-        gTotBadge.className = 'group-subtotal';
-        gTotBadge.id = `group_total_${gIdx}`;
-        gTotBadge.textContent = `Total ${getGroupDisplayName(group, gIdx)} : ${formatNum(calcGroupTotal(group))}`;
-        nameWrap.appendChild(gTotBadge);
+        const gt = document.createElement('div');
+        gt.className = 'group-top';
 
-        top.appendChild(nameWrap);
+        const ni = document.createElement('input');
+        ni.type = 'text';
+        ni.className = 'group-name';
+        ni.placeholder = `Fruit ${gi + 1}`;
+        ni.value = g.name;
+        ni.oninput = (e) => { state.groups[gi].name = e.target.value; save(); refresh(); };
 
-        const groupBtns = document.createElement('div');
-        groupBtns.style.display = 'flex';
-        groupBtns.style.gap = '8px';
+        const subG = document.createElement('span');
+        subG.className = 'group-sub';
+        subG.id = `gt_${gi}`;
+        subG.textContent = `= ${fmt(grpPF(g))}`;
 
-        const addRowBtn = document.createElement('button');
-        addRowBtn.className = 'btn-add';
-        addRowBtn.textContent = '➕ Ajouter une ligne';
-        addRowBtn.onclick = () => addGroupRow(gIdx);
-        groupBtns.appendChild(addRowBtn);
+        const addR = document.createElement('button');
+        addR.className = 'btn-add';
+        addR.textContent = '+ Ligne';
+        addR.onclick = () => { state.groups[gi].rows.push({ nbApp: '', nbPerApp: '' }); save(); render(); };
+
+        gt.appendChild(ni);
+        gt.appendChild(subG);
+        gt.appendChild(addR);
 
         if (state.groups.length > 1) {
-          const delGrpBtn = document.createElement('button');
-          delGrpBtn.className = 'btn-remove';
-          delGrpBtn.title = 'Supprimer ce groupe';
-          delGrpBtn.textContent = '🗑️';
-          delGrpBtn.onclick = () => removeGroup(gIdx);
-          groupBtns.appendChild(delGrpBtn);
+          const delG = document.createElement('button');
+          delG.className = 'btn-del';
+          delG.textContent = '×';
+          delG.onclick = () => { state.groups.splice(gi, 1); save(); render(); };
+          gt.appendChild(delG);
         }
+        gb.appendChild(gt);
 
-        top.appendChild(groupBtns);
-        gCard.appendChild(top);
+        g.rows.forEach((r, ri) => {
+          const row = document.createElement('div');
+          row.className = 'compact-row';
+          row.appendChild(numInp('App', r.nbApp, (v) => { state.groups[gi].rows[ri].nbApp = v; }));
+          row.appendChild(numInp('Nb/app', r.nbPerApp, (v) => { state.groups[gi].rows[ri].nbPerApp = v; }));
 
-        group.rows.forEach((row, rIdx) => {
-          const line = document.createElement('div');
-          line.className = 'inline-line';
+          const pill = document.createElement('span');
+          pill.className = 'mini-res';
+          pill.id = `rs_${gi}_${ri}`;
+          pill.textContent = `= ${fmt(rowPF(r))}`;
+          row.appendChild(pill);
 
-          line.appendChild(makeNumberField('Nb app', row.nbApp, (val) => {
-            state.groups[gIdx].rows[rIdx].nbApp = val;
-            saveState();
-            refreshCalculations();
-          }));
-
-          line.appendChild(makeNumberField('Nb par app', row.nbPerApp, (val) => {
-            state.groups[gIdx].rows[rIdx].nbPerApp = val;
-            saveState();
-            refreshCalculations();
-          }));
-
-          const sub = document.createElement('div');
-          sub.className = 'line-result';
-          sub.id = `row_sub_${gIdx}_${rIdx}`;
-          sub.textContent = `= ${formatNum(calcRowFinished(row))}`;
-          line.appendChild(sub);
-
-          if (group.rows.length > 1) {
-            const delRowBtn = document.createElement('button');
-            delRowBtn.className = 'btn-remove';
-            delRowBtn.title = 'Supprimer la ligne';
-            delRowBtn.textContent = '🗑️';
-            delRowBtn.onclick = () => removeGroupRow(gIdx, rIdx);
-            line.appendChild(delRowBtn);
+          if (g.rows.length > 1) {
+            const delR = document.createElement('button');
+            delR.className = 'btn-del';
+            delR.textContent = '×';
+            delR.onclick = () => { state.groups[gi].rows.splice(ri, 1); save(); render(); };
+            row.appendChild(delR);
           }
-
-          gCard.appendChild(line);
+          gb.appendChild(row);
         });
 
-        sec5.appendChild(gCard);
+        gList.appendChild(gb);
       });
+      c5.appendChild(gList);
+      strip.appendChild(c5);
 
-      app.appendChild(sec5);
+      // ORDRE : 3, 2, 4, 1 SUR LA MÊME LIGNE
+      strip.appendChild(makeCol('etiquettes', '3. 🏷️ Ét.',   'Réf eti'));
+      strip.appendChild(makeCol('capsules',   '2. 🔘 Cap.',  'Réf CRC'));
+      strip.appendChild(makeCol('trays',      '4. 📦 Trays', 'Réf cct'));
+      strip.appendChild(makeCol('bocaux',     '1. 🫙 Boc.',  'Réf V'));
 
-      // 2. ORDRE DEMANDÉ : 3 (ÉTIQUETTES), 2 (CAPSULES), 4 (TRAYS), 1 (BOCAUX)
-      // Pas d'ajout de ligne dans ces composants, chacun a sa référence (eti, CRC, cct, V)
-      app.appendChild(buildComponentSection('etiquettes', '3', '🏷️', 'Compteur d’étiquettes', 'Réf. eti'));
-      app.appendChild(buildComponentSection('capsules',   '2', '🔘', 'Compteur de capsules',   'Réf. CRC'));
-      app.appendChild(buildComponentSection('trays',      '4', '📦', 'Compteur de trays',      'Réf. cct'));
-      app.appendChild(buildComponentSection('bocaux',     '1', '🫙', 'Compteur de bocaux',     'Réf. V'));
-
-      refreshCalculations();
+      refresh();
     }
 
-    function makeNumberField(labelText, value, onInput) {
-      const box = document.createElement('div');
-      box.className = 'field-box';
-      const lbl = document.createElement('label');
-      lbl.textContent = labelText;
-      const inp = document.createElement('input');
-      inp.type = 'number';
-      inp.min = '0';
-      inp.step = 'any';
-      inp.placeholder = '0';
-      inp.value = value;
-      inp.oninput = (e) => onInput(e.target.value);
-      box.appendChild(lbl);
-      box.appendChild(inp);
-      return box;
-    }
+    function makeCol(key, title, refLbl) {
+      const c = state.components[key];
+      const col = document.createElement('div');
+      col.className = 'col-block';
 
-    function makeRefField(labelText, value, onInput) {
-      const box = document.createElement('div');
-      box.className = 'field-box ref-box';
-      const lbl = document.createElement('label');
-      lbl.textContent = labelText;
-      const inp = document.createElement('input');
-      inp.type = 'text';
-      inp.placeholder = labelText.replace('Réf. ', '');
-      inp.value = value;
-      inp.oninput = (e) => onInput(e.target.value);
-      box.appendChild(lbl);
-      box.appendChild(inp);
-      return box;
-    }
+      const head = document.createElement('div');
+      head.className = 'col-head';
+      head.textContent = title;
+      col.appendChild(head);
 
-    function buildComponentSection(key, num, emoji, title, refLabel) {
-      const comp = state.components[key];
-      const sec = document.createElement('div');
-      sec.className = 'section-block';
-
-      sec.innerHTML = `
-        <div class="section-header">
-          <div class="section-title"><span>${emoji}</span> <span>${num}. ${title}</span></div>
-          <span style="font-size:0.82rem; color:var(--text-muted); font-weight:600;">Sans ajout de ligne • Calcul auto selon Produit Fini</span>
-        </div>
-      `;
-
-      const line = document.createElement('div');
-      line.className = 'inline-line';
-
-      // Référence spécifique (eti, CRC, cct, V)
-      line.appendChild(makeRefField(refLabel, comp.ref, (val) => {
-        state.components[key].ref = val;
-        saveState();
-        refreshCalculations();
-      }));
+      const row = document.createElement('div');
+      row.className = 'compact-row';
+      row.appendChild(refInp(refLbl, c.ref, (v) => { state.components[key].ref = v; }));
 
       if (key === 'etiquettes') {
-        line.appendChild(makeNumberField('Nb étiquettes / paquet', comp.perPack, (val) => {
-          state.components.etiquettes.perPack = val;
-          saveState();
-          refreshCalculations();
-        }));
-        line.appendChild(makeNumberField('Stock paquets (optionnel)', comp.stockPacks, (val) => {
-          state.components.etiquettes.stockPacks = val;
-          saveState();
-          refreshCalculations();
-        }));
+        row.appendChild(numInp('Ét/pqt', c.perPack, (v) => { state.components.etiquettes.perPack = v; }));
+        row.appendChild(numInp('Stk', c.stockPacks, (v) => { state.components.etiquettes.stockPacks = v; }));
       } else if (key === 'capsules') {
-        line.appendChild(makeNumberField('Nb capsules / boîte', comp.perBox, (val) => {
-          state.components.capsules.perBox = val;
-          saveState();
-          refreshCalculations();
-        }));
-        line.appendChild(makeNumberField('Nb boîtes / palette', comp.boxesPerPallet, (val) => {
-          state.components.capsules.boxesPerPallet = val;
-          saveState();
-          refreshCalculations();
-        }));
-        line.appendChild(makeNumberField('Stock palettes (optionnel)', comp.stockPallets, (val) => {
-          state.components.capsules.stockPallets = val;
-          saveState();
-          refreshCalculations();
-        }));
+        row.appendChild(numInp('Cap/bte', c.perBox, (v) => { state.components.capsules.perBox = v; }));
+        row.appendChild(numInp('Bte/pal', c.boxesPerPallet, (v) => { state.components.capsules.boxesPerPallet = v; }));
+        row.appendChild(numInp('Stk pal', c.stockPallets, (v) => { state.components.capsules.stockPallets = v; }));
       } else if (key === 'trays') {
-        line.appendChild(makeNumberField('Nb trays / palette', comp.perPallet, (val) => {
-          state.components.trays.perPallet = val;
-          saveState();
-          refreshCalculations();
-        }));
+        row.appendChild(numInp('Tr/pal', c.perPallet, (v) => { state.components.trays.perPallet = v; }));
 
-        const radioBox = document.createElement('div');
-        radioBox.className = 'field-box radio-box';
-        const rLbl = document.createElement('label');
-        rLbl.textContent = 'Format (6, 8 ou 12)';
-        radioBox.appendChild(rLbl);
+        const fd = document.createElement('div');
+        fd.className = 'c-field';
+        const fl = document.createElement('label');
+        fl.textContent = 'Fmt';
+        fd.appendChild(fl);
 
-        const rRow = document.createElement('div');
-        rRow.className = 'radio-row';
-        [6, 8, 12].forEach(opt => {
-          const pill = document.createElement('label');
-          pill.className = 'radio-pill';
-          const radio = document.createElement('input');
-          radio.type = 'radio';
-          radio.name = 'tray_pack_size';
-          radio.value = opt;
-          radio.checked = Number(comp.packSize) === opt;
-          radio.onchange = () => {
-            state.components.trays.packSize = opt;
-            saveState();
-            refreshCalculations();
-          };
-          const span = document.createElement('span');
-          span.textContent = opt;
-          pill.appendChild(radio);
-          pill.appendChild(span);
-          rRow.appendChild(pill);
+        const rm = document.createElement('div');
+        rm.className = 'rad-mini';
+        [6, 8, 12].forEach(o => {
+          const lb = document.createElement('label');
+          const rd = document.createElement('input');
+          rd.type = 'radio';
+          rd.name = 'fmt_rad';
+          rd.value = o;
+          rd.checked = Number(c.packSize) === o;
+          rd.onchange = () => { state.components.trays.packSize = o; save(); refresh(); };
+          const sp = document.createElement('span');
+          sp.textContent = o;
+          lb.appendChild(rd);
+          lb.appendChild(sp);
+          rm.appendChild(lb);
         });
-        radioBox.appendChild(rRow);
-        line.appendChild(radioBox);
+        fd.appendChild(rm);
+        row.appendChild(fd);
 
-        line.appendChild(makeNumberField('Stock palettes (optionnel)', comp.stockPallets, (val) => {
-          state.components.trays.stockPallets = val;
-          saveState();
-          refreshCalculations();
-        }));
-      } else if (key === 'bocaux') {
-        line.appendChild(makeNumberField('Nb bocaux / palette', comp.perPallet, (val) => {
-          state.components.bocaux.perPallet = val;
-          saveState();
-          refreshCalculations();
-        }));
-        line.appendChild(makeNumberField('Stock palettes (optionnel)', comp.stockPallets, (val) => {
-          state.components.bocaux.stockPallets = val;
-          saveState();
-          refreshCalculations();
-        }));
+        row.appendChild(numInp('Stk pal', c.stockPallets, (v) => { state.components.trays.stockPallets = v; }));
+      } else {
+        row.appendChild(numInp('Boc/pal', c.perPallet, (v) => { state.components.bocaux.perPallet = v; }));
+        row.appendChild(numInp('Stk pal', c.stockPallets, (v) => { state.components.bocaux.stockPallets = v; }));
       }
 
-      sec.appendChild(line);
+      col.appendChild(row);
 
-      const needBox = document.createElement('div');
-      needBox.className = 'need-box';
-      needBox.id = `need_box_${key}`;
-      sec.appendChild(needBox);
+      const nd = document.createElement('div');
+      nd.className = 'need-pill';
+      nd.id = `nd_${key}`;
+      col.appendChild(nd);
 
-      return sec;
-    }
-
-    function addGroup() {
-      const nextIndex = state.groups.length;
-      state.groups.push(getDefaultGroup(nextIndex));
-      saveState();
-      renderApp();
-    }
-
-    function removeGroup(gIdx) {
-      state.groups.splice(gIdx, 1);
-      saveState();
-      renderApp();
-    }
-
-    function addGroupRow(gIdx) {
-      state.groups[gIdx].rows.push({ nbApp: '', nbPerApp: '' });
-      saveState();
-      renderApp();
-    }
-
-    function removeGroupRow(gIdx, rIdx) {
-      state.groups[gIdx].rows.splice(rIdx, 1);
-      saveState();
-      renderApp();
+      return col;
     }
 
     function resetAll() {
-      if (confirm('Voulez-vous vraiment remettre tous les groupes et compteurs à zéro ?')) {
-        state = getDefaultState();
-        saveState();
-        renderApp();
+      if (confirm('Reset à zéro ?')) {
+        state = defState();
+        save();
+        render();
       }
     }
 
     function printSummary() {
-      const report = document.getElementById('print-report');
+      const rep = document.getElementById('print-report');
       const now = new Date().toLocaleString('fr-FR');
-      const grandTotal = calcGrandTotal();
+      const pf = totPF();
 
-      let groupRowsHtml = '';
-      state.groups.forEach((grp, gIdx) => {
-        const gName = getGroupDisplayName(grp, gIdx);
-        const gTot = calcGroupTotal(grp);
-        grp.rows.forEach((row, rIdx) => {
-          groupRowsHtml += `
-            <tr>
-              <td>${gName}</td>
-              <td>Ligne ${rIdx + 1}</td>
-              <td>${row.nbApp || 0}</td>
-              <td>${row.nbPerApp || 0}</td>
-              <td><strong>${formatNum(calcRowFinished(row))}</strong></td>
-            </tr>
-          `;
+      let rowsHtml = '';
+      state.groups.forEach((g, gi) => {
+        const gn = gName(g, gi);
+        g.rows.forEach((r, ri) => {
+          rowsHtml += `<tr><td>${gn}</td><td>L${ri + 1}</td><td>${r.nbApp || 0}</td><td>${r.nbPerApp || 0}</td><td><strong>${fmt(rowPF(r))}</strong></td></tr>`;
         });
-        groupRowsHtml += `
-          <tr>
-            <td colspan="4"><strong>Sous-total ${gName}</strong></td>
-            <td><strong>${formatNum(gTot)}</strong></td>
-          </tr>
-        `;
+        rowsHtml += `<tr><td colspan="4"><strong>Total ${gn}</strong></td><td><strong>${fmt(grpPF(g))}</strong></td></tr>`;
       });
 
-      const compOrder = [
-        { key: 'etiquettes', label: '🏷️ 3. Compteur d’étiquettes (Réf. eti)' },
-        { key: 'capsules',   label: '🔘 2. Compteur de capsules (Réf. CRC)' },
-        { key: 'trays',      label: '📦 4. Compteur de trays (Réf. cct)' },
-        { key: 'bocaux',     label: '🫙 1. Compteur de bocaux (Réf. V)' }
+      const list = [
+        { k: 'etiquettes', t: '3. Ét. (eti)' },
+        { k: 'capsules',   t: '2. Cap. (CRC)' },
+        { k: 'trays',      t: '4. Trays (cct)' },
+        { k: 'bocaux',     t: '1. Boc. (V)' }
       ];
 
-      let compHtml = '';
-      compOrder.forEach(item => {
-        const c = state.components[item.key];
-        const info = computeComponentNeed(item.key, grandTotal);
-        let statusClass = '';
-        let statusExtra = '';
-        if (info.hasStock) {
-          if (info.missingUnits > 0) {
-            statusClass = 'print-err';
-            statusExtra = `<div class="${statusClass}">${info.missingText}</div>`;
-          } else {
-            statusClass = 'print-ok';
-            statusExtra = `<div class="${statusClass}">${info.okText}</div>`;
-          }
-        }
-        compHtml += `
-          <div class="print-block">
-            <h3>${item.label} — Réf : <em>${(c.ref || 'Non renseignée')}</em></h3>
-            <div>${info.summaryText}</div>
-            ${info.hasStock ? `<div>${info.stockText}</div>` : ''}
-            ${statusExtra}
-          </div>
-        `;
+      let cHtml = '';
+      list.forEach(item => {
+        const c = state.components[item.k];
+        const info = calcNeed(item.k, pf);
+        const extra = info.hasStk
+          ? `<div class="${info.missU > 0 ? 'p-err' : 'p-ok'}">${info.missU > 0 ? info.missTxt : info.okTxt}</div>`
+          : '';
+        cHtml += `<div class="p-box"><strong>${item.t}</strong> — Réf: <em>${c.ref || '-'}</em><br>${info.txt}${extra}</div>`;
       });
 
-      report.innerHTML = `
-        <div class="print-header">
-          <div>
-            <h2>📊 Résumé des Compteurs & Besoins</h2>
-            <p>Total Général Produit Fini : <strong>${formatNum(grandTotal)}</strong></p>
-          </div>
-          <div><strong>Date :</strong> ${now}</div>
+      rep.innerHTML = `
+        <div style="display:flex; justify-content:space-between; border-bottom:2px solid #000; padding-bottom:6px; margin-bottom:10px;">
+          <strong>Total PF: ${fmt(pf)}</strong>
+          <span>${now}</span>
         </div>
-
-        <div class="print-block">
-          <h3>✅ 5. Produits Finis par Groupe</h3>
-          <table class="print-table">
-            <thead>
-              <tr>
-                <th>Groupe</th>
-                <th>Ligne</th>
-                <th>Nb app</th>
-                <th>Nb par app</th>
-                <th>Quantité</th>
-              </tr>
-            </thead>
-            <tbody>${groupRowsHtml}</tbody>
+        <div class="p-box">
+          <strong>5. PF</strong>
+          <table class="p-tbl">
+            <thead><tr><th>Groupe</th><th>Ligne</th><th>App</th><th>Nb/app</th><th>Total</th></tr></thead>
+            <tbody>${rowsHtml}</tbody>
           </table>
-          <div style="margin-top:8px; font-size:1.05rem;"><strong>TOTAL GÉNÉRAL PRODUIT FINI : ${formatNum(grandTotal)}</strong></div>
         </div>
-
-        ${compHtml}
+        ${cHtml}
       `;
-
       window.print();
     }
 
-    loadState();
-    renderApp();
+    load();
+    render();
   </script>
 </body>
 </html>
