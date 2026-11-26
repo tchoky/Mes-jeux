@@ -20,6 +20,7 @@
       --success-border: #bbf7d0;
       --info-bg: #eff6ff;
       --info-border: #bfdbfe;
+      --line-accent: #2563eb;
     }
 
     * {
@@ -44,7 +45,8 @@
     .abc-btn,
     .clock-btn,
     .cons-row,
-    .eye-btn {
+    .eye-btn,
+    .page-tab-btn {
       -webkit-user-select: none;
       user-select: none;
       -webkit-touch-callout: none;
@@ -90,10 +92,10 @@
       font-weight: 900;
     }
 
-    /* En-tête Total PF simplifié : juste App + Total PF */
+    /* En-tête Total PF : App + Grand chiffre principal coloré selon la page */
     .top-card {
       background: var(--card);
-      border: 2px solid var(--primary);
+      border: 2px solid var(--line-accent);
       border-radius: 12px;
       padding: 14px 16px;
       margin-bottom: 10px;
@@ -102,7 +104,7 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 12px;
-      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
     }
 
     .top-app-only {
@@ -112,12 +114,12 @@
     }
 
     .top-value {
-      font-size: 1.8rem;
+      font-size: 1.9rem;
       font-weight: 900;
-      color: var(--primary);
+      color: var(--line-accent);
     }
 
-    /* Deuxième bloc : Verre */
+    /* Deuxième bloc : Verre + 5 boutons L1..LP dans l'espace inférieur droit */
     .glass-fixed-card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -132,7 +134,92 @@
       flex-wrap: wrap;
       align-items: flex-end;
       gap: 10px;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
+    }
+
+    .glass-bottom-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .page-tabs-box {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      margin-left: auto;
+    }
+
+    .page-tab-btn {
+      padding: 7px 11px;
+      border-radius: 9px;
+      border: 2px solid transparent;
+      font-size: 0.85rem;
+      font-weight: 900;
+      cursor: pointer;
+      transition: transform 0.08s ease, box-shadow 0.12s ease;
+    }
+
+    .page-tab-btn:active {
+      transform: scale(0.96);
+    }
+
+    .page-tab-btn.active {
+      box-shadow: 0 0 0 2px #0f172a;
+      transform: translateY(-1px);
+    }
+
+    .tab-l1 {
+      background: #dbeafe;
+      color: #1d4ed8;
+      border-color: #2563eb;
+    }
+    .tab-l1.active {
+      background: #2563eb;
+      color: #ffffff;
+    }
+
+    .tab-l2 {
+      background: #fef9c3;
+      color: #854d0e;
+      border-color: #eab308;
+    }
+    .tab-l2.active {
+      background: #eab308;
+      color: #0f172a;
+    }
+
+    .tab-l3 {
+      background: #dcfce7;
+      color: #15803d;
+      border-color: #16a34a;
+    }
+    .tab-l3.active {
+      background: #16a34a;
+      color: #ffffff;
+    }
+
+    .tab-l4 {
+      background: #fef9c3;
+      color: #854d0e;
+      border-color: #eab308;
+    }
+    .tab-l4.active {
+      background: #eab308;
+      color: #0f172a;
+    }
+
+    .tab-lp {
+      background: #ffedd5;
+      color: #c2410c;
+      border-color: #f97316;
+    }
+    .tab-lp.active {
+      background: #f97316;
+      color: #ffffff;
     }
 
     .glass-line-2 {
@@ -147,6 +234,7 @@
       border-radius: 8px;
       background: var(--info-bg);
       border: 1px solid var(--info-border);
+      margin-top: 8px;
     }
 
     .glass-line-2.err {
@@ -579,13 +667,13 @@
     <div class="cadence-badge" id="cadence-val">0 app/h</div>
   </div>
 
-  <!-- PREMIÈRE PAGE : JUSTE APP + TOTAL PF -->
-  <div class="top-card">
+  <!-- PREMIÈRE PAGE : APP + GRAND CHIFFRE PRINCIPAL COLORÉ -->
+  <div class="top-card" id="main-top-card">
     <div class="top-app-only">App : <span id="top-app-val">0</span></div>
     <div class="top-value" id="top-total">0</div>
   </div>
 
-  <!-- DEUXIÈME BLOC : VERRE -->
+  <!-- DEUXIÈME BLOC : VERRE + 5 BOUTONS L1..LP -->
   <div class="glass-fixed-card">
     <div class="glass-line-1">
       <div class="field" style="flex:0 0 auto;">
@@ -604,6 +692,9 @@
           <button type="button" class="step-btn" data-repeat-fn="stepGlassPerPal" data-repeat-delta="100">+</button>
         </div>
       </div>
+    </div>
+
+    <div class="glass-bottom-row">
       <div class="field" style="flex:0 0 auto;">
         <label>Nb palettes</label>
         <div class="stepper">
@@ -612,7 +703,16 @@
           <button type="button" class="step-btn" data-repeat-fn="stepGlassPallets" data-repeat-delta="1">+</button>
         </div>
       </div>
+
+      <div class="page-tabs-box" id="page-tabs-box">
+        <button type="button" class="page-tab-btn tab-l1 active" data-page="L1" onclick="switchPage('L1')">L1</button>
+        <button type="button" class="page-tab-btn tab-l2" data-page="L2" onclick="switchPage('L2')">L2</button>
+        <button type="button" class="page-tab-btn tab-l3" data-page="L3" onclick="switchPage('L3')">L3</button>
+        <button type="button" class="page-tab-btn tab-l4" data-page="L4" onclick="switchPage('L4')">L4</button>
+        <button type="button" class="page-tab-btn tab-lp" data-page="LP" onclick="switchPage('LP')">LP</button>
+      </div>
     </div>
+
     <div class="glass-line-2" id="g-ver-status">
       <span>Stock : 0 📜</span>
       <span>PF : 0</span>
@@ -727,18 +827,50 @@
   <div id="print-area"></div>
 
   <script>
-    const STORAGE_KEY = 'compteurs_eye_toggle_v1';
+    const STORAGE_KEY = 'compteurs_multi_pages_v1';
+    const PAGE_IDS = ['L1', 'L2', 'L3', 'L4', 'LP'];
+
+    const PAGE_COLORS = {
+      L1: '#2563eb', // bleu
+      L2: '#ca8a04', // jaune soutenu lisible sur fond blanc
+      L3: '#16a34a', // vert
+      L4: '#ca8a04', // jaune soutenu lisible sur fond blanc
+      LP: '#ea580c'  // orange
+    };
 
     const ICON_PACK = '🎟️';
     const ICON_BOX  = '📦';
     const ICON_PAL  = '📜';
     const ICON_WARN = '⚠️';
 
-    let state = {
-      prod: { startTime: '', endTime: '', doneApps: '' },
-      verre: { verPerApp: 3500, perPal: 4000, stkPal: '' },
-      lines: []
+    function createEmptyPageData() {
+      return {
+        prod: { startTime: '', endTime: '', doneApps: '' },
+        verre: { verPerApp: 3500, perPal: 4000, stkPal: '' },
+        lines: []
+      };
+    }
+
+    let appStore = {
+      activePage: 'L1',
+      pages: {
+        L1: createEmptyPageData(),
+        L2: createEmptyPageData(),
+        L3: createEmptyPageData(),
+        L4: createEmptyPageData(),
+        LP: createEmptyPageData()
+      }
     };
+
+    function getCurrentPage() {
+      if (!PAGE_IDS.includes(appStore.activePage)) {
+        appStore.activePage = 'L1';
+      }
+      if (!appStore.pages[appStore.activePage]) {
+        appStore.pages[appStore.activePage] = createEmptyPageData();
+      }
+      return appStore.pages[appStore.activePage];
+    }
 
     let activeConsTarget = null;
     let defaultFruitClearedOnFocus = false;
@@ -808,20 +940,23 @@
     }
 
     function getVerPerApp() {
-      const v = Number(state.verre.verPerApp);
+      const p = getCurrentPage();
+      const v = Number(p.verre.verPerApp);
       return Number.isFinite(v) && v >= 0 ? v : 3500;
     }
 
     function getVerPerPal() {
-      const v = Number(state.verre.perPal);
+      const p = getCurrentPage();
+      const v = Number(p.verre.perPal);
       return Number.isFinite(v) && v >= 0 ? v : 4000;
     }
 
+    // Par défaut le singe (collapsed: true) masque les infos quand on ajoute
     function createLine(fruit = 'Fruit 1', nbApp = 1) {
       return {
         fruit: fruit,
         nbApp: nbApp,
-        collapsed: false,
+        collapsed: true,
         etRef: '',
         etPerPack: 5000,
         etStkPack: 0,
@@ -835,29 +970,63 @@
       };
     }
 
+    function sanitizePageData(rawPage) {
+      const base = createEmptyPageData();
+      if (!rawPage) return base;
+      base.prod = Object.assign({ startTime: '', endTime: '', doneApps: '' }, rawPage.prod || {});
+      base.verre = Object.assign({ verPerApp: 3500, perPal: 4000, stkPal: '' }, rawPage.verre || {});
+      if (base.verre.perPal === '' || base.verre.perPal === undefined || base.verre.perPal === null) {
+        base.verre.perPal = 4000;
+      }
+      base.lines = Array.isArray(rawPage.lines) ? rawPage.lines : [];
+      return base;
+    }
+
     function loadState() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (raw) {
           const parsed = JSON.parse(raw);
-          state.prod = Object.assign({ startTime: '', endTime: '', doneApps: '' }, parsed.prod || {});
-          state.verre = Object.assign({ verPerApp: 3500, perPal: 4000, stkPal: '' }, parsed.verre || {});
-          if (state.verre.perPal === '' || state.verre.perPal === undefined || state.verre.perPal === null) {
-            state.verre.perPal = 4000;
-          }
-          state.lines = Array.isArray(parsed.lines) ? parsed.lines : [];
+          appStore.activePage = PAGE_IDS.includes(parsed.activePage) ? parsed.activePage : 'L1';
+          PAGE_IDS.forEach((pid) => {
+            appStore.pages[pid] = sanitizePageData(parsed.pages ? parsed.pages[pid] : null);
+          });
           return;
         }
       } catch (e) {}
-      state = {
-        prod: { startTime: '', endTime: '', doneApps: '' },
-        verre: { verPerApp: 3500, perPal: 4000, stkPal: '' },
-        lines: []
+      appStore = {
+        activePage: 'L1',
+        pages: {
+          L1: createEmptyPageData(),
+          L2: createEmptyPageData(),
+          L3: createEmptyPageData(),
+          L4: createEmptyPageData(),
+          LP: createEmptyPageData()
+        }
       };
     }
 
     function saveState() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(appStore));
+    }
+
+    function switchPage(pageId) {
+      if (!PAGE_IDS.includes(pageId)) return;
+      appStore.activePage = pageId;
+      saveState();
+      applyPageTheme();
+      bindFixedGlassInputs();
+      renderLines();
+    }
+
+    function applyPageTheme() {
+      const color = PAGE_COLORS[appStore.activePage] || '#2563eb';
+      document.documentElement.style.setProperty('--line-accent', color);
+
+      document.querySelectorAll('.page-tab-btn').forEach((btn) => {
+        const pid = btn.getAttribute('data-page');
+        btn.classList.toggle('active', pid === appStore.activePage);
+      });
     }
 
     function fmt(n) {
@@ -891,11 +1060,12 @@
     }
 
     function computeCadencePerHour() {
-      const doneApps = Number(state.prod.doneApps) || 0;
+      const p = getCurrentPage();
+      const doneApps = Number(p.prod.doneApps) || 0;
       if (doneApps <= 0) return 0;
 
-      const startMin = parseTimeToMinutes(state.prod.startTime);
-      const endMin = parseTimeToMinutes(state.prod.endTime);
+      const startMin = parseTimeToMinutes(p.prod.startTime);
+      const endMin = parseTimeToMinutes(p.prod.endTime);
       const nowMin = getNowMinutes();
 
       let durationMin = 0;
@@ -920,11 +1090,13 @@
     }
 
     function grandTotal() {
-      return state.lines.reduce((s, l) => s + lineTotal(l), 0);
+      const p = getCurrentPage();
+      return p.lines.reduce((s, l) => s + lineTotal(l), 0);
     }
 
     function totalAppsCount() {
-      return state.lines.reduce((s, l) => s + (Number(l.nbApp) || 0), 0);
+      const p = getCurrentPage();
+      return p.lines.reduce((s, l) => s + (Number(l.nbApp) || 0), 0);
     }
 
     function fruitDisplay(l, idx) {
@@ -941,28 +1113,38 @@
     }
 
     function toggleLineEye(idx) {
-      if (!state.lines[idx]) return;
-      state.lines[idx].collapsed = !state.lines[idx].collapsed;
+      const p = getCurrentPage();
+      if (!p.lines[idx]) return;
+      p.lines[idx].collapsed = !p.lines[idx].collapsed;
       saveState();
       renderLines();
     }
 
     function bindFixedGlassInputs() {
+      const p = getCurrentPage();
       const appInp = document.getElementById('g-ver-app');
       const palInp = document.getElementById('g-ver-pal');
       const stkInp = document.getElementById('g-ver-stk');
 
-      appInp.value = state.verre.verPerApp !== '' && state.verre.verPerApp !== undefined ? state.verre.verPerApp : 3500;
-      palInp.value = state.verre.perPal !== '' && state.verre.perPal !== undefined ? state.verre.perPal : 4000;
-      stkInp.value = state.verre.stkPal || '';
+      appInp.value = p.verre.verPerApp !== '' && p.verre.verPerApp !== undefined ? p.verre.verPerApp : 3500;
+      palInp.value = p.verre.perPal !== '' && p.verre.perPal !== undefined ? p.verre.perPal : 4000;
+      stkInp.value = p.verre.stkPal || '';
 
       appInp.oninput = (e) => {
-        state.verre.verPerApp = e.target.value;
+        getCurrentPage().verre.verPerApp = e.target.value;
         saveState();
         renderLines();
       };
-      palInp.oninput = (e) => { state.verre.perPal = e.target.value; saveState(); refreshGlassStatus(); };
-      stkInp.oninput = (e) => { state.verre.stkPal = e.target.value; saveState(); refreshGlassStatus(); };
+      palInp.oninput = (e) => {
+        getCurrentPage().verre.perPal = e.target.value;
+        saveState();
+        refreshGlassStatus();
+      };
+      stkInp.oninput = (e) => {
+        getCurrentPage().verre.stkPal = e.target.value;
+        saveState();
+        refreshGlassStatus();
+      };
     }
 
     function bindFruitAutoClear() {
@@ -983,45 +1165,50 @@
     }
 
     function stepVerPerApp(delta) {
-      const current = Number(state.verre.verPerApp);
+      const p = getCurrentPage();
+      const current = Number(p.verre.verPerApp);
       const base = Number.isFinite(current) ? current : 3500;
       const next = Math.max(0, base + delta);
-      state.verre.verPerApp = next;
+      p.verre.verPerApp = next;
       document.getElementById('g-ver-app').value = next;
       saveState();
       renderLines();
     }
 
     function stepGlassPerPal(delta) {
-      const current = Number(state.verre.perPal);
+      const p = getCurrentPage();
+      const current = Number(p.verre.perPal);
       const base = Number.isFinite(current) ? current : 4000;
       const next = Math.max(0, base + delta);
-      state.verre.perPal = next;
+      p.verre.perPal = next;
       document.getElementById('g-ver-pal').value = next;
       saveState();
       refreshGlassStatus();
     }
 
     function stepGlassPallets(delta) {
-      const current = Number(state.verre.stkPal) || 0;
+      const p = getCurrentPage();
+      const current = Number(p.verre.stkPal) || 0;
       const next = Math.max(0, current + delta);
-      state.verre.stkPal = next;
+      p.verre.stkPal = next;
       document.getElementById('g-ver-stk').value = next;
       saveState();
       refreshGlassStatus();
     }
 
     function stepLineApps(idx, delta) {
-      if (!state.lines[idx]) return;
-      const current = Number(state.lines[idx].nbApp) || 0;
-      state.lines[idx].nbApp = Math.max(0, current + delta);
+      const p = getCurrentPage();
+      if (!p.lines[idx]) return;
+      const current = Number(p.lines[idx].nbApp) || 0;
+      p.lines[idx].nbApp = Math.max(0, current + delta);
       saveState();
       renderLines();
     }
 
     function stepConsumable(idx, type, delta, event) {
       if (event) event.stopPropagation();
-      const l = state.lines[idx];
+      const p = getCurrentPage();
+      const l = p.lines[idx];
       if (!l) return;
 
       if (type === 'et') {
@@ -1036,9 +1223,10 @@
     }
 
     function refreshGlassStatus() {
+      const p = getCurrentPage();
       const pf = grandTotal();
       const vPerPal = getVerPerPal();
-      const vStkPal = Number(state.verre.stkPal) || 0;
+      const vStkPal = Number(p.verre.stkPal) || 0;
       const vStockUnits = vPerPal * vStkPal;
       const vNeedPal = vPerPal > 0 ? Math.ceil(pf / vPerPal) : 0;
 
@@ -1069,6 +1257,7 @@
     }
 
     function renderLines() {
+      const p = getCurrentPage();
       const container = document.getElementById('lines-list');
       const pfTotal = grandTotal();
       const verPerApp = getVerPerApp();
@@ -1082,8 +1271,8 @@
 
       refreshGlassStatus();
 
-      if (state.lines.length === 0) {
-        container.innerHTML = `<div class="empty-box">Aucune ligne pour l'instant.<br>Appuyez sur <strong>➕ Ajout</strong> pour commencer.</div>`;
+      if (p.lines.length === 0) {
+        container.innerHTML = `<div class="empty-box">Aucune ligne sur <strong>${appStore.activePage}</strong>.<br>Appuyez sur <strong>➕ Ajout</strong> pour commencer.</div>`;
         return;
       }
 
@@ -1091,11 +1280,11 @@
 
       let cumulAppsToDo = 0;
 
-      state.lines.forEach((l, idx) => {
+      p.lines.forEach((l, idx) => {
         const pf = lineTotal(l);
         const fruitName = fruitDisplay(l, idx);
         const lineApps = Math.max(0, Number(l.nbApp) || 0);
-        const isCollapsed = !!l.collapsed;
+        const isCollapsed = l.collapsed === undefined ? true : !!l.collapsed;
         cumulAppsToDo += lineApps;
 
         const etPack = Number(l.etPerPack) || 5000;
@@ -1230,7 +1419,8 @@
     }
 
     function openAddAppModal() {
-      const defFruit = getDefaultFruit(state.lines.length);
+      const p = getCurrentPage();
+      const defFruit = getDefaultFruit(p.lines.length);
       const fruitInp = document.getElementById('add-fruit');
       fruitInp.value = defFruit;
       fruitInp.placeholder = defFruit;
@@ -1250,20 +1440,22 @@
     }
 
     function confirmAddLine() {
-      const defFruit = getDefaultFruit(state.lines.length);
+      const p = getCurrentPage();
+      const defFruit = getDefaultFruit(p.lines.length);
       const typedFruit = document.getElementById('add-fruit').value.trim();
       const fruit = typedFruit || defFruit;
       const nbApp = Math.max(0, Number(document.getElementById('add-nb-app').value) || 0);
-      state.lines.push(createLine(fruit, nbApp));
+      p.lines.push(createLine(fruit, nbApp));
       saveState();
       closeAddModal();
       renderLines();
     }
 
     function openClockModal() {
-      document.getElementById('clk-start').value = state.prod.startTime || '';
-      document.getElementById('clk-end').value = state.prod.endTime || '';
-      document.getElementById('clk-done-app').value = state.prod.doneApps !== '' ? state.prod.doneApps : '';
+      const p = getCurrentPage();
+      document.getElementById('clk-start').value = p.prod.startTime || '';
+      document.getElementById('clk-end').value = p.prod.endTime || '';
+      document.getElementById('clk-done-app').value = p.prod.doneApps !== '' ? p.prod.doneApps : '';
       document.getElementById('clock-modal').classList.add('open');
     }
 
@@ -1272,7 +1464,8 @@
     }
 
     function saveClockModal() {
-      state.prod = {
+      const p = getCurrentPage();
+      p.prod = {
         startTime: document.getElementById('clk-start').value,
         endTime: document.getElementById('clk-end').value,
         doneApps: document.getElementById('clk-done-app').value
@@ -1283,7 +1476,8 @@
     }
 
     function openConsModal(lineIdx, type) {
-      const l = state.lines[lineIdx];
+      const p = getCurrentPage();
+      const l = p.lines[lineIdx];
       if (!l) return;
       activeConsTarget = { lineIdx, type };
 
@@ -1360,8 +1554,9 @@
 
     function saveConsModal() {
       if (!activeConsTarget) return;
+      const p = getCurrentPage();
       const { lineIdx, type } = activeConsTarget;
-      const l = state.lines[lineIdx];
+      const l = p.lines[lineIdx];
       if (!l) return;
 
       const perBoxVal = Math.max(0, Number(document.getElementById('cons-per-box').value) || 0);
@@ -1390,16 +1585,19 @@
     }
 
     function deleteLine(idx) {
-      state.lines.splice(idx, 1);
+      const p = getCurrentPage();
+      p.lines.splice(idx, 1);
       saveState();
       renderLines();
     }
 
     function resetAll() {
-      if (confirm('Voulez-vous remettre à zéro et effacer toutes les lignes ?')) {
-        const currentApp = state.verre && state.verre.verPerApp !== '' ? state.verre.verPerApp : 3500;
-        const currentPerPal = state.verre && state.verre.perPal !== '' ? state.verre.perPal : 4000;
-        state = {
+      const pid = appStore.activePage;
+      if (confirm(`Voulez-vous remettre à zéro la page ${pid} et effacer ses lignes ?`)) {
+        const current = getCurrentPage();
+        const currentApp = current.verre && current.verre.verPerApp !== '' ? current.verre.verPerApp : 3500;
+        const currentPerPal = current.verre && current.verre.perPal !== '' ? current.verre.perPal : 4000;
+        appStore.pages[pid] = {
           prod: { startTime: '', endTime: '', doneApps: '' },
           verre: { verPerApp: currentApp, perPal: currentPerPal, stkPal: '' },
           lines: []
@@ -1411,13 +1609,14 @@
     }
 
     function printReport() {
+      const p = getCurrentPage();
       const area = document.getElementById('print-area');
       const now = new Date().toLocaleString('fr-FR');
       const vInfo = document.getElementById('g-ver-status').textContent;
       const cadTxt = document.getElementById('cadence-val').textContent;
       let cardsHtml = '';
 
-      state.lines.forEach((l, i) => {
+      p.lines.forEach((l, i) => {
         const pf = lineTotal(l);
         cardsHtml += `
           <div class="p-card">
@@ -1431,7 +1630,7 @@
 
       area.innerHTML = `
         <div style="display:flex; justify-content:space-between; border-bottom:2px solid #000; padding-bottom:8px; margin-bottom:10px;">
-          <div><strong>Total PF : ${fmt(grandTotal())}</strong> • ${cadTxt}</div>
+          <div><strong>${appStore.activePage} — Total PF : ${fmt(grandTotal())}</strong> • ${cadTxt}</div>
           <div>${now}</div>
         </div>
         <div class="p-card"><strong>Verre :</strong> ${vInfo}</div>
@@ -1441,6 +1640,7 @@
     }
 
     loadState();
+    applyPageTheme();
     bindFixedGlassInputs();
     bindFruitAutoClear();
     bindPrefRefInput();
