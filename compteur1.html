@@ -119,7 +119,7 @@
       color: var(--line-accent);
     }
 
-    /* Deuxième bloc : Verre + 5 boutons L1..LP dans l'espace inférieur droit */
+    /* Deuxième bloc : Verre sur une seule ligne + 5 boutons L1..LP */
     .glass-fixed-card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -129,20 +129,23 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
     }
 
-    .glass-line-1 {
+    .glass-single-row {
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       align-items: flex-end;
-      gap: 10px;
+      justify-content: space-between;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 2px;
       margin-bottom: 10px;
     }
 
     .glass-bottom-row {
       display: flex;
       flex-wrap: wrap;
-      justify-content: space-between;
+      justify-content: flex-end;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
     .page-tabs-box {
@@ -252,23 +255,24 @@
     .field {
       display: flex;
       flex-direction: column;
-      min-width: 105px;
+      min-width: 0;
     }
 
     .field label {
-      font-size: 0.74rem;
+      font-size: 0.72rem;
       font-weight: 700;
       color: var(--muted);
       margin-bottom: 4px;
+      white-space: nowrap;
     }
 
     .field input[type="number"],
     .field input[type="text"],
     .field input[type="time"] {
-      padding: 8px 10px;
+      padding: 7px 8px;
       border: 1px solid #cbd5e1;
       border-radius: 8px;
-      font-size: 0.98rem;
+      font-size: 0.94rem;
       width: 100%;
       background: #fff;
     }
@@ -322,17 +326,17 @@
     .stepper {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
     }
 
     .step-btn {
-      width: 32px;
-      height: 36px;
+      width: 28px;
+      height: 34px;
       border-radius: 8px;
       border: 1px solid #94a3b8;
       background: #e2e8f0;
       color: var(--text);
-      font-size: 1.05rem;
+      font-size: 1rem;
       font-weight: 900;
       cursor: pointer;
       display: inline-flex;
@@ -347,15 +351,15 @@
     }
 
     .step-num-inp {
-      width: 64px !important;
+      width: 46px !important;
       text-align: center;
-      padding: 7px 6px !important;
+      padding: 6px 4px !important;
     }
 
     .step-num-wide {
-      width: 78px !important;
+      width: 64px !important;
       text-align: center;
-      padding: 7px 6px !important;
+      padding: 6px 4px !important;
     }
 
     .empty-box {
@@ -673,11 +677,11 @@
     <div class="top-value" id="top-total">0</div>
   </div>
 
-  <!-- DEUXIÈME BLOC : VERRE + 5 BOUTONS L1..LP -->
+  <!-- DEUXIÈME BLOC : VERRE SUR UNE SEULE LIGNE + 5 BOUTONS L1..LP -->
   <div class="glass-fixed-card">
-    <div class="glass-line-1">
+    <div class="glass-single-row">
       <div class="field" style="flex:0 0 auto;">
-        <label>Nb verre / app</label>
+        <label>verre /app</label>
         <div class="stepper">
           <button type="button" class="step-btn" data-repeat-fn="stepVerPerApp" data-repeat-delta="-50">-</button>
           <input type="number" inputmode="numeric" pattern="[0-9]*" class="step-num-wide" id="g-ver-app" value="3500">
@@ -685,25 +689,24 @@
         </div>
       </div>
       <div class="field" style="flex:0 0 auto;">
-        <label>Nb / palette</label>
+        <label>verre /pallette</label>
         <div class="stepper">
           <button type="button" class="step-btn" data-repeat-fn="stepGlassPerPal" data-repeat-delta="-100">-</button>
           <input type="number" inputmode="numeric" pattern="[0-9]*" class="step-num-wide" id="g-ver-pal" value="4000">
           <button type="button" class="step-btn" data-repeat-fn="stepGlassPerPal" data-repeat-delta="100">+</button>
         </div>
       </div>
-    </div>
-
-    <div class="glass-bottom-row">
       <div class="field" style="flex:0 0 auto;">
         <label>Nb palettes</label>
         <div class="stepper">
           <button type="button" class="step-btn" data-repeat-fn="stepGlassPallets" data-repeat-delta="-1">-</button>
-          <input type="number" inputmode="numeric" pattern="[0-9]*" class="step-num-inp" id="g-ver-stk" placeholder="0">
+          <input type="number" inputmode="numeric" pattern="[0-9]*" class="step-num-inp" id="g-ver-stk" value="10">
           <button type="button" class="step-btn" data-repeat-fn="stepGlassPallets" data-repeat-delta="1">+</button>
         </div>
       </div>
+    </div>
 
+    <div class="glass-bottom-row">
       <div class="page-tabs-box" id="page-tabs-box">
         <button type="button" class="page-tab-btn tab-l1 active" data-page="L1" onclick="switchPage('L1')">L1</button>
         <button type="button" class="page-tab-btn tab-l2" data-page="L2" onclick="switchPage('L2')">L2</button>
@@ -714,7 +717,7 @@
     </div>
 
     <div class="glass-line-2" id="g-ver-status">
-      <span>Stock : 0 📜</span>
+      <span>10 📜</span>
       <span>PF : 0</span>
     </div>
   </div>
@@ -827,14 +830,14 @@
   <div id="print-area"></div>
 
   <script>
-    const STORAGE_KEY = 'compteurs_multi_pages_v1';
+    const STORAGE_KEY = 'compteurs_single_line_pal10_v1';
     const PAGE_IDS = ['L1', 'L2', 'L3', 'L4', 'LP'];
 
     const PAGE_COLORS = {
       L1: '#2563eb', // bleu
-      L2: '#ca8a04', // jaune soutenu lisible sur fond blanc
+      L2: '#ca8a04', // jaune
       L3: '#16a34a', // vert
-      L4: '#ca8a04', // jaune soutenu lisible sur fond blanc
+      L4: '#ca8a04', // jaune
       LP: '#ea580c'  // orange
     };
 
@@ -846,7 +849,7 @@
     function createEmptyPageData() {
       return {
         prod: { startTime: '', endTime: '', doneApps: '' },
-        verre: { verPerApp: 3500, perPal: 4000, stkPal: '' },
+        verre: { verPerApp: 3500, perPal: 4000, stkPal: 10 },
         lines: []
       };
     }
@@ -951,7 +954,6 @@
       return Number.isFinite(v) && v >= 0 ? v : 4000;
     }
 
-    // Par défaut le singe (collapsed: true) masque les infos quand on ajoute
     function createLine(fruit = 'Fruit 1', nbApp = 1) {
       return {
         fruit: fruit,
@@ -974,9 +976,12 @@
       const base = createEmptyPageData();
       if (!rawPage) return base;
       base.prod = Object.assign({ startTime: '', endTime: '', doneApps: '' }, rawPage.prod || {});
-      base.verre = Object.assign({ verPerApp: 3500, perPal: 4000, stkPal: '' }, rawPage.verre || {});
+      base.verre = Object.assign({ verPerApp: 3500, perPal: 4000, stkPal: 10 }, rawPage.verre || {});
       if (base.verre.perPal === '' || base.verre.perPal === undefined || base.verre.perPal === null) {
         base.verre.perPal = 4000;
+      }
+      if (base.verre.stkPal === '' || base.verre.stkPal === undefined || base.verre.stkPal === null) {
+        base.verre.stkPal = 10;
       }
       base.lines = Array.isArray(rawPage.lines) ? rawPage.lines : [];
       return base;
@@ -1128,7 +1133,7 @@
 
       appInp.value = p.verre.verPerApp !== '' && p.verre.verPerApp !== undefined ? p.verre.verPerApp : 3500;
       palInp.value = p.verre.perPal !== '' && p.verre.perPal !== undefined ? p.verre.perPal : 4000;
-      stkInp.value = p.verre.stkPal || '';
+      stkInp.value = p.verre.stkPal !== '' && p.verre.stkPal !== undefined ? p.verre.stkPal : 10;
 
       appInp.oninput = (e) => {
         getCurrentPage().verre.verPerApp = e.target.value;
@@ -1188,8 +1193,9 @@
 
     function stepGlassPallets(delta) {
       const p = getCurrentPage();
-      const current = Number(p.verre.stkPal) || 0;
-      const next = Math.max(0, current + delta);
+      const current = Number(p.verre.stkPal);
+      const base = Number.isFinite(current) ? current : 10;
+      const next = Math.max(0, base + delta);
       p.verre.stkPal = next;
       document.getElementById('g-ver-stk').value = next;
       saveState();
@@ -1226,7 +1232,7 @@
       const p = getCurrentPage();
       const pf = grandTotal();
       const vPerPal = getVerPerPal();
-      const vStkPal = Number(p.verre.stkPal) || 0;
+      const vStkPal = p.verre.stkPal === '' || p.verre.stkPal === undefined ? 10 : (Number(p.verre.stkPal) || 0);
       const vStockUnits = vPerPal * vStkPal;
       const vNeedPal = vPerPal > 0 ? Math.ceil(pf / vPerPal) : 0;
 
@@ -1599,7 +1605,7 @@
         const currentPerPal = current.verre && current.verre.perPal !== '' ? current.verre.perPal : 4000;
         appStore.pages[pid] = {
           prod: { startTime: '', endTime: '', doneApps: '' },
-          verre: { verPerApp: currentApp, perPal: currentPerPal, stkPal: '' },
+          verre: { verPerApp: currentApp, perPal: currentPerPal, stkPal: 10 },
           lines: []
         };
         saveState();
