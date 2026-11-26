@@ -37,7 +37,7 @@
       margin: 0 auto;
     }
 
-    /* Bandeau tout en haut : Horloge tout à gauche, valeur cadence seule à droite */
+    /* Bandeau tout en haut : Horloge + Cadence juste à droite de l'heure */
     .cadence-bar {
       background: var(--card);
       border: 1px solid var(--border);
@@ -45,10 +45,10 @@
       padding: 10px 14px;
       margin-bottom: 10px;
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-start;
       align-items: center;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 12px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
     }
 
@@ -76,7 +76,7 @@
       font-weight: 900;
     }
 
-    /* En-tête Total PF + +/- sur la première page */
+    /* En-tête Total PF simplifié : juste App + Total PF */
     .top-card {
       background: var(--card);
       border: 2px solid var(--primary);
@@ -91,23 +91,10 @@
       box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
     }
 
-    .top-label {
-      font-size: 0.85rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    .top-sub {
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
-    .top-right {
-      display: flex;
-      align-items: center;
-      gap: 12px;
+    .top-app-only {
+      font-size: 1.05rem;
+      font-weight: 900;
+      color: var(--text);
     }
 
     .top-value {
@@ -116,7 +103,7 @@
       color: var(--primary);
     }
 
-    /* Deuxième bloc : Verre + case Nb verre / app */
+    /* Deuxième bloc : Verre */
     .glass-fixed-card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -238,6 +225,7 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
     }
 
     .step-btn:active {
@@ -246,6 +234,12 @@
 
     .step-num-inp {
       width: 64px !important;
+      text-align: center;
+      padding: 7px 6px !important;
+    }
+
+    .step-num-wide {
+      width: 78px !important;
       text-align: center;
       padding: 7px 6px !important;
     }
@@ -522,7 +516,7 @@
 </head>
 <body>
 
-  <!-- TOUT EN HAUT : HORLOGE TOUT À GAUCHE, CADENCE SEULE À DROITE -->
+  <!-- TOUT EN HAUT : HORLOGE + CADENCE JUSTE À DROITE DE L'HEURE -->
   <div class="cadence-bar">
     <button type="button" class="clock-btn" onclick="openClockModal()">
       <span>🕒</span>
@@ -531,29 +525,22 @@
     <div class="cadence-badge" id="cadence-val">0 app/h</div>
   </div>
 
-  <!-- PREMIÈRE PAGE : TOTAL PF + +/- -->
+  <!-- PREMIÈRE PAGE : JUSTE APP + TOTAL PF -->
   <div class="top-card">
-    <div>
-      <div class="top-label">Total Produit Fini</div>
-      <div class="top-sub" id="top-count">Aucune ligne</div>
-    </div>
-    <div class="top-right">
-      <div class="mini-stepper">
-        <span>App:</span>
-        <button type="button" class="mini-step-btn" onclick="stepFirstLineApps(-1)">-</button>
-        <span id="top-app-val">0</span>
-        <button type="button" class="mini-step-btn" onclick="stepFirstLineApps(1)">+</button>
-      </div>
-      <div class="top-value" id="top-total">0</div>
-    </div>
+    <div class="top-app-only">App : <span id="top-app-val">0</span></div>
+    <div class="top-value" id="top-total">0</div>
   </div>
 
-  <!-- DEUXIÈME BLOC : VERRE + CASE NB DE VERRE / APP -->
+  <!-- DEUXIÈME BLOC : VERRE -->
   <div class="glass-fixed-card">
     <div class="glass-line-1">
-      <div class="field" style="flex:1 1 115px;">
+      <div class="field" style="flex:0 0 auto;">
         <label>Nb verre / app</label>
-        <input type="number" inputmode="numeric" pattern="[0-9]*" id="g-ver-app" value="3500">
+        <div class="stepper">
+          <button type="button" class="step-btn" onclick="stepVerPerApp(-50)">-</button>
+          <input type="number" inputmode="numeric" pattern="[0-9]*" class="step-num-wide" id="g-ver-app" value="3500">
+          <button type="button" class="step-btn" onclick="stepVerPerApp(50)">+</button>
+        </div>
       </div>
       <div class="field" style="flex:1 1 120px;">
         <label>🫙 Nom verre (Réf V)</label>
@@ -562,9 +549,13 @@
           <button type="button" class="abc-btn" onclick="toggleAbc('g-ver-ref', this)">ABC</button>
         </div>
       </div>
-      <div class="field" style="flex:1 1 105px;">
+      <div class="field" style="flex:0 0 auto;">
         <label>Nb / palette</label>
-        <input type="number" inputmode="numeric" pattern="[0-9]*" id="g-ver-pal" placeholder="0">
+        <div class="stepper">
+          <button type="button" class="step-btn" onclick="stepGlassPerPal(-100)">-</button>
+          <input type="number" inputmode="numeric" pattern="[0-9]*" class="step-num-wide" id="g-ver-pal" value="4000">
+          <button type="button" class="step-btn" onclick="stepGlassPerPal(100)">+</button>
+        </div>
       </div>
       <div class="field" style="flex:0 0 auto;">
         <label>Nb palettes</label>
@@ -688,11 +679,11 @@
   <div id="print-area"></div>
 
   <script>
-    const STORAGE_KEY = 'compteurs_cct_crc_v1';
+    const STORAGE_KEY = 'compteurs_verre_steppers_v1';
 
     let state = {
       prod: { startTime: '', endTime: '', doneApps: '' },
-      verre: { verPerApp: 3500, ref: '', perPal: '', stkPal: '' },
+      verre: { verPerApp: 3500, ref: '', perPal: 4000, stkPal: '' },
       lines: []
     };
 
@@ -706,6 +697,11 @@
     function getVerPerApp() {
       const v = Number(state.verre.verPerApp);
       return Number.isFinite(v) && v >= 0 ? v : 3500;
+    }
+
+    function getVerPerPal() {
+      const v = Number(state.verre.perPal);
+      return Number.isFinite(v) && v >= 0 ? v : 4000;
     }
 
     function createLine(fruit = 'Fruit 1', nbApp = 1) {
@@ -730,14 +726,17 @@
         if (raw) {
           const parsed = JSON.parse(raw);
           state.prod = Object.assign({ startTime: '', endTime: '', doneApps: '' }, parsed.prod || {});
-          state.verre = Object.assign({ verPerApp: 3500, ref: '', perPal: '', stkPal: '' }, parsed.verre || {});
+          state.verre = Object.assign({ verPerApp: 3500, ref: '', perPal: 4000, stkPal: '' }, parsed.verre || {});
+          if (state.verre.perPal === '' || state.verre.perPal === undefined || state.verre.perPal === null) {
+            state.verre.perPal = 4000;
+          }
           state.lines = Array.isArray(parsed.lines) ? parsed.lines : [];
           return;
         }
       } catch (e) {}
       state = {
         prod: { startTime: '', endTime: '', doneApps: '' },
-        verre: { verPerApp: 3500, ref: '', perPal: '', stkPal: '' },
+        verre: { verPerApp: 3500, ref: '', perPal: 4000, stkPal: '' },
         lines: []
       };
     }
@@ -813,6 +812,10 @@
       return state.lines.reduce((s, l) => s + lineTotal(l), 0);
     }
 
+    function totalAppsCount() {
+      return state.lines.reduce((s, l) => s + (Number(l.nbApp) || 0), 0);
+    }
+
     function fruitDisplay(l, idx) {
       const f = (l.fruit || '').trim();
       return f ? f : getDefaultFruit(idx);
@@ -834,7 +837,7 @@
 
       appInp.value = state.verre.verPerApp !== '' && state.verre.verPerApp !== undefined ? state.verre.verPerApp : 3500;
       refInp.value = state.verre.ref || '';
-      palInp.value = state.verre.perPal || '';
+      palInp.value = state.verre.perPal !== '' && state.verre.perPal !== undefined ? state.verre.perPal : 4000;
       stkInp.value = state.verre.stkPal || '';
 
       appInp.oninput = (e) => {
@@ -864,6 +867,26 @@
       });
     }
 
+    function stepVerPerApp(delta) {
+      const current = Number(state.verre.verPerApp);
+      const base = Number.isFinite(current) ? current : 3500;
+      const next = Math.max(0, base + delta);
+      state.verre.verPerApp = next;
+      document.getElementById('g-ver-app').value = next;
+      saveState();
+      renderLines();
+    }
+
+    function stepGlassPerPal(delta) {
+      const current = Number(state.verre.perPal);
+      const base = Number.isFinite(current) ? current : 4000;
+      const next = Math.max(0, base + delta);
+      state.verre.perPal = next;
+      document.getElementById('g-ver-pal').value = next;
+      saveState();
+      refreshGlassStatus();
+    }
+
     function stepGlassPallets(delta) {
       const current = Number(state.verre.stkPal) || 0;
       const next = Math.max(0, current + delta);
@@ -871,21 +894,6 @@
       document.getElementById('g-ver-stk').value = next;
       saveState();
       refreshGlassStatus();
-    }
-
-    function stepFirstLineApps(delta) {
-      if (!state.lines.length) {
-        if (delta > 0) {
-          state.lines.push(createLine(getDefaultFruit(0), delta));
-          saveState();
-          renderLines();
-        }
-        return;
-      }
-      const current = Number(state.lines[0].nbApp) || 0;
-      state.lines[0].nbApp = Math.max(0, current + delta);
-      saveState();
-      renderLines();
     }
 
     function stepLineApps(idx, delta) {
@@ -915,7 +923,7 @@
     function refreshGlassStatus() {
       const pf = grandTotal();
       const vRef = (state.verre.ref || '').trim();
-      const vPerPal = Number(state.verre.perPal) || 0;
+      const vPerPal = getVerPerPal();
       const vStkPal = Number(state.verre.stkPal) || 0;
       const vStockUnits = vPerPal * vStkPal;
       const vNeedPal = vPerPal > 0 ? Math.ceil(pf / vPerPal) : 0;
@@ -957,10 +965,7 @@
 
       document.getElementById('cadence-val').textContent = formatCadenceLabel(cadence);
       document.getElementById('top-total').textContent = fmt(pfTotal);
-      document.getElementById('top-count').textContent =
-        state.lines.length === 0 ? 'Aucune ligne' : `${state.lines.length} ligne${state.lines.length > 1 ? 's' : ''}`;
-      document.getElementById('top-app-val').textContent =
-        state.lines.length > 0 ? (Number(state.lines[0].nbApp) || 0) : 0;
+      document.getElementById('top-app-val').textContent = totalAppsCount();
 
       refreshGlassStatus();
 
@@ -1263,9 +1268,10 @@
     function resetAll() {
       if (confirm('Voulez-vous remettre à zéro et effacer toutes les lignes ?')) {
         const currentApp = state.verre && state.verre.verPerApp !== '' ? state.verre.verPerApp : 3500;
+        const currentPerPal = state.verre && state.verre.perPal !== '' ? state.verre.perPal : 4000;
         state = {
           prod: { startTime: '', endTime: '', doneApps: '' },
-          verre: { verPerApp: currentApp, ref: '', perPal: '', stkPal: '' },
+          verre: { verPerApp: currentApp, ref: '', perPal: currentPerPal, stkPal: '' },
           lines: []
         };
         saveState();
