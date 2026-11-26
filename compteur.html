@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestionnaire de Compteurs - Production & Stock</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg: #f1f5f9;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --danger: #dc2626;
+      --danger-bg: #fef2f2;
+      --danger-border: #fecaca;
+      --success: #16a34a;
+      --success-bg: #f0fdf4;
+      --success-border: #bbf7d0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    header h1 {
+      font-size: 1.7rem;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    /* Navigation & Views */
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    /* Menu Grid */
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .counter-card {
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .counter-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
+      border-color: var(--primary);
+    }
+
+    .counter-card.card-error {
+      border-color: var(--danger);
+      background-color: var(--danger-bg);
+    }
+
+    .counter-card.card-ok {
+      border-color: var(--success-border);
+    }
+
+    .counter-card.card-ref {
+      border-color: var(--primary);
+      background-color: #eff6ff;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .card-emoji {
+      font-size: 2.2rem;
+      line-height: 1;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .card-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .card-total {
+      font-size: 1.6rem;
+      font-weight: 800;
+      margin: 8px 0;
+    }
+
+    .alert-badge {
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 6px;
+      margin-top: 6px;
+    }
+
+    .alert-badge.danger {
+      background: #fee2e2;
+      color: var(--danger);
+      border: 1px solid var(--danger-border);
+    }
+
+    .alert-badge.success {
+      background: var(--success-bg);
+      color: var(--success);
+      border: 1px solid var(--success-border);
+    }
+
+    .alert-badge.info {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    /* Action Buttons */
+    .actions-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 12px 20px;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.15s;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background: #e2e8f0;
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      background: #cbd5e1;
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #b91c1c;
+    }
+
+    .btn-add {
+      background: var(--success);
+      color: white;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .btn-add:hover {
+      background: #15803d;
+    }
+
+    /* Detail View */
+    .detail-box {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .detail-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .detail-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    .summary-banner {
+      padding: 14px 18px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+    }
+
+    .summary-banner.error {
+      background: var(--danger-bg);
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .summary-banner.ok {
+      background: var(--success-bg);
+      border-color: var(--success-border);
+      color: var(--success);
+    }
+
+    /* Rows */
+    .row-item {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: 12px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 130px;
+    }
+
+    .input-group label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .input-group input[type="number"] {
+      padding: 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 1rem;
+      width: 100%;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 8px;
+      padding-top: 2px;
+    }
+
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: white;
+      border: 1px solid #cbd5e1;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      color: var(--text);
+    }
+
+    .radio-group input[type="radio"]:checked + span {
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .row-subtotal {
+      font-weight: 700;
+      font-size: 1.05rem;
+      padding: 10px 12px;
+      background: white;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      min-width: 130px;
+      text-align: right;
+    }
+
+    .btn-remove {
+      background: #fee2e2;
+      color: var(--danger);
+      padding: 10px 12px;
+      border-radius: 6px;
+    }
+
+    .btn-remove:hover {
+      background: #fecaca;
+    }
+
+    /* Print Section (Hidden on screen, visible on print/PDF) */
+    #print-report {
+      display: none;
+    }
+
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+        max-width: 100%;
+      }
+      header, #menu-view, #detail-view {
+        display: none !important;
+      }
+      #print-report {
+        display: block !important;
+      }
+      .print-header {
+        border-bottom: 2px solid #000;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+      .print-section {
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        padding: 12px;
+        page-break-inside: avoid;
+      }
+      .print-section h3 {
+        margin-bottom: 8px;
+        font-size: 1.1rem;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 4px;
+      }
+      .print-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+      }
+      .print-table th, .print-table td {
+        border: 1px solid #ddd;
+        padding: 6px 8px;
+        text-align: left;
+      }
+      .print-table th {
+        background: #f3f4f6;
+      }
+      .print-total-line {
+        font-weight: bold;
+        font-size: 1rem;
+        margin-top: 6px;
+      }
+      .print-alert {
+        color: #dc2626 !important;
+        font-weight: bold;
+        margin-top: 4px;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .print-ok {
+        color: #16a34a !important;
+        font-weight: bold;
+        margin-top: 4px;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>📊 Gestionnaire de Compteurs</h1>
+    <p>Suivi des composants par rapport aux produits finis</p>
+  </header>
+
+  <!-- MENU PRINCIPAL -->
+  <div id="menu-view" class="view active">
+    <div class="menu-grid" id="menu-grid"></div>
+
+    <div class="actions-bar">
+      <button class="btn-primary" onclick="printSummary()">🖨️ Imprimer / Résumé PDF</button>
+      <button class="btn-danger" onclick="resetAll()">🔄 Reset à zéro</button>
+    </div>
+  </div>
+
+  <!-- VUE DÉTAILLÉE D'UN COMPTEUR -->
+  <div id="detail-view" class="view">
+    <div class="detail-box">
+      <div class="detail-top">
+        <div class="detail-title" id="detail-title"></div>
+        <button class="btn-secondary" onclick="showMenu()">⬅️ Retour au menu</button>
+      </div>
+
+      <div id="detail-banner" class="summary-banner"></div>
+
+      <div id="rows-container"></div>
+
+      <button class="btn-add" onclick="addRow()">➕ Ajouter une ligne</button>
+    </div>
+  </div>
+
+  <!-- RAPPORT D'IMPRESSION / PDF -->
+  <div id="print-report"></div>
+
+  <script>
+    const COUNTER_CONFIG = {
+      bocaux: {
+        id: 'bocaux',
+        num: 1,
+        emoji: '🫙',
+        name: 'Compteur de bocaux',
+        formulaText: 'Nb bocaux / palette × Nb palettes',
+        fields: [
+          { key: 'perPallet', label: 'Nb bocaux sur 1 palette' },
+          { key: 'pallets', label: 'Nb palettes' }
+        ],
+        calc: (row) => (Number(row.perPallet) || 0) * (Number(row.pallets) || 0)
+      },
+      capsules: {
+        id: 'capsules',
+        num: 2,
+        emoji: '🔘',
+        name: 'Compteur de capsules',
+        formulaText: 'Nb capsules / boîte × Nb boîtes / palette × Nb palettes',
+        fields: [
+          { key: 'perBox', label: 'Nb capsules dans 1 boîte' },
+          { key: 'boxesPerPallet', label: 'Nb boîtes sur 1 palette' },
+          { key: 'pallets', label: 'Nb palettes' }
+        ],
+        calc: (row) => (Number(row.perBox) || 0) * (Number(row.boxesPerPallet) || 0) * (Number(row.pallets) || 0)
+      },
+      etiquettes: {
+        id: 'etiquettes',
+        num: 3,
+        emoji: '🏷️',
+        name: 'Compteur d’étiquettes',
+        formulaText: 'Nb étiquettes / paquet × Nb paquets',
+        fields: [
+          { key: 'perPack', label: 'Nb étiquettes par paquet' },
+          { key: 'packs', label: 'Nombre de paquets' }
+        ],
+        calc: (row) => (Number(row.perPack) || 0) * (Number(row.packs) || 0)
+      },
+      trays: {
+        id: 'trays',
+        num: 4,
+        emoji: '📦',
+        name: 'Compteur de trays',
+        formulaText: 'Nb trays / palette × Nb palettes × (6, 8 ou 12)',
+        fields: [
+          { key: 'perPallet', label: 'Nb trays par palette' },
+          { key: 'pallets', label: 'Nb palettes' },
+          { key: 'packSize', label: 'Format (6, 8 ou 12)', type: 'radio', options: [6, 8, 12] }
+        ],
+        calc: (row) => (Number(row.perPallet) || 0) * (Number(row.pallets) || 0) * (Number(row.packSize) || 6)
+      },
+      produitFini: {
+        id: 'produitFini',
+        num: 5,
+        emoji: '✅',
+        name: 'Compteur de produit fini',
+        formulaText: 'Nb app × Nb par app (Référence minimale)',
+        isReference: true,
+        fields: [
+          { key: 'nbApp', label: 'Nb app' },
+          { key: 'nbPerApp', label: 'Nb par app' }
+        ],
+        calc: (row) => (Number(row.nbApp) || 0) * (Number(row.nbPerApp) || 0)
+      }
+    };
+
+    const STORAGE_KEY = 'inventaire_compteurs_v1';
+    let state = {};
+    let currentCounterId = null;
+
+    function getDefaultState() {
+      return {
+        bocaux: [{ perPallet: '', pallets: '' }],
+        capsules: [{ perBox: '', boxesPerPallet: '', pallets: '' }],
+        etiquettes: [{ perPack: '', packs: '' }],
+        trays: [{ perPallet: '', pallets: '', packSize: 6 }],
+        produitFini: [{ nbApp: '', nbPerApp: '' }]
+      };
+    }
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          state = JSON.parse(saved);
+          // Ensure all keys exist
+          const def = getDefaultState();
+          for (const key in def) {
+            if (!Array.isArray(state[key]) || state[key].length === 0) {
+              state[key] = def[key];
+            }
+          }
+          return;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+      state = getDefaultState();
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function getCounterTotal(id) {
+      const cfg = COUNTER_CONFIG[id];
+      const rows = state[id] || [];
+      return rows.reduce((sum, row) => sum + cfg.calc(row), 0);
+    }
+
+    function formatNum(n) {
+      return n.toLocaleString('fr-FR');
+    }
+
+    function renderMenu() {
+      const grid = document.getElementById('menu-grid');
+      grid.innerHTML = '';
+
+      const finishedTotal = getCounterTotal('produitFini');
+
+      Object.values(COUNTER_CONFIG).forEach(cfg => {
+        const total = getCounterTotal(cfg.id);
+        const card = document.createElement('div');
+        card.className = 'counter-card';
+        card.onclick = () => openCounter(cfg.id);
+
+        let statusHtml = '';
+        if (cfg.isReference) {
+          card.classList.add('card-ref');
+          statusHtml = `<div class="alert-badge info">🎯 Objectif minimal à dépasser</div>`;
+        } else {
+          const diff = total - finishedTotal;
+          if (diff < 0) {
+            card.classList.add('card-error');
+            statusHtml = `<div class="alert-badge danger">⚠️ Il manque ${formatNum(Math.abs(diff))} unités !</div>`;
+          } else {
+            card.classList.add('card-ok');
+            statusHtml = `<div class="alert-badge success">✔️ Stock suffisant (+${formatNum(diff)})</div>`;
+          }
+        }
+
+        card.innerHTML = `
+          <div>
+            <div class="card-header">
+              <span class="card-emoji">${cfg.emoji}</span>
+              <div>
+                <div class="card-title">${cfg.num}. ${cfg.name}</div>
+                <div class="card-subtitle">${cfg.formulaText}</div>
+              </div>
+            </div>
+            <div class="card-total">${formatNum(total)}</div>
+          </div>
+          ${statusHtml}
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function showMenu() {
+      currentCounterId = null;
+      document.getElementById('detail-view').classList.remove('active');
+      document.getElementById('menu-view').classList.add('active');
+      renderMenu();
+    }
+
+    function openCounter(id) {
+      currentCounterId = id;
+      document.getElementById('menu-view').classList.remove('active');
+      document.getElementById('detail-view').classList.add('active');
+      renderDetail();
+    }
+
+    function updateDetailBanner() {
+      const cfg = COUNTER_CONFIG[currentCounterId];
+      const total = getCounterTotal(currentCounterId);
+      const finishedTotal = getCounterTotal('produitFini');
+      const banner = document.getElementById('detail-banner');
+
+      banner.className = 'summary-banner';
+
+      if (cfg.isReference) {
+        banner.innerHTML = `
+          <div><strong>Total Produit Fini :</strong> <span style="font-size:1.3rem; font-weight:800;">${formatNum(total)}</span></div>
+          <div>Les compteurs 1, 2, 3 et 4 doivent dépasser ce total.</div>
+        `;
+      } else {
+        const diff = total - finishedTotal;
+        if (diff < 0) {
+          banner.classList.add('error');
+          banner.innerHTML = `
+            <div><strong>Total actuel :</strong> <span style="font-size:1.3rem; font-weight:800;">${formatNum(total)}</span> / ${formatNum(finishedTotal)} requis</div>
+            <div><strong>⚠️ ALERTE : Il manque ${formatNum(Math.abs(diff))} unités !</strong></div>
+          `;
+        } else {
+          banner.classList.add('ok');
+          banner.innerHTML = `
+            <div><strong>Total actuel :</strong> <span style="font-size:1.3rem; font-weight:800;">${formatNum(total)}</span> / ${formatNum(finishedTotal)} requis</div>
+            <div><strong>✔️ Stock OK (+${formatNum(diff)} d'avance)</strong></div>
+          `;
+        }
+      }
+    }
+
+    function renderDetail() {
+      const cfg = COUNTER_CONFIG[currentCounterId];
+      document.getElementById('detail-title').innerHTML = `<span>${cfg.emoji}</span> <span>${cfg.num}. ${cfg.name}</span>`;
+
+      updateDetailBanner();
+
+      const container = document.getElementById('rows-container');
+      container.innerHTML = '';
+
+      const rows = state[currentCounterId];
+
+      rows.forEach((row, index) => {
+        const rowEl = document.createElement('div');
+        rowEl.className = 'row-item';
+
+        cfg.fields.forEach(field => {
+          const group = document.createElement('div');
+          group.className = 'input-group';
+
+          const label = document.createElement('label');
+          label.textContent = field.label;
+          group.appendChild(label);
+
+          if (field.type === 'radio') {
+            const radioDiv = document.createElement('div');
+            radioDiv.className = 'radio-group';
+            field.options.forEach(opt => {
+              const rLabel = document.createElement('label');
+              const radio = document.createElement('input');
+              radio.type = 'radio';
+              radio.name = `radio_${currentCounterId}_${index}`;
+              radio.value = opt;
+              radio.checked = Number(row[field.key]) === opt;
+              radio.onchange = () => {
+                state[currentCounterId][index][field.key] = opt;
+                saveState();
+                updateRowSubtotal(index);
+                updateDetailBanner();
+              };
+              const span = document.createElement('span');
+              span.textContent = opt;
+              rLabel.appendChild(radio);
+              rLabel.appendChild(span);
+              radioDiv.appendChild(rLabel);
+            });
+            group.appendChild(radioDiv);
+          } else {
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.min = '0';
+            input.step = 'any';
+            input.placeholder = '0';
+            input.value = row[field.key];
+            input.oninput = (e) => {
+              state[currentCounterId][index][field.key] = e.target.value;
+              saveState();
+              updateRowSubtotal(index);
+              updateDetailBanner();
+            };
+            group.appendChild(input);
+          }
+
+          rowEl.appendChild(group);
+        });
+
+        const sub = document.createElement('div');
+        sub.className = 'row-subtotal';
+        sub.id = `subtotal_${index}`;
+        sub.textContent = `= ${formatNum(cfg.calc(row))}`;
+        rowEl.appendChild(sub);
+
+        if (rows.length > 1) {
+          const delBtn = document.createElement('button');
+          delBtn.className = 'btn-remove';
+          delBtn.title = 'Supprimer cette ligne';
+          delBtn.textContent = '🗑️';
+          delBtn.onclick = () => removeRow(index);
+          rowEl.appendChild(delBtn);
+        }
+
+        container.appendChild(rowEl);
+      });
+    }
+
+    function updateRowSubtotal(index) {
+      const cfg = COUNTER_CONFIG[currentCounterId];
+      const row = state[currentCounterId][index];
+      const el = document.getElementById(`subtotal_${index}`);
+      if (el) {
+        el.textContent = `= ${formatNum(cfg.calc(row))}`;
+      }
+    }
+
+    function addRow() {
+      const def = getDefaultState()[currentCounterId][0];
+      state[currentCounterId].push({ ...def });
+      saveState();
+      renderDetail();
+    }
+
+    function removeRow(index) {
+      state[currentCounterId].splice(index, 1);
+      saveState();
+      renderDetail();
+    }
+
+    function resetAll() {
+      if (confirm('Voulez-vous vraiment remettre tous les compteurs à zéro ?')) {
+        state = getDefaultState();
+        saveState();
+        renderMenu();
+      }
+    }
+
+    function printSummary() {
+      const report = document.getElementById('print-report');
+      const now = new Date().toLocaleString('fr-FR');
+      const finishedTotal = getCounterTotal('produitFini');
+
+      let html = `
+        <div class="print-header">
+          <div>
+            <h2>📊 Résumé des Compteurs - Production</h2>
+            <p>Comparaison des composants par rapport aux produits finis</p>
+          </div>
+          <div><strong>Date :</strong> ${now}</div>
+        </div>
+      `;
+
+      // Afficher d'abord le produit fini en référence ou dans l'ordre 1 à 5
+      Object.values(COUNTER_CONFIG).forEach(cfg => {
+        const rows = state[cfg.id];
+        const total = getCounterTotal(cfg.id);
+
+        let tableHeaders = cfg.fields.map(f => `<th>${f.label}</th>`).join('') + '<th>Sous-total</th>';
+        let tableRows = rows.map(row => {
+          const cells = cfg.fields.map(f => `<td>${row[f.key] || 0}</td>`).join('');
+          return `<tr>${cells}<td><strong>${formatNum(cfg.calc(row))}</strong></td></tr>`;
+        }).join('');
+
+        let statusLine = '';
+        if (cfg.isReference) {
+          statusLine = `<div style="margin-top:4px; color:#1e40af; font-weight:bold;">🎯 Référence minimale à dépasser : ${formatNum(total)}</div>`;
+        } else {
+          const diff = total - finishedTotal;
+          if (diff < 0) {
+            statusLine = `<div class="print-alert">⚠️ ALERTE : Il manque ${formatNum(Math.abs(diff))} unités pour couvrir les ${formatNum(finishedTotal)} produits finis !</div>`;
+          } else {
+            statusLine = `<div class="print-ok">✔️ Stock suffisant (+${formatNum(diff)} unités d'avance par rapport aux ${formatNum(finishedTotal)} produits finis)</div>`;
+          }
+        }
+
+        html += `
+          <div class="print-section">
+            <h3>${cfg.emoji} ${cfg.num}. ${cfg.name}</h3>
+            <table class="print-table">
+              <thead><tr>${tableHeaders}</tr></thead>
+              <tbody>${tableRows}</tbody>
+            </table>
+            <div class="print-total-line">Total ${cfg.name} : ${formatNum(total)}</div>
+            ${statusLine}
+          </div>
+        `;
+      });
+
+      report.innerHTML = html;
+      window.print();
+    }
+
+    // Initialisation
+    loadState();
+    renderMenu();
+  </script>
+</body>
+</html>
