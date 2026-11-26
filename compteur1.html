@@ -37,6 +37,50 @@
       margin: 0 auto;
     }
 
+    /* Bandeau tout en haut : Cadence + Horloge / Heure actuelle */
+    .cadence-bar {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    }
+
+    .cadence-info {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .cadence-badge {
+      color: var(--primary);
+      font-weight: 900;
+    }
+
+    .clock-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 12px;
+      border-radius: 9px;
+      border: 1px solid #94a3b8;
+      background: #f8fafc;
+      color: var(--text);
+      font-size: 0.88rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .clock-btn:hover {
+      background: #e2e8f0;
+    }
+
     /* En-tête Total PF + +/- sur la première page */
     .top-card {
       background: var(--card);
@@ -135,7 +179,8 @@
     }
 
     .field input[type="number"],
-    .field input[type="text"] {
+    .field input[type="text"],
+    .field input[type="time"] {
       padding: 8px 10px;
       border: 1px solid #cbd5e1;
       border-radius: 8px;
@@ -287,7 +332,6 @@
       margin-bottom: 8px;
     }
 
-    /* Lignes compactes sans dénomination */
     .consumables-stack {
       display: flex;
       flex-direction: column;
@@ -350,6 +394,17 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+    }
+
+    .line-end-time {
+      margin-top: 8px;
+      padding: 7px 10px;
+      border-radius: 8px;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      font-size: 0.84rem;
+      font-weight: 800;
+      color: var(--text);
     }
 
     .bottom-bar {
@@ -450,13 +505,24 @@
 
     @media print {
       body { background: #fff; padding: 0; }
-      .top-card, .glass-fixed-card, #lines-list, .bottom-bar, .modal-bg { display: none !important; }
+      .cadence-bar, .top-card, .glass-fixed-card, #lines-list, .bottom-bar, .modal-bg { display: none !important; }
       #print-area { display: block !important; }
       .p-card { border: 1px solid #bbb; border-radius: 8px; padding: 10px; margin-bottom: 12px; page-break-inside: avoid; }
     }
   </style>
 </head>
 <body>
+
+  <!-- TOUT EN HAUT : CADENCE + HORLOGE / HEURE ACTUELLE -->
+  <div class="cadence-bar">
+    <div class="cadence-info">
+      Cadence : <span class="cadence-badge" id="cadence-val">0 app/h</span>
+    </div>
+    <button type="button" class="clock-btn" onclick="openClockModal()">
+      <span>🕒</span>
+      <span id="live-clock-text">--:--</span>
+    </button>
+  </div>
 
   <!-- PREMIÈRE PAGE : TOTAL PF + +/- -->
   <div class="top-card">
@@ -517,7 +583,7 @@
     <button type="button" class="btn btn-pdf" onclick="printReport()">🖨️ PDF</button>
   </div>
 
-  <!-- MODALE AJOUT : FRUIT + NB APP -->
+  <!-- MODALE AJOUT : FRUIT (EFFACÉ D'OFFICE AU CLIC) + NB APP -->
   <div class="modal-bg" id="add-modal">
     <div class="modal-panel">
       <div class="modal-head">
@@ -545,6 +611,34 @@
     </div>
   </div>
 
+  <!-- MODALE HORLOGE : HEURE DÉBUT PROD, HEURE FIN PROD, NB APP REMPLI -->
+  <div class="modal-bg" id="clock-modal">
+    <div class="modal-panel">
+      <div class="modal-head">
+        <span>🕒 Prod & Cadence</span>
+        <button type="button" class="btn btn-sec btn-mini" onclick="closeClockModal()">✕</button>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div class="field">
+          <label>Heure début prod</label>
+          <input type="time" id="clk-start">
+        </div>
+        <div class="field">
+          <label>Heure fin de prod</label>
+          <input type="time" id="clk-end">
+        </div>
+        <div class="field">
+          <label>Nb app rempli</label>
+          <input type="number" inputmode="numeric" pattern="[0-9]*" id="clk-done-app" placeholder="0">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-sec" onclick="closeClockModal()">Annuler</button>
+        <button type="button" class="btn btn-add" onclick="saveClockModal()">Valider ✓</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODALE CLIC SUR LIGNE : NOMBRE PAR BOÎTE & NB DE BOÎTES -->
   <div class="modal-bg" id="cons-modal">
     <div class="modal-panel">
@@ -558,7 +652,7 @@
           <input type="number" inputmode="numeric" pattern="[0-9]*" id="cons-per-box" placeholder="0">
         </div>
         <div class="field">
-          <label id="cons-nb-box-label">Nombre de boîtes (0 si rien)</label>
+          <label id="cons-nb-box-label">Nombre de boîtes</label>
           <input type="number" inputmode="numeric" pattern="[0-9]*" id="cons-nb-box" placeholder="0">
         </div>
         <div class="field" id="cons-fmt-wrap" style="display:none;">
@@ -580,14 +674,16 @@
   <div id="print-area"></div>
 
   <script>
-    const STORAGE_KEY = 'compteurs_epure_ecart_v1';
+    const STORAGE_KEY = 'compteurs_cadence_horloge_v1';
 
     let state = {
+      prod: { startTime: '', endTime: '', doneApps: '' },
       verre: { verPerApp: 3500, ref: '', perPal: '', stkPal: '' },
       lines: []
     };
 
     let activeConsTarget = null;
+    let defaultFruitClearedOnFocus = false;
 
     function getDefaultFruit(index) {
       return `Fruit ${index + 1}`;
@@ -617,12 +713,17 @@
         const raw = localStorage.getItem(STORAGE_KEY);
         if (raw) {
           const parsed = JSON.parse(raw);
+          state.prod = Object.assign({ startTime: '', endTime: '', doneApps: '' }, parsed.prod || {});
           state.verre = Object.assign({ verPerApp: 3500, ref: '', perPal: '', stkPal: '' }, parsed.verre || {});
           state.lines = Array.isArray(parsed.lines) ? parsed.lines : [];
           return;
         }
       } catch (e) {}
-      state = { verre: { verPerApp: 3500, ref: '', perPal: '', stkPal: '' }, lines: [] };
+      state = {
+        prod: { startTime: '', endTime: '', doneApps: '' },
+        verre: { verPerApp: 3500, ref: '', perPal: '', stkPal: '' },
+        lines: []
+      };
     }
 
     function saveState() {
@@ -635,6 +736,58 @@
 
     function plural(count, sing, plur) {
       return count <= 1 ? sing : plur;
+    }
+
+    function parseTimeToMinutes(hhmm) {
+      if (!hhmm || !hhmm.includes(':')) return null;
+      const [h, m] = hhmm.split(':').map(Number);
+      if (!Number.isFinite(h) || !Number.isFinite(m)) return null;
+      return h * 60 + m;
+    }
+
+    function getNowMinutes() {
+      const now = new Date();
+      return now.getHours() * 60 + now.getMinutes();
+    }
+
+    function formatMinutesToTime(totalMin) {
+      const mod = ((Math.round(totalMin) % 1440) + 1440) % 1440;
+      const h = String(Math.floor(mod / 60)).padStart(2, '0');
+      const m = String(mod % 60).padStart(2, '0');
+      return `${h}:${m}`;
+    }
+
+    function updateLiveClockDisplay() {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('live-clock-text').textContent = `${h}:${m}`;
+    }
+
+    // Cadence en app / heure (ex. 2,5 app/h)
+    function computeCadencePerHour() {
+      const doneApps = Number(state.prod.doneApps) || 0;
+      if (doneApps <= 0) return 0;
+
+      const startMin = parseTimeToMinutes(state.prod.startTime);
+      const endMin = parseTimeToMinutes(state.prod.endTime);
+      const nowMin = getNowMinutes();
+
+      let durationMin = 0;
+      if (startMin !== null && endMin !== null) {
+        durationMin = endMin >= startMin ? (endMin - startMin) : (1440 - startMin + endMin);
+      } else if (startMin !== null) {
+        durationMin = nowMin >= startMin ? (nowMin - startMin) : (1440 - startMin + nowMin);
+      }
+
+      if (durationMin <= 0) return 0;
+      return doneApps / (durationMin / 60);
+    }
+
+    function formatCadenceLabel(cadence) {
+      if (!cadence || cadence <= 0) return '0 app/h';
+      const rounded = Math.round(cadence * 10) / 10;
+      return `${String(rounded).replace('.', ',')} app/h`;
     }
 
     function lineTotal(l) {
@@ -677,6 +830,16 @@
       refInp.oninput = (e) => { state.verre.ref = e.target.value; saveState(); refreshGlassStatus(); };
       palInp.oninput = (e) => { state.verre.perPal = e.target.value; saveState(); refreshGlassStatus(); };
       stkInp.oninput = (e) => { state.verre.stkPal = e.target.value; saveState(); refreshGlassStatus(); };
+    }
+
+    function bindFruitAutoClear() {
+      const fruitInp = document.getElementById('add-fruit');
+      fruitInp.addEventListener('focus', () => {
+        if (!defaultFruitClearedOnFocus && /^Fruit\s+\d+$/i.test(fruitInp.value.trim())) {
+          fruitInp.value = '';
+          defaultFruitClearedOnFocus = true;
+        }
+      });
     }
 
     function stepGlassPallets(delta) {
@@ -766,7 +929,11 @@
       const container = document.getElementById('lines-list');
       const pfTotal = grandTotal();
       const verPerApp = getVerPerApp();
+      const cadence = computeCadencePerHour();
+      const nowMin = getNowMinutes();
+      const washMin = 15;
 
+      document.getElementById('cadence-val').textContent = formatCadenceLabel(cadence);
       document.getElementById('top-total').textContent = fmt(pfTotal);
       document.getElementById('top-count').textContent =
         state.lines.length === 0 ? 'Aucune ligne' : `${state.lines.length} ligne${state.lines.length > 1 ? 's' : ''}`;
@@ -782,11 +949,15 @@
 
       container.innerHTML = '';
 
+      let cumulAppsToDo = 0;
+
       state.lines.forEach((l, idx) => {
         const pf = lineTotal(l);
         const fruitName = fruitDisplay(l, idx);
+        const lineApps = Math.max(0, Number(l.nbApp) || 0);
+        cumulAppsToDo += lineApps;
 
-        // 1. Paquets (sans dénomination "étiquette")
+        // 1. Paquets
         const etPack = Number(l.etPerPack) || 5000;
         const etStk = Number(l.etStkPack) || 0;
         const etNeed = pf > 0 && etPack > 0 ? Math.ceil(pf / etPack) : 0;
@@ -807,7 +978,7 @@
           }
         }
 
-        // 2. Boîtes (sans dénomination "capsule")
+        // 2. Boîtes
         const cBox = Number(l.capPerBox) || 400;
         const cNbBox = Number(l.capNbBox) || 0;
         const cNeed = pf > 0 && cBox > 0 ? Math.ceil(pf / cBox) : 0;
@@ -828,7 +999,7 @@
           }
         }
 
-        // 3. Palettes / format (sans dénomination "tray")
+        // 3. Palettes / format
         const trFmt = Number(l.trFmt) || 12;
         const trPal = Number(l.trPerPal) || 3000;
         const trNbPal = Number(l.trNbPal) || 0;
@@ -851,6 +1022,14 @@
           }
         }
 
+        // Heure de fin estimée : nb app à faire / cadence + heure actuelle + 15 min lavage
+        let endTimeText = 'Heure de fin : renseignez 🕒 (début, fin, nb app rempli)';
+        if (cadence > 0 && cumulAppsToDo > 0) {
+          const prodMinutes = (cumulAppsToDo / cadence) * 60;
+          const finishTotalMin = nowMin + prodMinutes + washMin;
+          endTimeText = `Heure de fin estimée : <strong>${formatMinutesToTime(finishTotalMin)}</strong> (${cumulAppsToDo} app à ${formatCadenceLabel(cadence)} + 15 min lavage)`;
+        }
+
         const card = document.createElement('div');
         card.className = 'line-card';
         card.innerHTML = `
@@ -862,14 +1041,14 @@
               <div class="mini-stepper">
                 <span>App:</span>
                 <button type="button" class="mini-step-btn" onclick="stepLineApps(${idx}, -1)">-</button>
-                <span>${Number(l.nbApp) || 0}</span>
+                <span>${lineApps}</span>
                 <button type="button" class="mini-step-btn" onclick="stepLineApps(${idx}, 1)">+</button>
               </div>
               <button type="button" class="btn btn-del btn-mini" onclick="deleteLine(${idx})">🗑️</button>
             </div>
           </div>
           <div class="line-meta">
-            ${verPerApp} × ${l.nbApp || 0} app = <strong>${fmt(pf)}</strong>
+            ${verPerApp} × ${lineApps} app = <strong>${fmt(pf)}</strong>
           </div>
           <div class="consumables-stack">
             <div class="${etCls}" onclick="openConsModal(${idx}, 'et')">
@@ -896,19 +1075,22 @@
               </div>
             </div>
           </div>
+          <div class="line-end-time">${endTimeText}</div>
         `;
         container.appendChild(card);
       });
     }
 
-    // --- MODALE AJOUT (FRUIT + NB APP) ---
+    // --- MODALE AJOUT (FRUIT EFFACÉ D'OFFICE AU CLIC + NB APP) ---
     function openAddAppModal() {
       const defFruit = getDefaultFruit(state.lines.length);
-      document.getElementById('add-fruit').value = defFruit;
-      document.getElementById('add-fruit').placeholder = defFruit;
+      const fruitInp = document.getElementById('add-fruit');
+      fruitInp.value = defFruit;
+      fruitInp.placeholder = defFruit;
+      defaultFruitClearedOnFocus = false;
       document.getElementById('add-nb-app').value = 1;
       document.getElementById('add-modal').classList.add('open');
-      setTimeout(() => document.getElementById('add-fruit').focus(), 50);
+      setTimeout(() => fruitInp.focus(), 50);
     }
 
     function closeAddModal() {
@@ -931,6 +1113,29 @@
       renderLines();
     }
 
+    // --- MODALE HORLOGE ---
+    function openClockModal() {
+      document.getElementById('clk-start').value = state.prod.startTime || '';
+      document.getElementById('clk-end').value = state.prod.endTime || '';
+      document.getElementById('clk-done-app').value = state.prod.doneApps !== '' ? state.prod.doneApps : '';
+      document.getElementById('clock-modal').classList.add('open');
+    }
+
+    function closeClockModal() {
+      document.getElementById('clock-modal').classList.remove('open');
+    }
+
+    function saveClockModal() {
+      state.prod = {
+        startTime: document.getElementById('clk-start').value,
+        endTime: document.getElementById('clk-end').value,
+        doneApps: document.getElementById('clk-done-app').value
+      };
+      saveState();
+      closeClockModal();
+      renderLines();
+    }
+
     // --- MODALE CLIC SUR LIGNE ---
     function openConsModal(lineIdx, type) {
       const l = state.lines[lineIdx];
@@ -943,19 +1148,19 @@
       if (type === 'et') {
         document.getElementById('cons-title').textContent = 'Paquets';
         document.getElementById('cons-per-box-label').textContent = 'Nombre par paquet';
-        document.getElementById('cons-nb-box-label').textContent = 'Nombre de paquets (0 si rien)';
+        document.getElementById('cons-nb-box-label').textContent = 'Nombre de paquets';
         document.getElementById('cons-per-box').value = l.etPerPack || 5000;
         document.getElementById('cons-nb-box').value = l.etStkPack || 0;
       } else if (type === 'cap') {
         document.getElementById('cons-title').textContent = 'Boîtes';
         document.getElementById('cons-per-box-label').textContent = 'Nombre par boîte';
-        document.getElementById('cons-nb-box-label').textContent = 'Nombre de boîtes (0 si rien)';
+        document.getElementById('cons-nb-box-label').textContent = 'Nombre de boîtes';
         document.getElementById('cons-per-box').value = l.capPerBox || 400;
         document.getElementById('cons-nb-box').value = l.capNbBox || 0;
       } else if (type === 'tr') {
         document.getElementById('cons-title').textContent = 'Palettes';
         document.getElementById('cons-per-box-label').textContent = 'Nombre par palette';
-        document.getElementById('cons-nb-box-label').textContent = 'Nombre de palettes (0 si rien)';
+        document.getElementById('cons-nb-box-label').textContent = 'Nombre de palettes';
         document.getElementById('cons-per-box').value = l.trPerPal || 3000;
         document.getElementById('cons-nb-box').value = l.trNbPal || 0;
         fmtWrap.style.display = 'block';
@@ -1009,7 +1214,11 @@
     function resetAll() {
       if (confirm('Voulez-vous remettre à zéro et effacer toutes les lignes ?')) {
         const currentApp = state.verre && state.verre.verPerApp !== '' ? state.verre.verPerApp : 3500;
-        state = { verre: { verPerApp: currentApp, ref: '', perPal: '', stkPal: '' }, lines: [] };
+        state = {
+          prod: { startTime: '', endTime: '', doneApps: '' },
+          verre: { verPerApp: currentApp, ref: '', perPal: '', stkPal: '' },
+          lines: []
+        };
         saveState();
         bindFixedGlassInputs();
         renderLines();
@@ -1020,6 +1229,7 @@
       const area = document.getElementById('print-area');
       const now = new Date().toLocaleString('fr-FR');
       const vInfo = document.getElementById('g-ver-status').textContent;
+      const cadTxt = document.getElementById('cadence-val').textContent;
       let cardsHtml = '';
 
       state.lines.forEach((l, i) => {
@@ -1036,7 +1246,7 @@
 
       area.innerHTML = `
         <div style="display:flex; justify-content:space-between; border-bottom:2px solid #000; padding-bottom:8px; margin-bottom:10px;">
-          <div><strong>Total PF : ${fmt(grandTotal())}</strong></div>
+          <div><strong>Total PF : ${fmt(grandTotal())}</strong> • Cadence : ${cadTxt}</div>
           <div>${now}</div>
         </div>
         <div class="p-card"><strong>Verre :</strong> ${vInfo}</div>
@@ -1047,6 +1257,12 @@
 
     loadState();
     bindFixedGlassInputs();
+    bindFruitAutoClear();
+    updateLiveClockDisplay();
+    setInterval(() => {
+      updateLiveClockDisplay();
+      renderLines();
+    }, 30000);
     renderLines();
   </script>
 </body>
