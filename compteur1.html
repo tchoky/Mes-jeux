@@ -288,6 +288,25 @@
       color: var(--text);
     }
 
+    .or-divider {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      margin: 2px 0;
+    }
+
+    .or-divider::before,
+    .or-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: #cbd5e1;
+    }
+
     .ref-row {
       display: flex;
       gap: 4px;
@@ -759,30 +778,35 @@
     </div>
   </div>
 
-  <!-- MODALE HORLOGE -->
+  <!-- MODALE HORLOGE : NB APP REMPLI OU NOMBRE DE VERRE REMPLI -->
   <div class="modal-bg" id="clock-modal">
     <div class="modal-panel">
       <div class="modal-head">
-        <span>🕒 Prod & Cadence</span>
-        <button type="button" class="btn btn-sec btn-mini" onclick="closeClockModal()">✕</button>
+        <span>🕒 Prod & Cadence</span>[span_3](start_span)[span_3](end_span)
+        <button type="button" class="btn btn-sec btn-mini" onclick="closeClockModal()">✕</button>[span_4](start_span)[span_4](end_span)
       </div>
       <div style="display:flex; flex-direction:column; gap:10px;">
         <div class="field">
-          <label>Heure début prod</label>
+          <label>Heure début prod</label>[span_5](start_span)[span_5](end_span)
           <input type="time" id="clk-start">
         </div>
         <div class="field">
-          <label>Heure fin de prod</label>
+          <label>Heure fin de prod</label>[span_6](start_span)[span_6](end_span)
           <input type="time" id="clk-end">
         </div>
         <div class="field">
-          <label>Nb app rempli</label>
+          <label>Nb app rempli</label>[span_7](start_span)[span_7](end_span)
           <input type="number" inputmode="numeric" pattern="[0-9]*" id="clk-done-app" placeholder="0">
+        </div>
+        <div class="or-divider">ou</div>
+        <div class="field">
+          <label id="clk-glass-label">Nombre de verre rempli (÷ 3500 verre/app)</label>
+          <input type="number" inputmode="numeric" pattern="[0-9]*" id="clk-done-glass" placeholder="0">
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-sec" onclick="closeClockModal()">Annuler</button>
-        <button type="button" class="btn btn-add" onclick="saveClockModal()">Valider ✓</button>
+        <button type="button" class="btn btn-sec" onclick="closeClockModal()">Annuler</button>[span_8](start_span)[span_8](end_span)
+        <button type="button" class="btn btn-add" onclick="saveClockModal()">Valider ✓</button>[span_9](start_span)[span_9](end_span)
       </div>
     </div>
   </div>
@@ -830,7 +854,7 @@
   <div id="print-area"></div>
 
   <script>
-    const STORAGE_KEY = 'compteurs_single_line_pal10_v1';
+    const STORAGE_KEY = 'compteurs_cadence_app_or_glass_v1';
     const PAGE_IDS = ['L1', 'L2', 'L3', 'L4', 'LP'];
 
     const PAGE_COLORS = {
@@ -848,7 +872,7 @@
 
     function createEmptyPageData() {
       return {
-        prod: { startTime: '', endTime: '', doneApps: '' },
+        prod: { startTime: '', endTime: '', doneApps: '', doneGlass: '' },
         verre: { verPerApp: 3500, perPal: 4000, stkPal: 10 },
         lines: []
       };
@@ -975,7 +999,7 @@
     function sanitizePageData(rawPage) {
       const base = createEmptyPageData();
       if (!rawPage) return base;
-      base.prod = Object.assign({ startTime: '', endTime: '', doneApps: '' }, rawPage.prod || {});
+      base.prod = Object.assign({ startTime: '', endTime: '', doneApps: '', doneGlass: '' }, rawPage.prod || {});
       base.verre = Object.assign({ verPerApp: 3500, perPal: 4000, stkPal: 10 }, rawPage.verre || {});
       if (base.verre.perPal === '' || base.verre.perPal === undefined || base.verre.perPal === null) {
         base.verre.perPal = 4000;
@@ -1066,8 +1090,18 @@
 
     function computeCadencePerHour() {
       const p = getCurrentPage();
-      const doneApps = Number(p.prod.doneApps) || 0;
-      if (doneApps <= 0) return 0;
+      const verPerApp = getVerPerApp();
+      const doneAppsVal = Number(p.prod.doneApps) || 0;
+      const doneGlassVal = Number(p.prod.doneGlass) || 0;
+
+      let effectiveApps = 0;
+      if (doneAppsVal > 0) {
+        effectiveApps = doneAppsVal;
+      } else if (doneGlassVal > 0 && verPerApp > 0) {
+        effectiveApps = doneGlassVal / verPerApp;
+      }
+
+      if (effectiveApps <= 0) return 0;
 
       const startMin = parseTimeToMinutes(p.prod.startTime);
       const endMin = parseTimeToMinutes(p.prod.endTime);
@@ -1081,7 +1115,7 @@
       }
 
       if (durationMin <= 0) return 0;
-      return doneApps / (durationMin / 60);
+      return effectiveApps / (durationMin / 60);
     }
 
     function formatCadenceLabel(cadence) {
@@ -1166,6 +1200,23 @@
       const refInp = document.getElementById('cons-ref-val');
       refInp.addEventListener('input', () => {
         refInp.classList.add('edited');
+      });
+    }
+
+    function bindClockExclusiveInputs() {
+      const appInp = document.getElementById('clk-done-app');
+      const glassInp = document.getElementById('clk-done-glass');
+
+      appInp.addEventListener('input', () => {
+        if (appInp.value !== '') {
+          glassInp.value = '';
+        }
+      });
+
+      glassInp.addEventListener('input', () => {
+        if (glassInp.value !== '') {
+          appInp.value = '';
+        }
       });
     }
 
@@ -1459,9 +1510,12 @@
 
     function openClockModal() {
       const p = getCurrentPage();
+      const verPerApp = getVerPerApp();
       document.getElementById('clk-start').value = p.prod.startTime || '';
       document.getElementById('clk-end').value = p.prod.endTime || '';
-      document.getElementById('clk-done-app').value = p.prod.doneApps !== '' ? p.prod.doneApps : '';
+      document.getElementById('clk-done-app').value = p.prod.doneApps !== '' && p.prod.doneApps !== undefined ? p.prod.doneApps : '';
+      document.getElementById('clk-done-glass').value = p.prod.doneGlass !== '' && p.prod.doneGlass !== undefined ? p.prod.doneGlass : '';
+      document.getElementById('clk-glass-label').textContent = `Nombre de verre rempli (÷ ${verPerApp} verre/app)`;
       document.getElementById('clock-modal').classList.add('open');
     }
 
@@ -1471,10 +1525,14 @@
 
     function saveClockModal() {
       const p = getCurrentPage();
+      const doneAppVal = document.getElementById('clk-done-app').value.trim();
+      const doneGlassVal = document.getElementById('clk-done-glass').value.trim();
+
       p.prod = {
         startTime: document.getElementById('clk-start').value,
         endTime: document.getElementById('clk-end').value,
-        doneApps: document.getElementById('clk-done-app').value
+        doneApps: doneAppVal,
+        doneGlass: doneAppVal !== '' ? '' : doneGlassVal
       };
       saveState();
       closeClockModal();
@@ -1604,7 +1662,7 @@
         const currentApp = current.verre && current.verre.verPerApp !== '' ? current.verre.verPerApp : 3500;
         const currentPerPal = current.verre && current.verre.perPal !== '' ? current.verre.perPal : 4000;
         appStore.pages[pid] = {
-          prod: { startTime: '', endTime: '', doneApps: '' },
+          prod: { startTime: '', endTime: '', doneApps: '', doneGlass: '' },
           verre: { verPerApp: currentApp, perPal: currentPerPal, stkPal: 10 },
           lines: []
         };
@@ -1650,6 +1708,7 @@
     bindFixedGlassInputs();
     bindFruitAutoClear();
     bindPrefRefInput();
+    bindClockExclusiveInputs();
     bindHoldButtons();
     updateLiveClockDisplay();
     setInterval(() => {
