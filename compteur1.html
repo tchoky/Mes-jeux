@@ -37,20 +37,7 @@
       margin: 0 auto;
     }
 
-    button,
-    .step-btn,
-    .mini-step-btn,
-    .cons-step-btn,
-    .abc-btn,
-    .clock-btn,
-    .cons-row {
-      -webkit-user-select: none;
-      user-select: none;
-      -webkit-touch-callout: none;
-      touch-action: manipulation;
-    }
-
-    /* Bandeau tout en haut : Horloge + Cadence juste à droite de l'heure */
+    /* Bandeau tout en haut : Cadence + Horloge / Heure actuelle */
     .cadence-bar {
       background: var(--card);
       border: 1px solid var(--border);
@@ -58,11 +45,22 @@
       padding: 10px 14px;
       margin-bottom: 10px;
       display: flex;
-      justify-content: flex-start;
+      justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 10px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    }
+
+    .cadence-info {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .cadence-badge {
+      color: var(--primary);
+      font-weight: 900;
     }
 
     .clock-btn {
@@ -74,7 +72,7 @@
       border: 1px solid #94a3b8;
       background: #f8fafc;
       color: var(--text);
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 800;
       cursor: pointer;
     }
@@ -83,13 +81,7 @@
       background: #e2e8f0;
     }
 
-    .cadence-badge {
-      color: var(--primary);
-      font-size: 1rem;
-      font-weight: 900;
-    }
-
-    /* En-tête Total PF simplifié : juste App + Total PF */
+    /* En-tête Total PF + +/- sur la première page */
     .top-card {
       background: var(--card);
       border: 2px solid var(--primary);
@@ -104,10 +96,23 @@
       box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
     }
 
-    .top-app-only {
-      font-size: 1.05rem;
-      font-weight: 900;
-      color: var(--text);
+    .top-label {
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .top-sub {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .top-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
     .top-value {
@@ -116,7 +121,7 @@
       color: var(--primary);
     }
 
-    /* Deuxième bloc : Verre */
+    /* Deuxième bloc : Verre + case Nb verre / app */
     .glass-fixed-card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -184,17 +189,6 @@
       background: #fff;
     }
 
-    .field input.pref-input {
-      background: #e2e8f0;
-      color: #64748b;
-      font-weight: 800;
-    }
-
-    .field input.pref-input.edited {
-      background: #ffffff;
-      color: var(--text);
-    }
-
     .ref-row {
       display: flex;
       gap: 4px;
@@ -238,22 +232,14 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      flex-shrink: 0;
     }
 
     .step-btn:active {
       transform: scale(0.96);
-      background: #cbd5e1;
     }
 
     .step-num-inp {
       width: 64px !important;
-      text-align: center;
-      padding: 7px 6px !important;
-    }
-
-    .step-num-wide {
-      width: 78px !important;
       text-align: center;
       padding: 7px 6px !important;
     }
@@ -340,10 +326,6 @@
       justify-content: center;
     }
 
-    .mini-step-btn:active {
-      background: #cbd5e1;
-    }
-
     .line-meta {
       font-size: 0.82rem;
       color: var(--muted);
@@ -386,7 +368,7 @@
     }
 
     .cons-text {
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       font-weight: 700;
       line-height: 1.3;
       flex: 1;
@@ -414,22 +396,15 @@
       justify-content: center;
     }
 
-    .cons-step-btn:active {
-      background: #e2e8f0;
-    }
-
     .line-end-time {
       margin-top: 8px;
-      padding: 6px 10px;
+      padding: 7px 10px;
       border-radius: 8px;
       background: #f8fafc;
       border: 1px solid #cbd5e1;
-      font-size: 0.9rem;
-      font-weight: 900;
+      font-size: 0.84rem;
+      font-weight: 800;
       color: var(--text);
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
     }
 
     .bottom-bar {
@@ -538,31 +513,40 @@
 </head>
 <body>
 
-  <!-- TOUT EN HAUT : HORLOGE + CADENCE JUSTE À DROITE DE L'HEURE -->
+  <!-- TOUT EN HAUT : CADENCE + HORLOGE / HEURE ACTUELLE -->
   <div class="cadence-bar">
+    <div class="cadence-info">
+      Cadence : <span class="cadence-badge" id="cadence-val">0 app/h</span>
+    </div>
     <button type="button" class="clock-btn" onclick="openClockModal()">
       <span>🕒</span>
       <span id="live-clock-text">--:--</span>
     </button>
-    <div class="cadence-badge" id="cadence-val">0 app/h</div>
   </div>
 
-  <!-- PREMIÈRE PAGE : JUSTE APP + TOTAL PF -->
+  <!-- PREMIÈRE PAGE : TOTAL PF + +/- -->
   <div class="top-card">
-    <div class="top-app-only">App : <span id="top-app-val">0</span></div>
-    <div class="top-value" id="top-total">0</div>
+    <div>
+      <div class="top-label">Total Produit Fini</div>
+      <div class="top-sub" id="top-count">Aucune ligne</div>
+    </div>
+    <div class="top-right">
+      <div class="mini-stepper">
+        <span>App:</span>
+        <button type="button" class="mini-step-btn" onclick="stepFirstLineApps(-1)">-</button>
+        <span id="top-app-val">0</span>
+        <button type="button" class="mini-step-btn" onclick="stepFirstLineApps(1)">+</button>
+      </div>
+      <div class="top-value" id="top-total">0</div>
+    </div>
   </div>
 
-  <!-- DEUXIÈME BLOC : VERRE -->
+  <!-- DEUXIÈME BLOC : VERRE + CASE NB DE VERRE / APP -->
   <div class="glass-fixed-card">
     <div class="glass-line-1">
-      <div class="field" style="flex:0 0 auto;">
+      <div class="field" style="flex:1 1 115px;">
         <label>Nb verre / app</label>
-        <div class="stepper">
-          <button type="button" class="step-btn" data-repeat-fn="stepVerPerApp" data-repeat-delta="-50">-</button>
-          <input type="number" inputmode="numeric" pattern="[0-9]*" class="step-num-wide" id="g-ver-app" value="3500">
-          <button type="button" class="step-btn" data-repeat-fn="stepVerPerApp" data-repeat-delta="50">+</button>
-        </div>
+        <input type="number" inputmode="numeric" pattern="[0-9]*" id="g-ver-app" value="3500">
       </div>
       <div class="field" style="flex:1 1 120px;">
         <label>🫙 Nom verre (Réf V)</label>
@@ -571,26 +555,22 @@
           <button type="button" class="abc-btn" onclick="toggleAbc('g-ver-ref', this)">ABC</button>
         </div>
       </div>
-      <div class="field" style="flex:0 0 auto;">
+      <div class="field" style="flex:1 1 105px;">
         <label>Nb / palette</label>
-        <div class="stepper">
-          <button type="button" class="step-btn" data-repeat-fn="stepGlassPerPal" data-repeat-delta="-100">-</button>
-          <input type="number" inputmode="numeric" pattern="[0-9]*" class="step-num-wide" id="g-ver-pal" value="4000">
-          <button type="button" class="step-btn" data-repeat-fn="stepGlassPerPal" data-repeat-delta="100">+</button>
-        </div>
+        <input type="number" inputmode="numeric" pattern="[0-9]*" id="g-ver-pal" placeholder="0">
       </div>
       <div class="field" style="flex:0 0 auto;">
         <label>Nb palettes</label>
         <div class="stepper">
-          <button type="button" class="step-btn" data-repeat-fn="stepGlassPallets" data-repeat-delta="-1">-</button>
+          <button type="button" class="step-btn" onclick="stepGlassPallets(-1)">-</button>
           <input type="number" inputmode="numeric" pattern="[0-9]*" class="step-num-inp" id="g-ver-stk" placeholder="0">
-          <button type="button" class="step-btn" data-repeat-fn="stepGlassPallets" data-repeat-delta="1">+</button>
+          <button type="button" class="step-btn" onclick="stepGlassPallets(1)">+</button>
         </div>
       </div>
     </div>
     <div class="glass-line-2" id="g-ver-status">
-      <span>Stock : 0 📜</span>
-      <span>PF : 0</span>
+      <span>Stock : 0 pal</span>
+      <span>Besoin PF : 0</span>
     </div>
   </div>
 
@@ -603,7 +583,7 @@
     <button type="button" class="btn btn-pdf" onclick="printReport()">🖨️ PDF</button>
   </div>
 
-  <!-- MODALE AJOUT : FRUIT + NB APP -->
+  <!-- MODALE AJOUT : FRUIT (EFFACÉ D'OFFICE AU CLIC) + NB APP -->
   <div class="modal-bg" id="add-modal">
     <div class="modal-panel">
       <div class="modal-head">
@@ -618,9 +598,9 @@
         <div class="field">
           <label>Combien d'app ?</label>
           <div class="stepper">
-            <button type="button" class="step-btn" data-repeat-fn="stepAddApps" data-repeat-delta="-1">-</button>
+            <button type="button" class="step-btn" onclick="stepAddApps(-1)">-</button>
             <input type="number" inputmode="numeric" pattern="[0-9]*" class="step-num-inp" id="add-nb-app" value="1">
-            <button type="button" class="step-btn" data-repeat-fn="stepAddApps" data-repeat-delta="1">+</button>
+            <button type="button" class="step-btn" onclick="stepAddApps(1)">+</button>
           </div>
         </div>
       </div>
@@ -631,7 +611,7 @@
     </div>
   </div>
 
-  <!-- MODALE HORLOGE -->
+  <!-- MODALE HORLOGE : HEURE DÉBUT PROD, HEURE FIN PROD, NB APP REMPLI -->
   <div class="modal-bg" id="clock-modal">
     <div class="modal-panel">
       <div class="modal-head">
@@ -659,7 +639,7 @@
     </div>
   </div>
 
-  <!-- MODALE CLIC SUR LIGNE CONSOMMABLE : PREMIÈRE CASE CCT (GRISÉ) / CRC -->
+  <!-- MODALE CLIC SUR LIGNE : NOMBRE PAR BOÎTE & NB DE BOÎTES -->
   <div class="modal-bg" id="cons-modal">
     <div class="modal-panel">
       <div class="modal-head">
@@ -667,13 +647,6 @@
         <button type="button" class="btn btn-sec btn-mini" onclick="closeConsModal()">✕</button>
       </div>
       <div style="display:flex; flex-direction:column; gap:10px;">
-        <div class="field" id="cons-ref-wrap" style="display:none;">
-          <label id="cons-ref-label">Réf</label>
-          <div class="ref-row">
-            <input type="text" inputmode="numeric" id="cons-ref-val" placeholder="">
-            <button type="button" class="abc-btn" id="cons-ref-abc" onclick="toggleAbc('cons-ref-val', this)">ABC</button>
-          </div>
-        </div>
         <div class="field">
           <label id="cons-per-box-label">Nombre par boîte</label>
           <input type="number" inputmode="numeric" pattern="[0-9]*" id="cons-per-box" placeholder="0">
@@ -701,81 +674,16 @@
   <div id="print-area"></div>
 
   <script>
-    const STORAGE_KEY = 'compteurs_emojis_v1';
-
-    const ICON_PACK = '🎟️';
-    const ICON_BOX  = '📦';
-    const ICON_PAL  = '📜';
-    const ICON_WARN = '⚠️';
+    const STORAGE_KEY = 'compteurs_cadence_horloge_v1';
 
     let state = {
       prod: { startTime: '', endTime: '', doneApps: '' },
-      verre: { verPerApp: 3500, ref: '', perPal: 4000, stkPal: '' },
+      verre: { verPerApp: 3500, ref: '', perPal: '', stkPal: '' },
       lines: []
     };
 
     let activeConsTarget = null;
     let defaultFruitClearedOnFocus = false;
-
-    let holdStartTimer = null;
-    let holdRepeatTimer = null;
-
-    function runStepAction(btn) {
-      const fnName = btn.getAttribute('data-repeat-fn');
-      const delta = Number(btn.getAttribute('data-repeat-delta')) || 0;
-      if (!fnName || !delta) return;
-
-      if (fnName === 'stepVerPerApp') stepVerPerApp(delta);
-      else if (fnName === 'stepGlassPerPal') stepGlassPerPal(delta);
-      else if (fnName === 'stepGlassPallets') stepGlassPallets(delta);
-      else if (fnName === 'stepAddApps') stepAddApps(delta);
-      else if (fnName === 'stepLineApps') {
-        const idx = Number(btn.getAttribute('data-line-idx'));
-        stepLineApps(idx, delta);
-      } else if (fnName === 'stepConsumable') {
-        const idx = Number(btn.getAttribute('data-line-idx'));
-        const type = btn.getAttribute('data-cons-type');
-        stepConsumable(idx, type, delta, null);
-      }
-    }
-
-    function clearHoldTimers() {
-      if (holdStartTimer) {
-        clearTimeout(holdStartTimer);
-        holdStartTimer = null;
-      }
-      if (holdRepeatTimer) {
-        clearInterval(holdRepeatTimer);
-        holdRepeatTimer = null;
-      }
-    }
-
-    function bindHoldButtons() {
-      document.addEventListener('pointerdown', (e) => {
-        const btn = e.target.closest('[data-repeat-fn]');
-        if (!btn) return;
-        e.preventDefault();
-        e.stopPropagation();
-        clearHoldTimers();
-
-        runStepAction(btn);
-
-        holdStartTimer = setTimeout(() => {
-          holdRepeatTimer = setInterval(() => {
-            runStepAction(btn);
-          }, 110);
-        }, 350);
-      });
-
-      document.addEventListener('pointerup', clearHoldTimers);
-      document.addEventListener('pointercancel', clearHoldTimers);
-      document.addEventListener('pointerleave', clearHoldTimers);
-      document.addEventListener('contextmenu', (e) => {
-        if (e.target.closest('[data-repeat-fn]')) {
-          e.preventDefault();
-        }
-      });
-    }
 
     function getDefaultFruit(index) {
       return `Fruit ${index + 1}`;
@@ -786,21 +694,14 @@
       return Number.isFinite(v) && v >= 0 ? v : 3500;
     }
 
-    function getVerPerPal() {
-      const v = Number(state.verre.perPal);
-      return Number.isFinite(v) && v >= 0 ? v : 4000;
-    }
-
     function createLine(fruit = 'Fruit 1', nbApp = 1) {
       return {
         fruit: fruit,
         nbApp: nbApp,
         etPerPack: 5000,
         etStkPack: 0,
-        capRef: 'CRC',
         capPerBox: 400,
         capNbBox: 0,
-        trRef: 'CCT',
         trPerPal: 3000,
         trNbPal: 0,
         trFmt: 12
@@ -813,17 +714,14 @@
         if (raw) {
           const parsed = JSON.parse(raw);
           state.prod = Object.assign({ startTime: '', endTime: '', doneApps: '' }, parsed.prod || {});
-          state.verre = Object.assign({ verPerApp: 3500, ref: '', perPal: 4000, stkPal: '' }, parsed.verre || {});
-          if (state.verre.perPal === '' || state.verre.perPal === undefined || state.verre.perPal === null) {
-            state.verre.perPal = 4000;
-          }
+          state.verre = Object.assign({ verPerApp: 3500, ref: '', perPal: '', stkPal: '' }, parsed.verre || {});
           state.lines = Array.isArray(parsed.lines) ? parsed.lines : [];
           return;
         }
       } catch (e) {}
       state = {
         prod: { startTime: '', endTime: '', doneApps: '' },
-        verre: { verPerApp: 3500, ref: '', perPal: 4000, stkPal: '' },
+        verre: { verPerApp: 3500, ref: '', perPal: '', stkPal: '' },
         lines: []
       };
     }
@@ -834,6 +732,10 @@
 
     function fmt(n) {
       return Math.ceil(Number(n) || 0).toLocaleString('fr-FR');
+    }
+
+    function plural(count, sing, plur) {
+      return count <= 1 ? sing : plur;
     }
 
     function parseTimeToMinutes(hhmm) {
@@ -862,6 +764,7 @@
       document.getElementById('live-clock-text').textContent = `${h}:${m}`;
     }
 
+    // Cadence en app / heure (ex. 2,5 app/h)
     function computeCadencePerHour() {
       const doneApps = Number(state.prod.doneApps) || 0;
       if (doneApps <= 0) return 0;
@@ -895,10 +798,6 @@
       return state.lines.reduce((s, l) => s + lineTotal(l), 0);
     }
 
-    function totalAppsCount() {
-      return state.lines.reduce((s, l) => s + (Number(l.nbApp) || 0), 0);
-    }
-
     function fruitDisplay(l, idx) {
       const f = (l.fruit || '').trim();
       return f ? f : getDefaultFruit(idx);
@@ -920,7 +819,7 @@
 
       appInp.value = state.verre.verPerApp !== '' && state.verre.verPerApp !== undefined ? state.verre.verPerApp : 3500;
       refInp.value = state.verre.ref || '';
-      palInp.value = state.verre.perPal !== '' && state.verre.perPal !== undefined ? state.verre.perPal : 4000;
+      palInp.value = state.verre.perPal || '';
       stkInp.value = state.verre.stkPal || '';
 
       appInp.oninput = (e) => {
@@ -943,33 +842,6 @@
       });
     }
 
-    function bindPrefRefInput() {
-      const refInp = document.getElementById('cons-ref-val');
-      refInp.addEventListener('input', () => {
-        refInp.classList.add('edited');
-      });
-    }
-
-    function stepVerPerApp(delta) {
-      const current = Number(state.verre.verPerApp);
-      const base = Number.isFinite(current) ? current : 3500;
-      const next = Math.max(0, base + delta);
-      state.verre.verPerApp = next;
-      document.getElementById('g-ver-app').value = next;
-      saveState();
-      renderLines();
-    }
-
-    function stepGlassPerPal(delta) {
-      const current = Number(state.verre.perPal);
-      const base = Number.isFinite(current) ? current : 4000;
-      const next = Math.max(0, base + delta);
-      state.verre.perPal = next;
-      document.getElementById('g-ver-pal').value = next;
-      saveState();
-      refreshGlassStatus();
-    }
-
     function stepGlassPallets(delta) {
       const current = Number(state.verre.stkPal) || 0;
       const next = Math.max(0, current + delta);
@@ -977,6 +849,21 @@
       document.getElementById('g-ver-stk').value = next;
       saveState();
       refreshGlassStatus();
+    }
+
+    function stepFirstLineApps(delta) {
+      if (!state.lines.length) {
+        if (delta > 0) {
+          state.lines.push(createLine(getDefaultFruit(0), delta));
+          saveState();
+          renderLines();
+        }
+        return;
+      }
+      const current = Number(state.lines[0].nbApp) || 0;
+      state.lines[0].nbApp = Math.max(0, current + delta);
+      saveState();
+      renderLines();
     }
 
     function stepLineApps(idx, delta) {
@@ -1006,7 +893,7 @@
     function refreshGlassStatus() {
       const pf = grandTotal();
       const vRef = (state.verre.ref || '').trim();
-      const vPerPal = getVerPerPal();
+      const vPerPal = Number(state.verre.perPal) || 0;
       const vStkPal = Number(state.verre.stkPal) || 0;
       const vStockUnits = vPerPal * vStkPal;
       const vNeedPal = vPerPal > 0 ? Math.ceil(pf / vPerPal) : 0;
@@ -1015,26 +902,26 @@
       bar.className = 'glass-line-2';
 
       const namePart = vRef ? `<strong>${vRef}</strong> • ` : '';
-      const needPart = `PF : <strong>${fmt(pf)}</strong>`;
+      const needPart = `Besoin PF : <strong>${fmt(pf)}</strong>`;
 
       if (pf > 0 && vPerPal > 0) {
         const diffPal = vStkPal - vNeedPal;
         if (diffPal < 0) {
           const m = Math.abs(diffPal);
           bar.classList.add('err');
-          bar.innerHTML = `<span>${namePart}${vStkPal} ${ICON_PAL}</span><span>${needPart} (${vNeedPal} ${ICON_PAL}) • ${ICON_WARN} -${m} ${ICON_PAL}</span>`;
+          bar.innerHTML = `<span>${namePart}Stock : <strong>${vStkPal}</strong> ${plural(vStkPal, 'palette', 'palettes')}</span><span>${needPart} (${vNeedPal} pal) • Manque ${m} ${plural(m, 'palette', 'palettes')}</span>`;
         } else if (diffPal > 0) {
           bar.classList.add('ok');
-          bar.innerHTML = `<span>${namePart}${vStkPal} ${ICON_PAL}</span><span>${needPart} (${vNeedPal} ${ICON_PAL}) • +${diffPal} ${ICON_PAL}</span>`;
+          bar.innerHTML = `<span>${namePart}Stock : <strong>${vStkPal}</strong> ${plural(vStkPal, 'palette', 'palettes')}</span><span>${needPart} (${vNeedPal} pal) • ${diffPal} ${plural(diffPal, 'palette', 'palettes')} en trop</span>`;
         } else {
           bar.classList.add('ok');
-          bar.innerHTML = `<span>${namePart}${vStkPal} ${ICON_PAL}</span><span>${needPart} (${vNeedPal} ${ICON_PAL}) • ✓</span>`;
+          bar.innerHTML = `<span>${namePart}Stock : <strong>${vStkPal}</strong> ${plural(vStkPal, 'palette', 'palettes')}</span><span>${needPart} (${vNeedPal} pal) • OK</span>`;
         }
       } else if (pf > 0 && vStockUnits < pf) {
         bar.classList.add('err');
-        bar.innerHTML = `<span>${namePart}${vStkPal} ${ICON_PAL}</span><span>${needPart} • ${ICON_WARN} -${fmt(pf - vStockUnits)}</span>`;
+        bar.innerHTML = `<span>${namePart}Stock : <strong>${vStkPal}</strong> ${plural(vStkPal, 'palette', 'palettes')}</span><span>${needPart} • Manque ${fmt(pf - vStockUnits)}</span>`;
       } else {
-        bar.innerHTML = `<span>${namePart}${vStkPal} ${ICON_PAL}</span><span>${needPart}</span>`;
+        bar.innerHTML = `<span>${namePart}Stock : <strong>${vStkPal}</strong> ${plural(vStkPal, 'palette', 'palettes')}</span><span>${needPart}</span>`;
       }
     }
 
@@ -1048,7 +935,10 @@
 
       document.getElementById('cadence-val').textContent = formatCadenceLabel(cadence);
       document.getElementById('top-total').textContent = fmt(pfTotal);
-      document.getElementById('top-app-val').textContent = totalAppsCount();
+      document.getElementById('top-count').textContent =
+        state.lines.length === 0 ? 'Aucune ligne' : `${state.lines.length} ligne${state.lines.length > 1 ? 's' : ''}`;
+      document.getElementById('top-app-val').textContent =
+        state.lines.length > 0 ? (Number(state.lines[0].nbApp) || 0) : 0;
 
       refreshGlassStatus();
 
@@ -1067,79 +957,77 @@
         const lineApps = Math.max(0, Number(l.nbApp) || 0);
         cumulAppsToDo += lineApps;
 
-        // 1. Paquets 🎟️
+        // 1. Paquets
         const etPack = Number(l.etPerPack) || 5000;
         const etStk = Number(l.etStkPack) || 0;
         const etNeed = pf > 0 && etPack > 0 ? Math.ceil(pf / etPack) : 0;
         let etCls = 'cons-row';
-        let etMsg = `<strong>${fmt(etNeed)}</strong> ${ICON_PACK} × ${fmt(etPack)}`;
+        let etMsg = `<strong>${fmt(etNeed)}</strong> ${plural(etNeed, 'paquet', 'paquets')} de ${fmt(etPack)}`;
         if (etNeed > 0) {
           const diffEt = etStk - etNeed;
           if (diffEt < 0) {
             const m = Math.abs(diffEt);
             etCls = 'cons-row err';
-            etMsg += ` • ${ICON_WARN} -${m} ${ICON_PACK}`;
+            etMsg += ` • Manque ${m} ${plural(m, 'paquet', 'paquets')}`;
           } else if (diffEt > 0) {
             etCls = 'cons-row ok';
-            etMsg += ` • +${diffEt} ${ICON_PACK}`;
+            etMsg += ` • ${diffEt} ${plural(diffEt, 'paquet', 'paquets')} en trop`;
           } else {
             etCls = 'cons-row ok';
-            etMsg += ` • ✓ (${etStk} ${ICON_PACK})`;
+            etMsg += ` • OK (${etStk} ${plural(etStk, 'paquet', 'paquets')})`;
           }
         }
 
-        // 2. Boîtes capsules 📦
+        // 2. Boîtes
         const cBox = Number(l.capPerBox) || 400;
         const cNbBox = Number(l.capNbBox) || 0;
         const cNeed = pf > 0 && cBox > 0 ? Math.ceil(pf / cBox) : 0;
-        const cRefTxt = (l.capRef || '').trim();
-        const cRefBadge = cRefTxt && cRefTxt.toUpperCase() !== 'CRC' ? `[${cRefTxt}] ` : '';
         let cCls = 'cons-row';
-        let cMsg = `${cRefBadge}<strong>${fmt(cNeed)}</strong> ${ICON_BOX} × ${fmt(cBox)}`;
+        let cMsg = `<strong>${fmt(cNeed)}</strong> ${plural(cNeed, 'boîte', 'boîtes')} de ${fmt(cBox)}`;
         if (cNeed > 0) {
           const diffC = cNbBox - cNeed;
           if (diffC < 0) {
             const m = Math.abs(diffC);
             cCls = 'cons-row err';
-            cMsg += ` • ${ICON_WARN} -${m} ${ICON_BOX}`;
+            cMsg += ` • Manque ${m} ${plural(m, 'boîte', 'boîtes')}`;
           } else if (diffC > 0) {
             cCls = 'cons-row ok';
-            cMsg += ` • +${diffC} ${ICON_BOX}`;
+            cMsg += ` • ${diffC} ${plural(diffC, 'boîte', 'boîtes')} en trop`;
           } else {
             cCls = 'cons-row ok';
-            cMsg += ` • ✓ (${cNbBox} ${ICON_BOX})`;
+            cMsg += ` • OK (${cNbBox} ${plural(cNbBox, 'boîte', 'boîtes')})`;
           }
         }
 
-        // 3. Palettes 📜
+        // 3. Palettes / format
         const trFmt = Number(l.trFmt) || 12;
         const trPal = Number(l.trPerPal) || 3000;
         const trNbPal = Number(l.trNbPal) || 0;
         const trUnits = pf > 0 ? Math.ceil(pf / trFmt) : 0;
         const trNeed = trUnits > 0 && trPal > 0 ? Math.ceil(trUnits / trPal) : 0;
-        const trRefTxt = (l.trRef || '').trim();
-        const trRefBadge = trRefTxt && trRefTxt.toUpperCase() !== 'CCT' ? `[${trRefTxt}] ` : '';
         let trCls = 'cons-row';
-        let trMsg = `${trRefBadge}<strong>${fmt(trNeed)}</strong> ${ICON_PAL} × ${fmt(trPal)} (x${trFmt})`;
+        let trMsg = `<strong>${fmt(trNeed)}</strong> ${plural(trNeed, 'palette', 'palettes')} de ${fmt(trPal)} (x${trFmt})`;
         if (trNeed > 0) {
           const diffTr = trNbPal - trNeed;
           if (diffTr < 0) {
             const m = Math.abs(diffTr);
             trCls = 'cons-row err';
-            trMsg += ` • ${ICON_WARN} -${m} ${ICON_PAL}`;
+            trMsg += ` • Manque ${m} ${plural(m, 'palette', 'palettes')}`;
           } else if (diffTr > 0) {
             trCls = 'cons-row ok';
-            trMsg += ` • +${diffTr} ${ICON_PAL}`;
+            trMsg += ` • ${diffTr} ${plural(diffTr, 'palette', 'palettes')} en trop`;
           } else {
             trCls = 'cons-row ok';
-            trMsg += ` • ✓ (${trNbPal} ${ICON_PAL})`;
+            trMsg += ` • OK (${trNbPal} ${plural(trNbPal, 'palette', 'palettes')})`;
           }
         }
 
-        let endTimeLabel = '--:--';
+        // Heure de fin estimée : nb app à faire / cadence + heure actuelle + 15 min lavage
+        let endTimeText = 'Heure de fin : renseignez 🕒 (début, fin, nb app rempli)';
         if (cadence > 0 && cumulAppsToDo > 0) {
           const prodMinutes = (cumulAppsToDo / cadence) * 60;
-          endTimeLabel = formatMinutesToTime(nowMin + prodMinutes + washMin);
+          const finishTotalMin = nowMin + prodMinutes + washMin;
+          endTimeText = `Heure de fin estimée : <strong>${formatMinutesToTime(finishTotalMin)}</strong> (${cumulAppsToDo} app à ${formatCadenceLabel(cadence)} + 15 min lavage)`;
         }
 
         const card = document.createElement('div');
@@ -1152,9 +1040,9 @@
             <div class="line-tools">
               <div class="mini-stepper">
                 <span>App:</span>
-                <button type="button" class="mini-step-btn" data-repeat-fn="stepLineApps" data-repeat-delta="-1" data-line-idx="${idx}">-</button>
+                <button type="button" class="mini-step-btn" onclick="stepLineApps(${idx}, -1)">-</button>
                 <span>${lineApps}</span>
-                <button type="button" class="mini-step-btn" data-repeat-fn="stepLineApps" data-repeat-delta="1" data-line-idx="${idx}">+</button>
+                <button type="button" class="mini-step-btn" onclick="stepLineApps(${idx}, 1)">+</button>
               </div>
               <button type="button" class="btn btn-del btn-mini" onclick="deleteLine(${idx})">🗑️</button>
             </div>
@@ -1166,33 +1054,34 @@
             <div class="${etCls}" onclick="openConsModal(${idx}, 'et')">
               <div class="cons-text">${etMsg}</div>
               <div class="cons-right-controls">
-                <button type="button" class="cons-step-btn" data-repeat-fn="stepConsumable" data-repeat-delta="-1" data-line-idx="${idx}" data-cons-type="et">-</button>
-                <button type="button" class="cons-step-btn" data-repeat-fn="stepConsumable" data-repeat-delta="1" data-line-idx="${idx}" data-cons-type="et">+</button>
+                <button type="button" class="cons-step-btn" onclick="stepConsumable(${idx}, 'et', -1, event)">-</button>
+                <button type="button" class="cons-step-btn" onclick="stepConsumable(${idx}, 'et', 1, event)">+</button>
               </div>
             </div>
 
             <div class="${cCls}" onclick="openConsModal(${idx}, 'cap')">
               <div class="cons-text">${cMsg}</div>
               <div class="cons-right-controls">
-                <button type="button" class="cons-step-btn" data-repeat-fn="stepConsumable" data-repeat-delta="-1" data-line-idx="${idx}" data-cons-type="cap">-</button>
-                <button type="button" class="cons-step-btn" data-repeat-fn="stepConsumable" data-repeat-delta="1" data-line-idx="${idx}" data-cons-type="cap">+</button>
+                <button type="button" class="cons-step-btn" onclick="stepConsumable(${idx}, 'cap', -1, event)">-</button>
+                <button type="button" class="cons-step-btn" onclick="stepConsumable(${idx}, 'cap', 1, event)">+</button>
               </div>
             </div>
 
             <div class="${trCls}" onclick="openConsModal(${idx}, 'tr')">
               <div class="cons-text">${trMsg}</div>
               <div class="cons-right-controls">
-                <button type="button" class="cons-step-btn" data-repeat-fn="stepConsumable" data-repeat-delta="-1" data-line-idx="${idx}" data-cons-type="tr">-</button>
-                <button type="button" class="cons-step-btn" data-repeat-fn="stepConsumable" data-repeat-delta="1" data-line-idx="${idx}" data-cons-type="tr">+</button>
+                <button type="button" class="cons-step-btn" onclick="stepConsumable(${idx}, 'tr', -1, event)">-</button>
+                <button type="button" class="cons-step-btn" onclick="stepConsumable(${idx}, 'tr', 1, event)">+</button>
               </div>
             </div>
           </div>
-          <div class="line-end-time">🏁 ${endTimeLabel}</div>
+          <div class="line-end-time">${endTimeText}</div>
         `;
         container.appendChild(card);
       });
     }
 
+    // --- MODALE AJOUT (FRUIT EFFACÉ D'OFFICE AU CLIC + NB APP) ---
     function openAddAppModal() {
       const defFruit = getDefaultFruit(state.lines.length);
       const fruitInp = document.getElementById('add-fruit');
@@ -1224,6 +1113,7 @@
       renderLines();
     }
 
+    // --- MODALE HORLOGE ---
     function openClockModal() {
       document.getElementById('clk-start').value = state.prod.startTime || '';
       document.getElementById('clk-end').value = state.prod.endTime || '';
@@ -1246,52 +1136,29 @@
       renderLines();
     }
 
+    // --- MODALE CLIC SUR LIGNE ---
     function openConsModal(lineIdx, type) {
       const l = state.lines[lineIdx];
       if (!l) return;
       activeConsTarget = { lineIdx, type };
 
-      const refWrap = document.getElementById('cons-ref-wrap');
-      const refInp = document.getElementById('cons-ref-val');
-      const refAbc = document.getElementById('cons-ref-abc');
       const fmtWrap = document.getElementById('cons-fmt-wrap');
-
-      refWrap.style.display = 'none';
       fmtWrap.style.display = 'none';
-      refInp.className = 'pref-input';
-      refInp.inputMode = 'numeric';
-      refAbc.classList.remove('active');
 
       if (type === 'et') {
-        document.getElementById('cons-title').textContent = `${ICON_PACK} Paquets`;
+        document.getElementById('cons-title').textContent = 'Paquets';
         document.getElementById('cons-per-box-label').textContent = 'Nombre par paquet';
         document.getElementById('cons-nb-box-label').textContent = 'Nombre de paquets';
         document.getElementById('cons-per-box').value = l.etPerPack || 5000;
         document.getElementById('cons-nb-box').value = l.etStkPack || 0;
       } else if (type === 'cap') {
-        document.getElementById('cons-title').textContent = `${ICON_BOX} Boîtes capsules`;
-        refWrap.style.display = 'flex';
-        document.getElementById('cons-ref-label').textContent = 'CRC';
-        const curCapRef = (l.capRef || 'CRC').trim();
-        refInp.value = curCapRef;
-        refInp.placeholder = 'CRC';
-        if (curCapRef.toUpperCase() !== 'CRC' && curCapRef !== '') {
-          refInp.classList.add('edited');
-        }
+        document.getElementById('cons-title').textContent = 'Boîtes';
         document.getElementById('cons-per-box-label').textContent = 'Nombre par boîte';
         document.getElementById('cons-nb-box-label').textContent = 'Nombre de boîtes';
         document.getElementById('cons-per-box').value = l.capPerBox || 400;
         document.getElementById('cons-nb-box').value = l.capNbBox || 0;
       } else if (type === 'tr') {
-        document.getElementById('cons-title').textContent = `${ICON_PAL} Palettes`;
-        refWrap.style.display = 'flex';
-        document.getElementById('cons-ref-label').textContent = 'CCT';
-        const curTrRef = (l.trRef || 'CCT').trim();
-        refInp.value = curTrRef;
-        refInp.placeholder = 'CCT';
-        if (curTrRef.toUpperCase() !== 'CCT' && curTrRef !== '') {
-          refInp.classList.add('edited');
-        }
+        document.getElementById('cons-title').textContent = 'Palettes';
         document.getElementById('cons-per-box-label').textContent = 'Nombre par palette';
         document.getElementById('cons-nb-box-label').textContent = 'Nombre de palettes';
         document.getElementById('cons-per-box').value = l.trPerPal || 3000;
@@ -1319,17 +1186,14 @@
 
       const perBoxVal = Math.max(0, Number(document.getElementById('cons-per-box').value) || 0);
       const nbBoxVal = Math.max(0, Number(document.getElementById('cons-nb-box').value) || 0);
-      const refVal = document.getElementById('cons-ref-val').value.trim();
 
       if (type === 'et') {
         l.etPerPack = perBoxVal;
         l.etStkPack = nbBoxVal;
       } else if (type === 'cap') {
-        l.capRef = refVal || 'CRC';
         l.capPerBox = perBoxVal;
         l.capNbBox = nbBoxVal;
       } else if (type === 'tr') {
-        l.trRef = refVal || 'CCT';
         l.trPerPal = perBoxVal;
         l.trNbPal = nbBoxVal;
         const ch = document.querySelector('input[name="cons_fmt"]:checked');
@@ -1350,10 +1214,9 @@
     function resetAll() {
       if (confirm('Voulez-vous remettre à zéro et effacer toutes les lignes ?')) {
         const currentApp = state.verre && state.verre.verPerApp !== '' ? state.verre.verPerApp : 3500;
-        const currentPerPal = state.verre && state.verre.perPal !== '' ? state.verre.perPal : 4000;
         state = {
           prod: { startTime: '', endTime: '', doneApps: '' },
-          verre: { verPerApp: currentApp, ref: '', perPal: currentPerPal, stkPal: '' },
+          verre: { verPerApp: currentApp, ref: '', perPal: '', stkPal: '' },
           lines: []
         };
         saveState();
@@ -1374,16 +1237,16 @@
         cardsHtml += `
           <div class="p-card">
             <strong>${fruitDisplay(l, i)}</strong> (${getVerPerApp()} × ${l.nbApp || 0} app = ${fmt(pf)})<br>
-            ${fmt(l.etPerPack || 5000)} ${ICON_PACK} (stk ${l.etStkPack || 0}) •
-            [${l.capRef || 'CRC'}] ${fmt(l.capPerBox || 400)} ${ICON_BOX} (stk ${l.capNbBox || 0}) •
-            [${l.trRef || 'CCT'}] ${fmt(l.trPerPal || 3000)} ${ICON_PAL} x${l.trFmt || 12} (stk ${l.trNbPal || 0})
+            ${fmt(l.etPerPack || 5000)}/pqt (stk ${l.etStkPack || 0}) •
+            ${fmt(l.capPerBox || 400)}/bte (stk ${l.capNbBox || 0}) •
+            ${fmt(l.trPerPal || 3000)}/pal x${l.trFmt || 12} (stk ${l.trNbPal || 0})
           </div>
         `;
       });
 
       area.innerHTML = `
         <div style="display:flex; justify-content:space-between; border-bottom:2px solid #000; padding-bottom:8px; margin-bottom:10px;">
-          <div><strong>Total PF : ${fmt(grandTotal())}</strong> • ${cadTxt}</div>
+          <div><strong>Total PF : ${fmt(grandTotal())}</strong> • Cadence : ${cadTxt}</div>
           <div>${now}</div>
         </div>
         <div class="p-card"><strong>Verre :</strong> ${vInfo}</div>
@@ -1395,8 +1258,6 @@
     loadState();
     bindFixedGlassInputs();
     bindFruitAutoClear();
-    bindPrefRefInput();
-    bindHoldButtons();
     updateLiveClockDisplay();
     setInterval(() => {
       updateLiveClockDisplay();
