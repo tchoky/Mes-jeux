@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Compteurs 5-3-2-4-1 sur une même ligne</title>
+  <title>Compteurs - Vue compacte</title>
   <style>
     :root {
       --primary: #2563eb;
@@ -32,176 +32,161 @@
     body {
       background: var(--bg);
       color: var(--text);
-      padding: 10px;
+      padding: 8px;
+      width: 100%;
+      max-width: 100%;
     }
 
     .top-bar {
       background: var(--card-bg);
       border: 2px solid var(--primary);
       border-radius: 8px;
-      padding: 8px 14px;
-      margin-bottom: 10px;
+      padding: 8px 12px;
+      margin-bottom: 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
     .top-title {
       font-size: 0.85rem;
       font-weight: 800;
-      text-transform: uppercase;
       color: var(--text-muted);
     }
 
     .top-total {
-      font-size: 1.5rem;
+      font-size: 1.45rem;
       font-weight: 900;
       color: var(--primary);
     }
 
-    /* TOUS LES COMPTEURS (5, 3, 2, 4, 1) SUR UNE MÊME LIGNE HORIZONTALE */
-    .horizontal-strip {
+    /* Bande horizontale sur toute la largeur */
+    .strip-wrap {
       display: flex;
       flex-direction: row;
       flex-wrap: nowrap;
       align-items: stretch;
-      gap: 10px;
+      gap: 8px;
       overflow-x: auto;
       padding-bottom: 6px;
+      width: 100%;
     }
 
-    .col-block {
+    .comp-col {
       background: var(--card-bg);
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 10px;
-      min-width: 250px;
-      flex: 1 0 250px;
+      padding: 8px;
+      min-width: 225px;
+      flex: 1 0 225px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 8px;
-    }
-
-    .col-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
       gap: 6px;
+    }
+
+    .comp-head {
+      font-size: 0.92rem;
+      font-weight: 800;
+      padding-bottom: 4px;
       border-bottom: 1px solid #e2e8f0;
-      padding-bottom: 6px;
-      font-weight: 800;
-      font-size: 0.95rem;
-    }
-
-    .group-box {
-      background: #f8fafc;
-      border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      padding: 6px;
-      margin-bottom: 6px;
-    }
-
-    .group-top {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      margin-bottom: 5px;
-    }
-
-    .group-name {
-      padding: 4px 6px;
-      border: 1px solid #94a3b8;
-      border-radius: 4px;
-      font-size: 0.82rem;
-      font-weight: 700;
-      width: 95px;
-      background: #fff;
-    }
-
-    .group-sub {
-      font-size: 0.8rem;
-      font-weight: 800;
-      padding: 4px 6px;
-      background: #fff;
-      border: 1px solid #e2e8f0;
-      border-radius: 4px;
       white-space: nowrap;
     }
 
-    /* Ligne de champs compacte */
-    .compact-row {
+    .line-flex {
       display: flex;
       flex-wrap: nowrap;
       align-items: flex-end;
-      gap: 4px;
-      margin-bottom: 4px;
+      gap: 5px;
     }
 
-    .c-field {
+    .f-item {
       display: flex;
       flex-direction: column;
-      min-width: 56px;
-      flex: 1 1 56px;
+      min-width: 52px;
+      flex: 1 1 52px;
     }
 
-    .c-field.ref-f {
-      min-width: 58px;
-      flex: 0 0 64px;
+    .f-item.ref-item {
+      min-width: 66px;
+      flex: 0 0 74px;
     }
 
-    .c-field label {
-      font-size: 0.66rem;
+    .f-item.fmt-item {
+      flex: 0 0 auto;
+    }
+
+    .f-item label {
+      font-size: 0.65rem;
       font-weight: 700;
       color: var(--text-muted);
       margin-bottom: 2px;
       white-space: nowrap;
     }
 
-    .c-field input[type="number"],
-    .c-field input[type="text"] {
-      padding: 4px 6px;
-      border: 1px solid #cbd5e1;
-      border-radius: 4px;
-      font-size: 0.85rem;
-      width: 100%;
-    }
-
-    .rad-mini {
+    .ref-row {
       display: flex;
+      align-items: center;
       gap: 3px;
     }
 
-    .rad-mini label {
+    .f-item input[type="number"],
+    .f-item input[type="text"] {
+      padding: 5px 6px;
+      border: 1px solid #cbd5e1;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      width: 100%;
+    }
+
+    .abc-btn {
+      padding: 5px 5px;
+      border-radius: 5px;
+      border: 1px solid #94a3b8;
+      background: #e2e8f0;
+      color: #0f172a;
+      font-size: 0.65rem;
+      font-weight: 800;
+      cursor: pointer;
+      line-height: 1;
+      flex: 0 0 auto;
+    }
+
+    .abc-btn.active-abc {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .fmt-pills {
+      display: flex;
+      gap: 4px;
+    }
+
+    .fmt-pill {
       display: inline-flex;
       align-items: center;
       gap: 2px;
-      border: 1px solid #cbd5e1;
+      border: 1px solid #94a3b8;
       background: #f8fafc;
-      padding: 3px 5px;
-      border-radius: 4px;
-      font-size: 0.78rem;
-      font-weight: 700;
+      padding: 4px 6px;
+      border-radius: 5px;
+      font-size: 0.82rem;
+      font-weight: 800;
       cursor: pointer;
       white-space: nowrap;
     }
 
-    .rad-mini input:checked + span {
+    .fmt-pill input {
+      margin: 0;
+    }
+
+    .fmt-pill input:checked + span {
       color: var(--primary);
     }
 
-    .mini-res {
-      font-size: 0.8rem;
-      font-weight: 800;
-      padding: 4px 6px;
-      background: #f1f5f9;
-      border: 1px solid #cbd5e1;
-      border-radius: 4px;
-      white-space: nowrap;
-    }
-
-    .need-pill {
+    .need-bar {
       padding: 6px 8px;
       border-radius: 6px;
       background: var(--info-bg);
@@ -211,50 +196,156 @@
       line-height: 1.3;
     }
 
-    .need-pill.err {
+    .need-bar.err {
       background: var(--danger-bg);
       border-color: var(--danger);
       color: var(--danger);
     }
 
-    .need-pill.ok {
+    .need-bar.ok {
       background: var(--success-bg);
       border-color: var(--success-border);
       color: var(--success);
     }
 
-    button {
-      padding: 4px 8px;
+    /* Zone Groupes en dessous */
+    .groups-zone {
+      margin-top: 10px;
+      width: 100%;
+    }
+
+    .groups-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .groups-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+    }
+
+    .grp-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px;
+      margin-bottom: 8px;
+    }
+
+    .grp-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .grp-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .grp-name {
+      padding: 5px 8px;
+      border: 1px solid #94a3b8;
       border-radius: 5px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      width: 120px;
+    }
+
+    .grp-tot {
+      font-size: 0.85rem;
+      font-weight: 800;
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      padding: 5px 8px;
+      border-radius: 5px;
+      white-space: nowrap;
+    }
+
+    .grp-pool {
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 5px 8px;
+      border-radius: 5px;
+      background: var(--info-bg);
+      border: 1px solid var(--info-border);
+      margin-bottom: 6px;
+    }
+
+    .grp-pool.err {
+      background: var(--danger-bg);
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .grp-pool.ok {
+      background: var(--success-bg);
+      border-color: var(--success-border);
+      color: var(--success);
+    }
+
+    .row-line {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: flex-end;
+      gap: 6px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 6px;
+      margin-bottom: 5px;
+    }
+
+    .sub-badge {
+      font-size: 0.85rem;
+      font-weight: 800;
+      padding: 5px 8px;
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 5px;
+      white-space: nowrap;
+    }
+
+    button.act-btn {
+      padding: 6px 10px;
+      border-radius: 6px;
       border: none;
-      font-size: 0.76rem;
+      font-size: 0.82rem;
       font-weight: 700;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 3px;
+      gap: 4px;
       white-space: nowrap;
     }
 
-    .btn-primary { background: var(--primary); color: #fff; padding: 8px 14px; font-size: 0.88rem; }
     .btn-add { background: var(--success); color: #fff; }
-    .btn-danger { background: var(--danger); color: #fff; padding: 8px 14px; font-size: 0.88rem; }
-    .btn-del { background: #fee2e2; color: var(--danger); padding: 4px 6px; }
+    .btn-del { background: #fee2e2; color: var(--danger); padding: 5px 8px; }
+    .btn-pdf { background: var(--primary); color: #fff; padding: 8px 14px; }
+    .btn-rst { background: var(--danger); color: #fff; padding: 8px 14px; }
 
-    .actions-bar {
+    .bottom-actions {
       display: flex;
       gap: 10px;
       justify-content: center;
       margin-top: 12px;
+      margin-bottom: 12px;
     }
 
     #print-report { display: none; }
 
     @media print {
       body { background: #fff; padding: 0; }
-      .top-bar, .horizontal-strip, .actions-bar { display: none !important; }
+      .top-bar, .strip-wrap, .groups-zone, .bottom-actions { display: none !important; }
       #print-report { display: block !important; }
-      .p-box { border: 1px solid #bbb; border-radius: 6px; padding: 8px; margin-bottom: 10px; page-break-inside: avoid; }
+      .p-sec { border: 1px solid #bbb; border-radius: 6px; padding: 8px; margin-bottom: 10px; page-break-inside: avoid; }
       .p-tbl { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 4px; }
       .p-tbl th, .p-tbl td { border: 1px solid #ccc; padding: 4px 6px; text-align: left; }
       .p-err { color: #dc2626 !important; font-weight: bold; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -265,22 +356,31 @@
 <body>
 
   <div class="top-bar">
-    <div class="top-title">Total PF (5)</div>
+    <div class="top-title">Total ✅ PF</div>
     <div class="top-total" id="top-total">0</div>
   </div>
 
-  <!-- 5, 3, 2, 4, 1 SUR UNE MÊME LIGNE -->
-  <div class="horizontal-strip" id="strip"></div>
+  <!-- 🏷️ Ét. | 🔘 Cap. | 📦 Trays | 🫙 Verre SUR UNE MÊME LIGNE -->
+  <div class="strip-wrap" id="comp-strip"></div>
 
-  <div class="actions-bar">
-    <button class="btn-primary" onclick="printSummary()">🖨️ PDF</button>
-    <button class="btn-danger" onclick="resetAll()">🔄 Reset</button>
+  <!-- GROUPES EN DESSOUS (PUISENT DANS 🫙 VERRE RENSEIGNÉ UNE SEULE FOIS) -->
+  <div class="groups-zone">
+    <div class="groups-header">
+      <div class="groups-title">✅ PF par groupe</div>
+      <button class="act-btn btn-add" onclick="addGroup()">+ Groupe</button>
+    </div>
+    <div id="groups-container"></div>
+  </div>
+
+  <div class="bottom-actions">
+    <button class="act-btn btn-pdf" onclick="printSummary()">🖨️ PDF</button>
+    <button class="act-btn btn-rst" onclick="resetAll()">🔄 Reset</button>
   </div>
 
   <div id="print-report"></div>
 
   <script>
-    const KEY = 'compteurs_53241_ligne_v1';
+    const KEY = 'compteurs_verre_iphone_v1';
 
     let state = {
       groups: [],
@@ -288,7 +388,7 @@
         etiquettes: { ref: '', perPack: '', stockPacks: '' },
         capsules:   { ref: '', perBox: '', boxesPerPallet: '', stockPallets: '' },
         trays:      { ref: '', perPallet: '', packSize: 6, stockPallets: '' },
-        bocaux:     { ref: '', perPallet: '', stockPallets: '' }
+        verre:      { ref: '', perPallet: '', stockPallets: '' }
       }
     };
 
@@ -307,7 +407,7 @@
           etiquettes: { ref: '', perPack: '', stockPacks: '' },
           capsules:   { ref: '', perBox: '', boxesPerPallet: '', stockPallets: '' },
           trays:      { ref: '', perPallet: '', packSize: 6, stockPallets: '' },
-          bocaux:     { ref: '', perPallet: '', stockPallets: '' }
+          verre:      { ref: '', perPallet: '', stockPallets: '' }
         }
       };
     }
@@ -349,6 +449,11 @@
     function gName(g, i) {
       const t = (g.name || '').trim();
       return t ? t : `Fruit ${i + 1}`;
+    }
+
+    function getVerreTotalStock() {
+      const v = state.components.verre;
+      return (Number(v.perPallet) || 0) * (Number(v.stockPallets) || 0);
     }
 
     function calcNeed(key, pf) {
@@ -408,18 +513,19 @@
         };
       }
 
+      // verre (renseigné une seule fois, puisé par les groupes)
       const perPal = Number(c.perPallet) || 0;
       const stkPal = Number(c.stockPallets) || 0;
-      const needPal = perPal > 0 ? Math.ceil(pf / perPal) : 0;
       const stkU = stkPal * perPal;
+      const needPal = perPal > 0 ? Math.ceil(pf / perPal) : 0;
       const missU = Math.max(0, pf - stkU);
       const missPal = perPal > 0 ? Math.max(0, needPal - stkPal) : 0;
       return {
-        txt: `Besoin${tag}: ${fmt(pf)} boc.` + (perPal > 0 ? ` / ${fmt(needPal)} pal` : ''),
+        txt: `Puisé${tag}: ${fmt(pf)} ver.` + (perPal > 0 ? ` (${fmt(needPal)} pal)` : '') + (stkU > 0 ? ` / Stk: ${fmt(stkU)}` : ''),
         hasStk: stkPal > 0,
         missU,
-        missTxt: `Manque: ${fmt(missU)} boc.` + (perPal > 0 ? ` (${fmt(missPal)} pal)` : ''),
-        okTxt: `OK (+${fmt(stkU - pf)} boc.)`
+        missTxt: `Manque: ${fmt(missU)} ver.` + (perPal > 0 ? ` (${fmt(missPal)} pal)` : ''),
+        okTxt: `Reste: ${fmt(stkU - pf)} ver.`
       };
     }
 
@@ -427,20 +533,11 @@
       const pf = totPF();
       document.getElementById('top-total').textContent = fmt(pf);
 
-      state.groups.forEach((g, gi) => {
-        const ge = document.getElementById(`gt_${gi}`);
-        if (ge) ge.textContent = `= ${fmt(grpPF(g))}`;
-        g.rows.forEach((r, ri) => {
-          const re = document.getElementById(`rs_${gi}_${ri}`);
-          if (re) re.textContent = `= ${fmt(rowPF(r))}`;
-        });
-      });
-
-      ['etiquettes', 'capsules', 'trays', 'bocaux'].forEach(k => {
+      ['etiquettes', 'capsules', 'trays', 'verre'].forEach(k => {
         const el = document.getElementById(`nd_${k}`);
         if (!el) return;
         const info = calcNeed(k, pf);
-        el.className = 'need-pill';
+        el.className = 'need-bar';
         if (info.hasStk) {
           if (info.missU > 0) {
             el.classList.add('err');
@@ -453,15 +550,55 @@
           el.textContent = info.txt;
         }
       });
+
+      // Calcul cumulé puisé dans le Verre par ordre des groupes
+      const verreTotal = getVerreTotalStock();
+      const verreRef = (state.components.verre.ref || '').trim();
+      let cumulPF = 0;
+
+      state.groups.forEach((g, gi) => {
+        const gVal = grpPF(g);
+        cumulPF += gVal;
+
+        const ge = document.getElementById(`gt_${gi}`);
+        if (ge) ge.textContent = `= ${fmt(gVal)}`;
+
+        g.rows.forEach((r, ri) => {
+          const re = document.getElementById(`rs_${gi}_${ri}`);
+          if (re) re.textContent = `= ${fmt(rowPF(r))}`;
+        });
+
+        const pe = document.getElementById(`gp_${gi}`);
+        if (pe) {
+          const tag = verreRef ? ` [${verreRef}]` : '';
+          if (verreTotal > 0) {
+            const resteApresGroupe = verreTotal - cumulPF;
+            if (resteApresGroupe < 0) {
+              const manqueIci = Math.min(gVal, Math.abs(resteApresGroupe));
+              pe.className = 'grp-pool err';
+              pe.textContent = `🫙 Verre${tag}: puise ${fmt(gVal)} (cumul ${fmt(cumulPF)} / ${fmt(verreTotal)}) — Manque ${fmt(manqueIci)} sur ce groupe !`;
+            } else {
+              pe.className = 'grp-pool ok';
+              pe.textContent = `🫙 Verre${tag}: puise ${fmt(gVal)} (cumul ${fmt(cumulPF)} / ${fmt(verreTotal)}) — Reste ${fmt(resteApresGroupe)}`;
+            }
+          } else {
+            pe.className = 'grp-pool';
+            pe.textContent = `🫙 Verre${tag}: puise ${fmt(gVal)} (cumul ${fmt(cumulPF)})`;
+          }
+        }
+      });
     }
 
-    function numInp(lbl, val, fn) {
+    // Clavier numérique par défaut sur iPhone
+    function numField(lbl, val, fn) {
       const d = document.createElement('div');
-      d.className = 'c-field';
+      d.className = 'f-item';
       const l = document.createElement('label');
       l.textContent = lbl;
       const i = document.createElement('input');
       i.type = 'number';
+      i.inputMode = 'numeric';
+      i.pattern = '[0-9]*';
       i.min = '0';
       i.step = 'any';
       i.placeholder = '0';
@@ -472,152 +609,93 @@
       return d;
     }
 
-    function refInp(lbl, val, fn) {
+    // Clavier numérique par défaut + petit bouton ABC pour passer en mode lettres
+    function refField(lbl, val, fn) {
       const d = document.createElement('div');
-      d.className = 'c-field ref-f';
+      d.className = 'f-item ref-item';
       const l = document.createElement('label');
       l.textContent = lbl;
+
+      const wrap = document.createElement('div');
+      wrap.className = 'ref-row';
+
       const i = document.createElement('input');
       i.type = 'text';
+      i.inputMode = 'numeric';
       i.placeholder = lbl.replace('Réf ', '');
       i.value = val;
       i.oninput = (e) => { fn(e.target.value); save(); refresh(); };
+
+      const abc = document.createElement('button');
+      abc.type = 'button';
+      abc.className = 'abc-btn';
+      abc.textContent = 'ABC';
+      abc.title = 'Basculer clavier lettres / chiffres';
+      abc.onclick = () => {
+        const isTextMode = abc.classList.toggle('active-abc');
+        i.inputMode = isTextMode ? 'text' : 'numeric';
+        i.focus();
+      };
+
+      wrap.appendChild(i);
+      wrap.appendChild(abc);
       d.appendChild(l);
-      d.appendChild(i);
+      d.appendChild(wrap);
       return d;
     }
 
     function render() {
-      const strip = document.getElementById('strip');
+      const strip = document.getElementById('comp-strip');
       strip.innerHTML = '';
 
-      // 5. PF (groupes)
-      const c5 = document.createElement('div');
-      c5.className = 'col-block';
-      c5.style.minWidth = '310px';
-      c5.style.flex = '1.3 0 310px';
+      // Ordre : Ét. | Cap. | Trays | Verre (sans 5,3,2,4,1)
+      strip.appendChild(makeCol('etiquettes', '🏷️ Ét.',   'Réf eti'));
+      strip.appendChild(makeCol('capsules',   '🔘 Cap.',  'Réf CRC'));
+      strip.appendChild(makeCol('trays',      '📦 Trays', 'Réf cct'));
+      strip.appendChild(makeCol('verre',      '🫙 Verre', 'Réf V'));
 
-      const h5 = document.createElement('div');
-      h5.className = 'col-head';
-      h5.innerHTML = `<span>✅ 5. PF</span>`;
-      const addGBtn = document.createElement('button');
-      addGBtn.className = 'btn-add';
-      addGBtn.textContent = '+ Grp';
-      addGBtn.onclick = () => { state.groups.push(defGroup(state.groups.length)); save(); render(); };
-      h5.appendChild(addGBtn);
-      c5.appendChild(h5);
-
-      const gList = document.createElement('div');
-      state.groups.forEach((g, gi) => {
-        const gb = document.createElement('div');
-        gb.className = 'group-box';
-
-        const gt = document.createElement('div');
-        gt.className = 'group-top';
-
-        const ni = document.createElement('input');
-        ni.type = 'text';
-        ni.className = 'group-name';
-        ni.placeholder = `Fruit ${gi + 1}`;
-        ni.value = g.name;
-        ni.oninput = (e) => { state.groups[gi].name = e.target.value; save(); refresh(); };
-
-        const subG = document.createElement('span');
-        subG.className = 'group-sub';
-        subG.id = `gt_${gi}`;
-        subG.textContent = `= ${fmt(grpPF(g))}`;
-
-        const addR = document.createElement('button');
-        addR.className = 'btn-add';
-        addR.textContent = '+ Ligne';
-        addR.onclick = () => { state.groups[gi].rows.push({ nbApp: '', nbPerApp: '' }); save(); render(); };
-
-        gt.appendChild(ni);
-        gt.appendChild(subG);
-        gt.appendChild(addR);
-
-        if (state.groups.length > 1) {
-          const delG = document.createElement('button');
-          delG.className = 'btn-del';
-          delG.textContent = '×';
-          delG.onclick = () => { state.groups.splice(gi, 1); save(); render(); };
-          gt.appendChild(delG);
-        }
-        gb.appendChild(gt);
-
-        g.rows.forEach((r, ri) => {
-          const row = document.createElement('div');
-          row.className = 'compact-row';
-          row.appendChild(numInp('App', r.nbApp, (v) => { state.groups[gi].rows[ri].nbApp = v; }));
-          row.appendChild(numInp('Nb/app', r.nbPerApp, (v) => { state.groups[gi].rows[ri].nbPerApp = v; }));
-
-          const pill = document.createElement('span');
-          pill.className = 'mini-res';
-          pill.id = `rs_${gi}_${ri}`;
-          pill.textContent = `= ${fmt(rowPF(r))}`;
-          row.appendChild(pill);
-
-          if (g.rows.length > 1) {
-            const delR = document.createElement('button');
-            delR.className = 'btn-del';
-            delR.textContent = '×';
-            delR.onclick = () => { state.groups[gi].rows.splice(ri, 1); save(); render(); };
-            row.appendChild(delR);
-          }
-          gb.appendChild(row);
-        });
-
-        gList.appendChild(gb);
-      });
-      c5.appendChild(gList);
-      strip.appendChild(c5);
-
-      // ORDRE : 3, 2, 4, 1 SUR LA MÊME LIGNE
-      strip.appendChild(makeCol('etiquettes', '3. 🏷️ Ét.',   'Réf eti'));
-      strip.appendChild(makeCol('capsules',   '2. 🔘 Cap.',  'Réf CRC'));
-      strip.appendChild(makeCol('trays',      '4. 📦 Trays', 'Réf cct'));
-      strip.appendChild(makeCol('bocaux',     '1. 🫙 Boc.',  'Réf V'));
-
+      renderGroups();
       refresh();
     }
 
     function makeCol(key, title, refLbl) {
       const c = state.components[key];
       const col = document.createElement('div');
-      col.className = 'col-block';
+      col.className = 'comp-col';
 
       const head = document.createElement('div');
-      head.className = 'col-head';
+      head.className = 'comp-head';
       head.textContent = title;
       col.appendChild(head);
 
-      const row = document.createElement('div');
-      row.className = 'compact-row';
-      row.appendChild(refInp(refLbl, c.ref, (v) => { state.components[key].ref = v; }));
+      const line = document.createElement('div');
+      line.className = 'line-flex';
+      line.appendChild(refField(refLbl, c.ref, (v) => { state.components[key].ref = v; }));
 
       if (key === 'etiquettes') {
-        row.appendChild(numInp('Ét/pqt', c.perPack, (v) => { state.components.etiquettes.perPack = v; }));
-        row.appendChild(numInp('Stk', c.stockPacks, (v) => { state.components.etiquettes.stockPacks = v; }));
+        line.appendChild(numField('Ét/pqt', c.perPack, (v) => { state.components.etiquettes.perPack = v; }));
+        line.appendChild(numField('Stk', c.stockPacks, (v) => { state.components.etiquettes.stockPacks = v; }));
       } else if (key === 'capsules') {
-        row.appendChild(numInp('Cap/bte', c.perBox, (v) => { state.components.capsules.perBox = v; }));
-        row.appendChild(numInp('Bte/pal', c.boxesPerPallet, (v) => { state.components.capsules.boxesPerPallet = v; }));
-        row.appendChild(numInp('Stk pal', c.stockPallets, (v) => { state.components.capsules.stockPallets = v; }));
+        line.appendChild(numField('Cap/bte', c.perBox, (v) => { state.components.capsules.perBox = v; }));
+        line.appendChild(numField('Bte/pal', c.boxesPerPallet, (v) => { state.components.capsules.boxesPerPallet = v; }));
+        line.appendChild(numField('Stk pal', c.stockPallets, (v) => { state.components.capsules.stockPallets = v; }));
       } else if (key === 'trays') {
-        row.appendChild(numInp('Tr/pal', c.perPallet, (v) => { state.components.trays.perPallet = v; }));
+        line.appendChild(numField('Tr/pal', c.perPallet, (v) => { state.components.trays.perPallet = v; }));
 
         const fd = document.createElement('div');
-        fd.className = 'c-field';
+        fd.className = 'f-item fmt-item';
         const fl = document.createElement('label');
         fl.textContent = 'Fmt';
         fd.appendChild(fl);
 
-        const rm = document.createElement('div');
-        rm.className = 'rad-mini';
+        const fp = document.createElement('div');
+        fp.className = 'fmt-pills';
         [6, 8, 12].forEach(o => {
           const lb = document.createElement('label');
+          lb.className = 'fmt-pill';
           const rd = document.createElement('input');
           rd.type = 'radio';
-          rd.name = 'fmt_rad';
+          rd.name = 'tray_fmt_rad';
           rd.value = o;
           rd.checked = Number(c.packSize) === o;
           rd.onchange = () => { state.components.trays.packSize = o; save(); refresh(); };
@@ -625,25 +703,121 @@
           sp.textContent = o;
           lb.appendChild(rd);
           lb.appendChild(sp);
-          rm.appendChild(lb);
+          fp.appendChild(lb);
         });
-        fd.appendChild(rm);
-        row.appendChild(fd);
+        fd.appendChild(fp);
+        line.appendChild(fd);
 
-        row.appendChild(numInp('Stk pal', c.stockPallets, (v) => { state.components.trays.stockPallets = v; }));
+        line.appendChild(numField('Stk pal', c.stockPallets, (v) => { state.components.trays.stockPallets = v; }));
       } else {
-        row.appendChild(numInp('Boc/pal', c.perPallet, (v) => { state.components.bocaux.perPallet = v; }));
-        row.appendChild(numInp('Stk pal', c.stockPallets, (v) => { state.components.bocaux.stockPallets = v; }));
+        // Verre : renseigné une seule fois, puisé par les groupes
+        line.appendChild(numField('Ver/pal', c.perPallet, (v) => { state.components.verre.perPallet = v; }));
+        line.appendChild(numField('Stk pal', c.stockPallets, (v) => { state.components.verre.stockPallets = v; }));
       }
 
-      col.appendChild(row);
+      col.appendChild(line);
 
       const nd = document.createElement('div');
-      nd.className = 'need-pill';
+      nd.className = 'need-bar';
       nd.id = `nd_${key}`;
       col.appendChild(nd);
 
       return col;
+    }
+
+    function renderGroups() {
+      const container = document.getElementById('groups-container');
+      container.innerHTML = '';
+
+      state.groups.forEach((g, gi) => {
+        const card = document.createElement('div');
+        card.className = 'grp-card';
+
+        const top = document.createElement('div');
+        top.className = 'grp-top';
+
+        const left = document.createElement('div');
+        left.className = 'grp-left';
+
+        const ni = document.createElement('input');
+        ni.type = 'text';
+        ni.inputMode = 'text';
+        ni.className = 'grp-name';
+        ni.placeholder = `Fruit ${gi + 1}`;
+        ni.value = g.name;
+        ni.oninput = (e) => { state.groups[gi].name = e.target.value; save(); refresh(); };
+
+        const totB = document.createElement('span');
+        totB.className = 'grp-tot';
+        totB.id = `gt_${gi}`;
+        totB.textContent = `= ${fmt(grpPF(g))}`;
+
+        left.appendChild(ni);
+        left.appendChild(totB);
+        top.appendChild(left);
+
+        const btns = document.createElement('div');
+        btns.style.display = 'flex';
+        btns.style.gap = '6px';
+
+        const addR = document.createElement('button');
+        addR.type = 'button';
+        addR.className = 'act-btn btn-add';
+        addR.textContent = '+ Ligne';
+        addR.onclick = () => { state.groups[gi].rows.push({ nbApp: '', nbPerApp: '' }); save(); renderGroups(); refresh(); };
+        btns.appendChild(addR);
+
+        if (state.groups.length > 1) {
+          const delG = document.createElement('button');
+          delG.type = 'button';
+          delG.className = 'act-btn btn-del';
+          delG.textContent = '×';
+          delG.onclick = () => { state.groups.splice(gi, 1); save(); renderGroups(); refresh(); };
+          btns.appendChild(delG);
+        }
+
+        top.appendChild(btns);
+        card.appendChild(top);
+
+        const pool = document.createElement('div');
+        pool.className = 'grp-pool';
+        pool.id = `gp_${gi}`;
+        card.appendChild(pool);
+
+        g.rows.forEach((r, ri) => {
+          const line = document.createElement('div');
+          line.className = 'row-line';
+
+          line.appendChild(numField('App', r.nbApp, (v) => { state.groups[gi].rows[ri].nbApp = v; }));
+          line.appendChild(numField('Nb/app', r.nbPerApp, (v) => { state.groups[gi].rows[ri].nbPerApp = v; }));
+
+          const sb = document.createElement('span');
+          sb.className = 'sub-badge';
+          sb.id = `rs_${gi}_${ri}`;
+          sb.textContent = `= ${fmt(rowPF(r))}`;
+          line.appendChild(sb);
+
+          if (g.rows.length > 1) {
+            const delR = document.createElement('button');
+            delR.type = 'button';
+            delR.className = 'act-btn btn-del';
+            delR.textContent = '×';
+            delR.onclick = () => { state.groups[gi].rows.splice(ri, 1); save(); renderGroups(); refresh(); };
+            line.appendChild(delR);
+          }
+
+          card.appendChild(line);
+        });
+
+        container.appendChild(card);
+      });
+    }
+
+    function addGroup() {
+      state.groups.push(defGroup(state.groups.length));
+      save();
+      renderGroups();
+      refresh();
     }
 
     function resetAll() {
@@ -669,10 +843,10 @@
       });
 
       const list = [
-        { k: 'etiquettes', t: '3. Ét. (eti)' },
-        { k: 'capsules',   t: '2. Cap. (CRC)' },
-        { k: 'trays',      t: '4. Trays (cct)' },
-        { k: 'bocaux',     t: '1. Boc. (V)' }
+        { k: 'etiquettes', t: '🏷️ Ét. (eti)' },
+        { k: 'capsules',   t: '🔘 Cap. (CRC)' },
+        { k: 'trays',      t: '📦 Trays (cct)' },
+        { k: 'verre',      t: '🫙 Verre (V)' }
       ];
 
       let cHtml = '';
@@ -682,16 +856,16 @@
         const extra = info.hasStk
           ? `<div class="${info.missU > 0 ? 'p-err' : 'p-ok'}">${info.missU > 0 ? info.missTxt : info.okTxt}</div>`
           : '';
-        cHtml += `<div class="p-box"><strong>${item.t}</strong> — Réf: <em>${c.ref || '-'}</em><br>${info.txt}${extra}</div>`;
+        cHtml += `<div class="p-sec"><strong>${item.t}</strong> — Réf: <em>${c.ref || '-'}</em><br>${info.txt}${extra}</div>`;
       });
 
       rep.innerHTML = `
         <div style="display:flex; justify-content:space-between; border-bottom:2px solid #000; padding-bottom:6px; margin-bottom:10px;">
-          <strong>Total PF: ${fmt(pf)}</strong>
+          <strong>Total ✅ PF: ${fmt(pf)}</strong>
           <span>${now}</span>
         </div>
-        <div class="p-box">
-          <strong>5. PF</strong>
+        <div class="p-sec">
+          <strong>✅ PF par groupe</strong>
           <table class="p-tbl">
             <thead><tr><th>Groupe</th><th>Ligne</th><th>App</th><th>Nb/app</th><th>Total</th></tr></thead>
             <tbody>${rowsHtml}</tbody>
