@@ -398,13 +398,16 @@
 
     .line-end-time {
       margin-top: 8px;
-      padding: 7px 10px;
+      padding: 6px 10px;
       border-radius: 8px;
       background: #f8fafc;
       border: 1px solid #cbd5e1;
-      font-size: 0.84rem;
-      font-weight: 800;
+      font-size: 0.9rem;
+      font-weight: 900;
       color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .bottom-bar {
@@ -674,7 +677,7 @@
   <div id="print-area"></div>
 
   <script>
-    const STORAGE_KEY = 'compteurs_cadence_horloge_v1';
+    const STORAGE_KEY = 'compteurs_logo_fin_v1';
 
     let state = {
       prod: { startTime: '', endTime: '', doneApps: '' },
@@ -764,7 +767,6 @@
       document.getElementById('live-clock-text').textContent = `${h}:${m}`;
     }
 
-    // Cadence en app / heure (ex. 2,5 app/h)
     function computeCadencePerHour() {
       const doneApps = Number(state.prod.doneApps) || 0;
       if (doneApps <= 0) return 0;
@@ -1022,12 +1024,11 @@
           }
         }
 
-        // Heure de fin estimée : nb app à faire / cadence + heure actuelle + 15 min lavage
-        let endTimeText = 'Heure de fin : renseignez 🕒 (début, fin, nb app rempli)';
+        // Heure de fin uniquement avec logo 🏁
+        let endTimeLabel = '--:--';
         if (cadence > 0 && cumulAppsToDo > 0) {
           const prodMinutes = (cumulAppsToDo / cadence) * 60;
-          const finishTotalMin = nowMin + prodMinutes + washMin;
-          endTimeText = `Heure de fin estimée : <strong>${formatMinutesToTime(finishTotalMin)}</strong> (${cumulAppsToDo} app à ${formatCadenceLabel(cadence)} + 15 min lavage)`;
+          endTimeLabel = formatMinutesToTime(nowMin + prodMinutes + washMin);
         }
 
         const card = document.createElement('div');
@@ -1075,13 +1076,12 @@
               </div>
             </div>
           </div>
-          <div class="line-end-time">${endTimeText}</div>
+          <div class="line-end-time">🏁 ${endTimeLabel}</div>
         `;
         container.appendChild(card);
       });
     }
 
-    // --- MODALE AJOUT (FRUIT EFFACÉ D'OFFICE AU CLIC + NB APP) ---
     function openAddAppModal() {
       const defFruit = getDefaultFruit(state.lines.length);
       const fruitInp = document.getElementById('add-fruit');
@@ -1113,7 +1113,6 @@
       renderLines();
     }
 
-    // --- MODALE HORLOGE ---
     function openClockModal() {
       document.getElementById('clk-start').value = state.prod.startTime || '';
       document.getElementById('clk-end').value = state.prod.endTime || '';
@@ -1136,7 +1135,6 @@
       renderLines();
     }
 
-    // --- MODALE CLIC SUR LIGNE ---
     function openConsModal(lineIdx, type) {
       const l = state.lines[lineIdx];
       if (!l) return;
