@@ -37,6 +37,19 @@
       margin: 0 auto;
     }
 
+    button,
+    .step-btn,
+    .mini-step-btn,
+    .cons-step-btn,
+    .abc-btn,
+    .clock-btn,
+    .cons-row {
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+      touch-action: manipulation;
+    }
+
     /* Bandeau tout en haut : Horloge + Cadence juste à droite de l'heure */
     .cadence-bar {
       background: var(--card);
@@ -230,6 +243,7 @@
 
     .step-btn:active {
       transform: scale(0.96);
+      background: #cbd5e1;
     }
 
     .step-num-inp {
@@ -326,6 +340,10 @@
       justify-content: center;
     }
 
+    .mini-step-btn:active {
+      background: #cbd5e1;
+    }
+
     .line-meta {
       font-size: 0.82rem;
       color: var(--muted);
@@ -394,6 +412,10 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+    }
+
+    .cons-step-btn:active {
+      background: #e2e8f0;
     }
 
     .line-end-time {
@@ -537,9 +559,9 @@
       <div class="field" style="flex:0 0 auto;">
         <label>Nb verre / app</label>
         <div class="stepper">
-          <button type="button" class="step-btn" onclick="stepVerPerApp(-50)">-</button>
+          <button type="button" class="step-btn" data-repeat-fn="stepVerPerApp" data-repeat-delta="-50">-</button>
           <input type="number" inputmode="numeric" pattern="[0-9]*" class="step-num-wide" id="g-ver-app" value="3500">
-          <button type="button" class="step-btn" onclick="stepVerPerApp(50)">+</button>
+          <button type="button" class="step-btn" data-repeat-fn="stepVerPerApp" data-repeat-delta="50">+</button>
         </div>
       </div>
       <div class="field" style="flex:1 1 120px;">
@@ -552,17 +574,17 @@
       <div class="field" style="flex:0 0 auto;">
         <label>Nb / palette</label>
         <div class="stepper">
-          <button type="button" class="step-btn" onclick="stepGlassPerPal(-100)">-</button>
+          <button type="button" class="step-btn" data-repeat-fn="stepGlassPerPal" data-repeat-delta="-100">-</button>
           <input type="number" inputmode="numeric" pattern="[0-9]*" class="step-num-wide" id="g-ver-pal" value="4000">
-          <button type="button" class="step-btn" onclick="stepGlassPerPal(100)">+</button>
+          <button type="button" class="step-btn" data-repeat-fn="stepGlassPerPal" data-repeat-delta="100">+</button>
         </div>
       </div>
       <div class="field" style="flex:0 0 auto;">
         <label>Nb palettes</label>
         <div class="stepper">
-          <button type="button" class="step-btn" onclick="stepGlassPallets(-1)">-</button>
+          <button type="button" class="step-btn" data-repeat-fn="stepGlassPallets" data-repeat-delta="-1">-</button>
           <input type="number" inputmode="numeric" pattern="[0-9]*" class="step-num-inp" id="g-ver-stk" placeholder="0">
-          <button type="button" class="step-btn" onclick="stepGlassPallets(1)">+</button>
+          <button type="button" class="step-btn" data-repeat-fn="stepGlassPallets" data-repeat-delta="1">+</button>
         </div>
       </div>
     </div>
@@ -596,9 +618,9 @@
         <div class="field">
           <label>Combien d'app ?</label>
           <div class="stepper">
-            <button type="button" class="step-btn" onclick="stepAddApps(-1)">-</button>
+            <button type="button" class="step-btn" data-repeat-fn="stepAddApps" data-repeat-delta="-1">-</button>
             <input type="number" inputmode="numeric" pattern="[0-9]*" class="step-num-inp" id="add-nb-app" value="1">
-            <button type="button" class="step-btn" onclick="stepAddApps(1)">+</button>
+            <button type="button" class="step-btn" data-repeat-fn="stepAddApps" data-repeat-delta="1">+</button>
           </div>
         </div>
       </div>
@@ -679,7 +701,7 @@
   <div id="print-area"></div>
 
   <script>
-    const STORAGE_KEY = 'compteurs_verre_steppers_v1';
+    const STORAGE_KEY = 'compteurs_hold_step_v1';
 
     let state = {
       prod: { startTime: '', endTime: '', doneApps: '' },
@@ -689,6 +711,70 @@
 
     let activeConsTarget = null;
     let defaultFruitClearedOnFocus = false;
+
+    // Gestion appui long sur + / -
+    let holdStartTimer = null;
+    let holdRepeatTimer = null;
+    let holdDidRepeat = false;
+
+    function runStepAction(btn) {
+      const fnName = btn.getAttribute('data-repeat-fn');
+      const delta = Number(btn.getAttribute('data-repeat-delta')) || 0;
+      if (!fnName || !delta) return;
+
+      if (fnName === 'stepVerPerApp') stepVerPerApp(delta);
+      else if (fnName === 'stepGlassPerPal') stepGlassPerPal(delta);
+      else if (fnName === 'stepGlassPallets') stepGlassPallets(delta);
+      else if (fnName === 'stepAddApps') stepAddApps(delta);
+      else if (fnName === 'stepLineApps') {
+        const idx = Number(btn.getAttribute('data-line-idx'));
+        stepLineApps(idx, delta);
+      } else if (fnName === 'stepConsumable') {
+        const idx = Number(btn.getAttribute('data-line-idx'));
+        const type = btn.getAttribute('data-cons-type');
+        stepConsumable(idx, type, delta, null);
+      }
+    }
+
+    function clearHoldTimers() {
+      if (holdStartTimer) {
+        clearTimeout(holdStartTimer);
+        holdStartTimer = null;
+      }
+      if (holdRepeatTimer) {
+        clearInterval(holdRepeatTimer);
+        holdRepeatTimer = null;
+      }
+    }
+
+    function bindHoldButtons() {
+      document.addEventListener('pointerdown', (e) => {
+        const btn = e.target.closest('[data-repeat-fn]');
+        if (!btn) return;
+        e.preventDefault();
+        e.stopPropagation();
+        clearHoldTimers();
+        holdDidRepeat = false;
+
+        runStepAction(btn);
+
+        holdStartTimer = setTimeout(() => {
+          holdRepeatTimer = setInterval(() => {
+            holdDidRepeat = true;
+            runStepAction(btn);
+          }, 110);
+        }, 350);
+      });
+
+      document.addEventListener('pointerup', clearHoldTimers);
+      document.addEventListener('pointercancel', clearHoldTimers);
+      document.addEventListener('pointerleave', clearHoldTimers);
+      document.addEventListener('contextmenu', (e) => {
+        if (e.target.closest('[data-repeat-fn]')) {
+          e.preventDefault();
+        }
+      });
+    }
 
     function getDefaultFruit(index) {
       return `Fruit ${index + 1}`;
@@ -984,7 +1070,6 @@
         const lineApps = Math.max(0, Number(l.nbApp) || 0);
         cumulAppsToDo += lineApps;
 
-        // 1. Paquets
         const etPack = Number(l.etPerPack) || 5000;
         const etStk = Number(l.etStkPack) || 0;
         const etNeed = pf > 0 && etPack > 0 ? Math.ceil(pf / etPack) : 0;
@@ -1005,7 +1090,6 @@
           }
         }
 
-        // 2. Boîtes (CRC)
         const cBox = Number(l.capPerBox) || 400;
         const cNbBox = Number(l.capNbBox) || 0;
         const cNeed = pf > 0 && cBox > 0 ? Math.ceil(pf / cBox) : 0;
@@ -1028,7 +1112,6 @@
           }
         }
 
-        // 3. Palettes / cartons (CCT)
         const trFmt = Number(l.trFmt) || 12;
         const trPal = Number(l.trPerPal) || 3000;
         const trNbPal = Number(l.trNbPal) || 0;
@@ -1053,7 +1136,6 @@
           }
         }
 
-        // Heure de fin uniquement avec logo 🏁
         let endTimeLabel = '--:--';
         if (cadence > 0 && cumulAppsToDo > 0) {
           const prodMinutes = (cumulAppsToDo / cadence) * 60;
@@ -1070,9 +1152,9 @@
             <div class="line-tools">
               <div class="mini-stepper">
                 <span>App:</span>
-                <button type="button" class="mini-step-btn" onclick="stepLineApps(${idx}, -1)">-</button>
+                <button type="button" class="mini-step-btn" data-repeat-fn="stepLineApps" data-repeat-delta="-1" data-line-idx="${idx}">-</button>
                 <span>${lineApps}</span>
-                <button type="button" class="mini-step-btn" onclick="stepLineApps(${idx}, 1)">+</button>
+                <button type="button" class="mini-step-btn" data-repeat-fn="stepLineApps" data-repeat-delta="1" data-line-idx="${idx}">+</button>
               </div>
               <button type="button" class="btn btn-del btn-mini" onclick="deleteLine(${idx})">🗑️</button>
             </div>
@@ -1084,24 +1166,24 @@
             <div class="${etCls}" onclick="openConsModal(${idx}, 'et')">
               <div class="cons-text">${etMsg}</div>
               <div class="cons-right-controls">
-                <button type="button" class="cons-step-btn" onclick="stepConsumable(${idx}, 'et', -1, event)">-</button>
-                <button type="button" class="cons-step-btn" onclick="stepConsumable(${idx}, 'et', 1, event)">+</button>
+                <button type="button" class="cons-step-btn" data-repeat-fn="stepConsumable" data-repeat-delta="-1" data-line-idx="${idx}" data-cons-type="et">-</button>
+                <button type="button" class="cons-step-btn" data-repeat-fn="stepConsumable" data-repeat-delta="1" data-line-idx="${idx}" data-cons-type="et">+</button>
               </div>
             </div>
 
             <div class="${cCls}" onclick="openConsModal(${idx}, 'cap')">
               <div class="cons-text">${cMsg}</div>
               <div class="cons-right-controls">
-                <button type="button" class="cons-step-btn" onclick="stepConsumable(${idx}, 'cap', -1, event)">-</button>
-                <button type="button" class="cons-step-btn" onclick="stepConsumable(${idx}, 'cap', 1, event)">+</button>
+                <button type="button" class="cons-step-btn" data-repeat-fn="stepConsumable" data-repeat-delta="-1" data-line-idx="${idx}" data-cons-type="cap">-</button>
+                <button type="button" class="cons-step-btn" data-repeat-fn="stepConsumable" data-repeat-delta="1" data-line-idx="${idx}" data-cons-type="cap">+</button>
               </div>
             </div>
 
             <div class="${trCls}" onclick="openConsModal(${idx}, 'tr')">
               <div class="cons-text">${trMsg}</div>
               <div class="cons-right-controls">
-                <button type="button" class="cons-step-btn" onclick="stepConsumable(${idx}, 'tr', -1, event)">-</button>
-                <button type="button" class="cons-step-btn" onclick="stepConsumable(${idx}, 'tr', 1, event)">+</button>
+                <button type="button" class="cons-step-btn" data-repeat-fn="stepConsumable" data-repeat-delta="-1" data-line-idx="${idx}" data-cons-type="tr">-</button>
+                <button type="button" class="cons-step-btn" data-repeat-fn="stepConsumable" data-repeat-delta="1" data-line-idx="${idx}" data-cons-type="tr">+</button>
               </div>
             </div>
           </div>
@@ -1314,6 +1396,7 @@
     bindFixedGlassInputs();
     bindFruitAutoClear();
     bindPrefRefInput();
+    bindHoldButtons();
     updateLiveClockDisplay();
     setInterval(() => {
       updateLiveClockDisplay();
