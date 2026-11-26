@@ -53,7 +53,6 @@
       touch-action: manipulation;
     }
 
-    /* Bandeau tout en haut : Horloge + Cadence juste à droite de l'heure */
     .cadence-bar {
       background: var(--card);
       border: 1px solid var(--border);
@@ -92,7 +91,6 @@
       font-weight: 900;
     }
 
-    /* En-tête Total PF : App + Grand chiffre principal coloré selon la page */
     .top-card {
       background: var(--card);
       border: 2px solid var(--line-accent);
@@ -119,7 +117,6 @@
       color: var(--line-accent);
     }
 
-    /* Deuxième bloc : Verre sur une seule ligne + 5 boutons L1..LP */
     .glass-fixed-card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -605,7 +602,6 @@
     .btn-mini  { padding: 7px 11px; font-size: 0.84rem; border-radius: 8px; }
     .btn-del   { background: #fee2e2; color: var(--danger); }
 
-    /* Modales */
     .modal-bg {
       display: none;
       position: fixed;
@@ -681,7 +677,6 @@
 </head>
 <body>
 
-  <!-- TOUT EN HAUT : HORLOGE + CADENCE JUSTE À DROITE DE L'HEURE -->
   <div class="cadence-bar">
     <button type="button" class="clock-btn" onclick="openClockModal()">
       <span>🕒</span>
@@ -690,13 +685,11 @@
     <div class="cadence-badge" id="cadence-val">0 app/h</div>
   </div>
 
-  <!-- PREMIÈRE PAGE : APP + GRAND CHIFFRE PRINCIPAL COLORÉ -->
   <div class="top-card" id="main-top-card">
     <div class="top-app-only">App : <span id="top-app-val">0</span></div>
     <div class="top-value" id="top-total">0</div>
   </div>
 
-  <!-- DEUXIÈME BLOC : VERRE SUR UNE SEULE LIGNE + 5 BOUTONS L1..LP -->
   <div class="glass-fixed-card">
     <div class="glass-single-row">
       <div class="field" style="flex:0 0 auto;">
@@ -743,14 +736,12 @@
 
   <div id="lines-list"></div>
 
-  <!-- BOUTON AJOUT -->
   <div class="bottom-bar">
     <button type="button" class="btn btn-add" onclick="openAddAppModal()">➕ Ajout</button>
     <button type="button" class="btn btn-reset" onclick="resetAll()">🔄 Reset</button>
     <button type="button" class="btn btn-pdf" onclick="printReport()">🖨️ PDF</button>
   </div>
 
-  <!-- MODALE AJOUT : FRUIT + NB APP -->
   <div class="modal-bg" id="add-modal">
     <div class="modal-panel">
       <div class="modal-head">
@@ -778,24 +769,23 @@
     </div>
   </div>
 
-  <!-- MODALE HORLOGE : NB APP REMPLI OU NOMBRE DE VERRE REMPLI -->
   <div class="modal-bg" id="clock-modal">
     <div class="modal-panel">
       <div class="modal-head">
-        <span>🕒 Prod & Cadence</span>[span_3](start_span)[span_3](end_span)
-        <button type="button" class="btn btn-sec btn-mini" onclick="closeClockModal()">✕</button>[span_4](start_span)[span_4](end_span)
+        <span>🕒 Prod & Cadence</span>
+        <button type="button" class="btn btn-sec btn-mini" onclick="closeClockModal()">✕</button>
       </div>
       <div style="display:flex; flex-direction:column; gap:10px;">
         <div class="field">
-          <label>Heure début prod</label>[span_5](start_span)[span_5](end_span)
+          <label>Heure début prod</label>
           <input type="time" id="clk-start">
         </div>
         <div class="field">
-          <label>Heure fin de prod</label>[span_6](start_span)[span_6](end_span)
+          <label>Heure fin de prod</label>
           <input type="time" id="clk-end">
         </div>
         <div class="field">
-          <label>Nb app rempli</label>[span_7](start_span)[span_7](end_span)
+          <label>Nb app rempli</label>
           <input type="number" inputmode="numeric" pattern="[0-9]*" id="clk-done-app" placeholder="0">
         </div>
         <div class="or-divider">ou</div>
@@ -805,13 +795,12 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-sec" onclick="closeClockModal()">Annuler</button>[span_8](start_span)[span_8](end_span)
-        <button type="button" class="btn btn-add" onclick="saveClockModal()">Valider ✓</button>[span_9](start_span)[span_9](end_span)
+        <button type="button" class="btn btn-sec" onclick="closeClockModal()">Annuler</button>
+        <button type="button" class="btn btn-add" onclick="saveClockModal()">Valider ✓</button>
       </div>
     </div>
   </div>
 
-  <!-- MODALE CLIC SUR LIGNE CONSOMMABLE : ETI / CRC / CCT -->
   <div class="modal-bg" id="cons-modal">
     <div class="modal-panel">
       <div class="modal-head">
@@ -858,11 +847,11 @@
     const PAGE_IDS = ['L1', 'L2', 'L3', 'L4', 'LP'];
 
     const PAGE_COLORS = {
-      L1: '#2563eb', // bleu
-      L2: '#ca8a04', // jaune
-      L3: '#16a34a', // vert
-      L4: '#ca8a04', // jaune
-      LP: '#ea580c'  // orange
+      L1: '#2563eb',
+      L2: '#ca8a04',
+      L3: '#16a34a',
+      L4: '#ca8a04',
+      LP: '#ea580c'
     };
 
     const ICON_PACK = '🎟️';
