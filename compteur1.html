@@ -190,6 +190,10 @@
       justify-content: center;
     }
 
+    .step-btn:active {
+      transform: scale(0.96);
+    }
+
     .step-num-inp {
       width: 66px !important;
       text-align: center;
@@ -234,14 +238,14 @@
       gap: 8px;
     }
 
-    .pill-total {
-      background: var(--info-bg);
-      color: #1e40af;
-      border: 1px solid var(--info-border);
-      font-size: 0.95rem;
+    .pill-fruit {
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fde68a;
+      font-size: 0.98rem;
       font-weight: 900;
-      padding: 4px 10px;
-      border-radius: 6px;
+      padding: 4px 12px;
+      border-radius: 7px;
     }
 
     .line-tools {
@@ -279,7 +283,7 @@
     }
 
     .line-meta {
-      font-size: 0.86rem;
+      font-size: 0.84rem;
       color: var(--muted);
       margin-bottom: 10px;
     }
@@ -321,7 +325,7 @@
     }
 
     .cons-text {
-      font-size: 0.85rem;
+      font-size: 0.86rem;
       font-weight: 700;
       line-height: 1.35;
       flex: 1;
@@ -503,26 +507,32 @@
 
   <div id="lines-list"></div>
 
-  <!-- BOUTON AJOUT À LA PLACE DE START -->
+  <!-- BOUTON AJOUT -->
   <div class="bottom-bar">
     <button type="button" class="btn btn-add" onclick="openAddAppModal()">➕ Ajout</button>
     <button type="button" class="btn btn-reset" onclick="resetAll()">🔄 Reset</button>
     <button type="button" class="btn btn-pdf" onclick="printReport()">🖨️ PDF</button>
   </div>
 
-  <!-- MODALE AJOUT : UNIQUEMENT NB APP -->
+  <!-- MODALE AJOUT : FRUIT (PAR DÉFAUT FRUIT 1, 2...) + NB APP -->
   <div class="modal-bg" id="add-modal">
     <div class="modal-panel">
       <div class="modal-head">
         <span>➕ Ajout</span>
         <button type="button" class="btn btn-sec btn-mini" onclick="closeAddModal()">✕</button>
       </div>
-      <div class="field">
-        <label>Combien d'app ?</label>
-        <div class="stepper">
-          <button type="button" class="step-btn" onclick="stepAddApps(-1)">-</button>
-          <input type="number" inputmode="numeric" pattern="[0-9]*" class="step-num-inp" id="add-nb-app" value="1">
-          <button type="button" class="step-btn" onclick="stepAddApps(1)">+</button>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div class="field">
+          <label>Fruit</label>
+          <input type="text" inputmode="text" id="add-fruit" placeholder="Fruit 1">
+        </div>
+        <div class="field">
+          <label>Combien d'app ?</label>
+          <div class="stepper">
+            <button type="button" class="step-btn" onclick="stepAddApps(-1)">-</button>
+            <input type="number" inputmode="numeric" pattern="[0-9]*" class="step-num-inp" id="add-nb-app" value="1">
+            <button type="button" class="step-btn" onclick="stepAddApps(1)">+</button>
+          </div>
         </div>
       </div>
       <div class="modal-footer">
@@ -567,17 +577,22 @@
   <div id="print-area"></div>
 
   <script>
-    const STORAGE_KEY = 'compteurs_ajout_cons_v1';
+    const STORAGE_KEY = 'compteurs_fruit_degrossi_v1';
 
     let state = {
       verre: { ref: '', perPal: '', stkPal: '' },
       lines: []
     };
 
-    let activeConsTarget = null; // { lineIdx, type: 'et' | 'cap' | 'tr' }
+    let activeConsTarget = null;
 
-    function createLine(nbApp = 1) {
+    function getDefaultFruit(index) {
+      return `Fruit ${index + 1}`;
+    }
+
+    function createLine(fruit = 'Fruit 1', nbApp = 1) {
       return {
+        fruit: fruit,
         verPerApp: 3500,
         nbApp: nbApp,
         etPerPack: 5000,
@@ -619,6 +634,11 @@
       return state.lines.reduce((s, l) => s + lineTotal(l), 0);
     }
 
+    function fruitDisplay(l, idx) {
+      const f = (l.fruit || '').trim();
+      return f ? f : getDefaultFruit(idx);
+    }
+
     function toggleAbc(id, btn) {
       const inp = document.getElementById(id);
       if (!inp) return;
@@ -653,7 +673,7 @@
     function stepFirstLineApps(delta) {
       if (!state.lines.length) {
         if (delta > 0) {
-          state.lines.push(createLine(delta));
+          state.lines.push(createLine(getDefaultFruit(0), delta));
           saveState();
           renderLines();
         }
@@ -705,12 +725,12 @@
 
       if (pf > 0 && vStockUnits < pf) {
         bar.classList.add('err');
-        bar.innerHTML = `<span>${namePart}Stock : <strong>${fmt(vStockUnits)}</strong> (${vStkPal} pal)</span><span>${needPart} • ⚠️ Manque <strong>${fmt(pf - vStockUnits)}</strong></span>`;
+        bar.innerHTML = `<span>${namePart}Stock : <strong>${vStkPal} pal</strong></span><span>${needPart} • ⚠️ Manque <strong>${fmt(Math.max(0, vNeedPal - vStkPal))} pal</strong></span>`;
       } else if (pf > 0 && vStockUnits >= pf) {
         bar.classList.add('ok');
-        bar.innerHTML = `<span>${namePart}Stock : <strong>${fmt(vStockUnits)}</strong> (${vStkPal} pal)</span><span>${needPart} • ✔️ Reste <strong>${fmt(vStockUnits - pf)}</strong></span>`;
+        bar.innerHTML = `<span>${namePart}Stock : <strong>${vStkPal} pal</strong></span><span>${needPart} • ✔️ OK</span>`;
       } else {
-        bar.innerHTML = `<span>${namePart}Stock : <strong>${fmt(vStockUnits)}</strong> (${vStkPal} pal)</span><span>${needPart}</span>`;
+        bar.innerHTML = `<span>${namePart}Stock : <strong>${vStkPal} pal</strong></span><span>${needPart}</span>`;
       }
     }
 
@@ -734,51 +754,50 @@
 
       state.lines.forEach((l, idx) => {
         const pf = lineTotal(l);
+        const fruitName = fruitDisplay(l, idx);
 
-        // 1. Étiquettes (0 paquet si rien)
-        const etPack = Number(l.etPerPack) || 0;
+        // 1. Étiquettes dégrossies en paquets (ex. 3 paquets de 5 000)
+        const etPack = Number(l.etPerPack) || 5000;
         const etStk = Number(l.etStkPack) || 0;
-        const etNeedPack = etPack > 0 ? Math.ceil(pf / etPack) : 0;
-        const etDispo = etPack * etStk;
+        const etNeedPack = pf > 0 && etPack > 0 ? Math.ceil(pf / etPack) : 0;
         let etCls = 'cons-row';
-        let etMsg = `🏷️ <strong>Étiquettes</strong> : besoin ${fmt(pf)}` + (etPack > 0 ? ` (${fmt(etNeedPack)} pqt)` : '');
-        if (pf > 0 && etDispo < pf) {
+        let etMsg = `🏷️ <strong>Étiquettes</strong> : ${fmt(etNeedPack)} paquet${etNeedPack > 1 ? 's' : ''} de ${fmt(etPack)}`;
+        if (etNeedPack > 0 && etStk < etNeedPack) {
           etCls = 'cons-row err';
-          etMsg += `<br>⚠️ Manque ${fmt(pf - etDispo)} ét. (stock : ${etStk} pqt)`;
-        } else if (pf > 0 && etDispo >= pf) {
+          etMsg += `<br>⚠️ Manque ${fmt(etNeedPack - etStk)} paquet${etNeedPack - etStk > 1 ? 's' : ''} (stock : ${etStk} pqt)`;
+        } else if (etNeedPack > 0 && etStk >= etNeedPack) {
           etCls = 'cons-row ok';
-          etMsg += `<br>✔️ OK (+${fmt(etDispo - pf)}) • stock : ${etStk} pqt`;
+          etMsg += `<br>✔️ OK (${etStk} pqt en stock)`;
         }
 
-        // 2. Capsules (0 boîte si rien)
-        const cBox = Number(l.capPerBox) || 0;
+        // 2. Capsules dégrossies en boîtes (ex. 4 boîtes de 400)
+        const cBox = Number(l.capPerBox) || 400;
         const cNbBox = Number(l.capNbBox) || 0;
-        const cNeedBox = cBox > 0 ? Math.ceil(pf / cBox) : 0;
-        const cDispo = cBox * cNbBox;
+        const cNeedBox = pf > 0 && cBox > 0 ? Math.ceil(pf / cBox) : 0;
         let cCls = 'cons-row';
-        let cMsg = `🔘 <strong>Capsules</strong> : besoin ${fmt(pf)}` + (cBox > 0 ? ` (${fmt(cNeedBox)} bte à ${cBox})` : '');
-        if (pf > 0 && cDispo < pf) {
+        let cMsg = `🔘 <strong>Capsules</strong> : ${fmt(cNeedBox)} boîte${cNeedBox > 1 ? 's' : ''} de ${fmt(cBox)}`;
+        if (cNeedBox > 0 && cNbBox < cNeedBox) {
           cCls = 'cons-row err';
-          cMsg += `<br>⚠️ Manque ${fmt(pf - cDispo)} cap. (stock : ${cNbBox} bte)`;
-        } else if (pf > 0 && cDispo >= pf) {
+          cMsg += `<br>⚠️ Manque ${fmt(cNeedBox - cNbBox)} boîte${cNeedBox - cNbBox > 1 ? 's' : ''} (stock : ${cNbBox} bte)`;
+        } else if (cNeedBox > 0 && cNbBox >= cNeedBox) {
           cCls = 'cons-row ok';
-          cMsg += `<br>✔️ OK (+${fmt(cDispo - pf)}) • stock : ${cNbBox} bte`;
+          cMsg += `<br>✔️ OK (${cNbBox} bte en stock)`;
         }
 
-        // 3. Trays (0 palette si rien)
+        // 3. Trays dégrossis en palettes / trays
         const trFmt = Number(l.trFmt) || 12;
-        const trPal = Number(l.trPerPal) || 0;
+        const trPal = Number(l.trPerPal) || 3000;
         const trNbPal = Number(l.trNbPal) || 0;
-        const trNeed = pf > 0 ? Math.ceil(pf / trFmt) : 0;
-        const trDispo = trPal * trNbPal;
+        const trNeedUnits = pf > 0 ? Math.ceil(pf / trFmt) : 0;
+        const trNeedPal = trNeedUnits > 0 && trPal > 0 ? Math.ceil(trNeedUnits / trPal) : 0;
         let trCls = 'cons-row';
-        let trMsg = `📦 <strong>Trays (x${trFmt})</strong> : besoin ${fmt(trNeed)} trays`;
-        if (trNeed > 0 && trDispo < trNeed) {
+        let trMsg = `📦 <strong>Trays (x${trFmt})</strong> : ${fmt(trNeedPal)} palette${trNeedPal > 1 ? 's' : ''} de ${fmt(trPal)} (${fmt(trNeedUnits)} tr.)`;
+        if (trNeedPal > 0 && trNbPal < trNeedPal) {
           trCls = 'cons-row err';
-          trMsg += `<br>⚠️ Manque ${fmt(trNeed - trDispo)} tr. (stock : ${trNbPal} pal)`;
-        } else if (trNeed > 0 && trDispo >= trNeed) {
+          trMsg += `<br>⚠️ Manque ${fmt(trNeedPal - trNbPal)} palette${trNeedPal - trNbPal > 1 ? 's' : ''} (stock : ${trNbPal} pal)`;
+        } else if (trNeedPal > 0 && trNbPal >= trNeedPal) {
           trCls = 'cons-row ok';
-          trMsg += `<br>✔️ OK (+${fmt(trDispo - trNeed)}) • stock : ${trNbPal} pal`;
+          trMsg += `<br>✔️ OK (${trNbPal} pal en stock)`;
         }
 
         const card = document.createElement('div');
@@ -786,7 +805,7 @@
         card.innerHTML = `
           <div class="line-header">
             <div class="line-identity">
-              <span class="pill-total">${fmt(pf)} PF</span>
+              <span class="pill-fruit">🍓 ${fruitName}</span>
             </div>
             <div class="line-tools">
               <div class="mini-stepper">
@@ -799,7 +818,7 @@
             </div>
           </div>
           <div class="line-meta">
-            Verre/app : <strong>${l.verPerApp || 3500}</strong> × App : <strong>${l.nbApp || 0}</strong>
+            ${l.verPerApp || 3500} verre/app × ${l.nbApp || 0} app
           </div>
           <div class="consumables-stack">
             <div class="${etCls}" onclick="openConsModal(${idx}, 'et')">
@@ -831,11 +850,14 @@
       });
     }
 
-    // --- MODALE AJOUT (UNIQUEMENT NB APP) ---
+    // --- MODALE AJOUT (FRUIT PAR DÉFAUT FRUIT 1, 2... + NB APP) ---
     function openAddAppModal() {
+      const defFruit = getDefaultFruit(state.lines.length);
+      document.getElementById('add-fruit').value = defFruit;
+      document.getElementById('add-fruit').placeholder = defFruit;
       document.getElementById('add-nb-app').value = 1;
       document.getElementById('add-modal').classList.add('open');
-      setTimeout(() => document.getElementById('add-nb-app').focus(), 50);
+      setTimeout(() => document.getElementById('add-fruit').focus(), 50);
     }
 
     function closeAddModal() {
@@ -848,8 +870,11 @@
     }
 
     function confirmAddLine() {
+      const defFruit = getDefaultFruit(state.lines.length);
+      const typedFruit = document.getElementById('add-fruit').value.trim();
+      const fruit = typedFruit || defFruit;
       const nbApp = Math.max(0, Number(document.getElementById('add-nb-app').value) || 0);
-      state.lines.push(createLine(nbApp));
+      state.lines.push(createLine(fruit, nbApp));
       saveState();
       closeAddModal();
       renderLines();
@@ -947,12 +972,17 @@
 
       state.lines.forEach((l, i) => {
         const pf = lineTotal(l);
+        const etNeed = pf > 0 ? Math.ceil(pf / (l.etPerPack || 5000)) : 0;
+        const capNeed = pf > 0 ? Math.ceil(pf / (l.capPerBox || 400)) : 0;
+        const trUnits = pf > 0 ? Math.ceil(pf / (l.trFmt || 12)) : 0;
+        const trPalNeed = trUnits > 0 ? Math.ceil(trUnits / (l.trPerPal || 3000)) : 0;
+
         cardsHtml += `
           <div class="p-card">
-            <strong>Ligne ${i + 1}</strong> : <strong>${fmt(pf)} PF</strong> (${l.verPerApp || 3500} verre/app × ${l.nbApp || 0} app)<br>
-            Étiquettes : ${l.etStkPack || 0} pqt (à ${l.etPerPack || 5000}) •
-            Capsules : ${l.capNbBox || 0} bte (à ${l.capPerBox || 400}) •
-            Trays (x${l.trFmt || 12}) : ${l.trNbPal || 0} pal (à ${l.trPerPal || 3000})
+            <strong>${fruitDisplay(l, i)}</strong> (${l.verPerApp || 3500} verre/app × ${l.nbApp || 0} app)<br>
+            Étiquettes : ${fmt(etNeed)} pqt de ${fmt(l.etPerPack || 5000)} (stock : ${l.etStkPack || 0}) •
+            Capsules : ${fmt(capNeed)} bte de ${fmt(l.capPerBox || 400)} (stock : ${l.capNbBox || 0}) •
+            Trays (x${l.trFmt || 12}) : ${fmt(trPalNeed)} pal de ${fmt(l.trPerPal || 3000)} (stock : ${l.trNbPal || 0})
           </div>
         `;
       });
