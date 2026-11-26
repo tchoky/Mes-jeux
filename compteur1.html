@@ -386,7 +386,7 @@
     }
 
     .cons-text {
-      font-size: 0.86rem;
+      font-size: 0.88rem;
       font-weight: 700;
       line-height: 1.3;
       flex: 1;
@@ -589,8 +589,8 @@
       </div>
     </div>
     <div class="glass-line-2" id="g-ver-status">
-      <span>Stock : 0 pal</span>
-      <span>Besoin PF : 0</span>
+      <span>Stock : 0 📜</span>
+      <span>PF : 0</span>
     </div>
   </div>
 
@@ -701,7 +701,12 @@
   <div id="print-area"></div>
 
   <script>
-    const STORAGE_KEY = 'compteurs_hold_step_v1';
+    const STORAGE_KEY = 'compteurs_emojis_v1';
+
+    const ICON_PACK = '🎟️';
+    const ICON_BOX  = '📦';
+    const ICON_PAL  = '📜';
+    const ICON_WARN = '⚠️';
 
     let state = {
       prod: { startTime: '', endTime: '', doneApps: '' },
@@ -712,10 +717,8 @@
     let activeConsTarget = null;
     let defaultFruitClearedOnFocus = false;
 
-    // Gestion appui long sur + / -
     let holdStartTimer = null;
     let holdRepeatTimer = null;
-    let holdDidRepeat = false;
 
     function runStepAction(btn) {
       const fnName = btn.getAttribute('data-repeat-fn');
@@ -754,13 +757,11 @@
         e.preventDefault();
         e.stopPropagation();
         clearHoldTimers();
-        holdDidRepeat = false;
 
         runStepAction(btn);
 
         holdStartTimer = setTimeout(() => {
           holdRepeatTimer = setInterval(() => {
-            holdDidRepeat = true;
             runStepAction(btn);
           }, 110);
         }, 350);
@@ -833,10 +834,6 @@
 
     function fmt(n) {
       return Math.ceil(Number(n) || 0).toLocaleString('fr-FR');
-    }
-
-    function plural(count, sing, plur) {
-      return count <= 1 ? sing : plur;
     }
 
     function parseTimeToMinutes(hhmm) {
@@ -1018,26 +1015,26 @@
       bar.className = 'glass-line-2';
 
       const namePart = vRef ? `<strong>${vRef}</strong> • ` : '';
-      const needPart = `Besoin PF : <strong>${fmt(pf)}</strong>`;
+      const needPart = `PF : <strong>${fmt(pf)}</strong>`;
 
       if (pf > 0 && vPerPal > 0) {
         const diffPal = vStkPal - vNeedPal;
         if (diffPal < 0) {
           const m = Math.abs(diffPal);
           bar.classList.add('err');
-          bar.innerHTML = `<span>${namePart}Stock : <strong>${vStkPal}</strong> ${plural(vStkPal, 'palette', 'palettes')}</span><span>${needPart} (${vNeedPal} pal) • Manque ${m} ${plural(m, 'palette', 'palettes')}</span>`;
+          bar.innerHTML = `<span>${namePart}${vStkPal} ${ICON_PAL}</span><span>${needPart} (${vNeedPal} ${ICON_PAL}) • ${ICON_WARN} -${m} ${ICON_PAL}</span>`;
         } else if (diffPal > 0) {
           bar.classList.add('ok');
-          bar.innerHTML = `<span>${namePart}Stock : <strong>${vStkPal}</strong> ${plural(vStkPal, 'palette', 'palettes')}</span><span>${needPart} (${vNeedPal} pal) • ${diffPal} ${plural(diffPal, 'palette', 'palettes')} en trop</span>`;
+          bar.innerHTML = `<span>${namePart}${vStkPal} ${ICON_PAL}</span><span>${needPart} (${vNeedPal} ${ICON_PAL}) • +${diffPal} ${ICON_PAL}</span>`;
         } else {
           bar.classList.add('ok');
-          bar.innerHTML = `<span>${namePart}Stock : <strong>${vStkPal}</strong> ${plural(vStkPal, 'palette', 'palettes')}</span><span>${needPart} (${vNeedPal} pal) • OK</span>`;
+          bar.innerHTML = `<span>${namePart}${vStkPal} ${ICON_PAL}</span><span>${needPart} (${vNeedPal} ${ICON_PAL}) • ✓</span>`;
         }
       } else if (pf > 0 && vStockUnits < pf) {
         bar.classList.add('err');
-        bar.innerHTML = `<span>${namePart}Stock : <strong>${vStkPal}</strong> ${plural(vStkPal, 'palette', 'palettes')}</span><span>${needPart} • Manque ${fmt(pf - vStockUnits)}</span>`;
+        bar.innerHTML = `<span>${namePart}${vStkPal} ${ICON_PAL}</span><span>${needPart} • ${ICON_WARN} -${fmt(pf - vStockUnits)}</span>`;
       } else {
-        bar.innerHTML = `<span>${namePart}Stock : <strong>${vStkPal}</strong> ${plural(vStkPal, 'palette', 'palettes')}</span><span>${needPart}</span>`;
+        bar.innerHTML = `<span>${namePart}${vStkPal} ${ICON_PAL}</span><span>${needPart}</span>`;
       }
     }
 
@@ -1070,48 +1067,51 @@
         const lineApps = Math.max(0, Number(l.nbApp) || 0);
         cumulAppsToDo += lineApps;
 
+        // 1. Paquets 🎟️
         const etPack = Number(l.etPerPack) || 5000;
         const etStk = Number(l.etStkPack) || 0;
         const etNeed = pf > 0 && etPack > 0 ? Math.ceil(pf / etPack) : 0;
         let etCls = 'cons-row';
-        let etMsg = `<strong>${fmt(etNeed)}</strong> ${plural(etNeed, 'paquet', 'paquets')} de ${fmt(etPack)}`;
+        let etMsg = `<strong>${fmt(etNeed)}</strong> ${ICON_PACK} × ${fmt(etPack)}`;
         if (etNeed > 0) {
           const diffEt = etStk - etNeed;
           if (diffEt < 0) {
             const m = Math.abs(diffEt);
             etCls = 'cons-row err';
-            etMsg += ` • Manque ${m} ${plural(m, 'paquet', 'paquets')}`;
+            etMsg += ` • ${ICON_WARN} -${m} ${ICON_PACK}`;
           } else if (diffEt > 0) {
             etCls = 'cons-row ok';
-            etMsg += ` • ${diffEt} ${plural(diffEt, 'paquet', 'paquets')} en trop`;
+            etMsg += ` • +${diffEt} ${ICON_PACK}`;
           } else {
             etCls = 'cons-row ok';
-            etMsg += ` • OK (${etStk} ${plural(etStk, 'paquet', 'paquets')})`;
+            etMsg += ` • ✓ (${etStk} ${ICON_PACK})`;
           }
         }
 
+        // 2. Boîtes capsules 📦
         const cBox = Number(l.capPerBox) || 400;
         const cNbBox = Number(l.capNbBox) || 0;
         const cNeed = pf > 0 && cBox > 0 ? Math.ceil(pf / cBox) : 0;
         const cRefTxt = (l.capRef || '').trim();
         const cRefBadge = cRefTxt && cRefTxt.toUpperCase() !== 'CRC' ? `[${cRefTxt}] ` : '';
         let cCls = 'cons-row';
-        let cMsg = `${cRefBadge}<strong>${fmt(cNeed)}</strong> ${plural(cNeed, 'boîte', 'boîtes')} de ${fmt(cBox)}`;
+        let cMsg = `${cRefBadge}<strong>${fmt(cNeed)}</strong> ${ICON_BOX} × ${fmt(cBox)}`;
         if (cNeed > 0) {
           const diffC = cNbBox - cNeed;
           if (diffC < 0) {
             const m = Math.abs(diffC);
             cCls = 'cons-row err';
-            cMsg += ` • Manque ${m} ${plural(m, 'boîte', 'boîtes')}`;
+            cMsg += ` • ${ICON_WARN} -${m} ${ICON_BOX}`;
           } else if (diffC > 0) {
             cCls = 'cons-row ok';
-            cMsg += ` • ${diffC} ${plural(diffC, 'boîte', 'boîtes')} en trop`;
+            cMsg += ` • +${diffC} ${ICON_BOX}`;
           } else {
             cCls = 'cons-row ok';
-            cMsg += ` • OK (${cNbBox} ${plural(cNbBox, 'boîte', 'boîtes')})`;
+            cMsg += ` • ✓ (${cNbBox} ${ICON_BOX})`;
           }
         }
 
+        // 3. Palettes 📜
         const trFmt = Number(l.trFmt) || 12;
         const trPal = Number(l.trPerPal) || 3000;
         const trNbPal = Number(l.trNbPal) || 0;
@@ -1120,19 +1120,19 @@
         const trRefTxt = (l.trRef || '').trim();
         const trRefBadge = trRefTxt && trRefTxt.toUpperCase() !== 'CCT' ? `[${trRefTxt}] ` : '';
         let trCls = 'cons-row';
-        let trMsg = `${trRefBadge}<strong>${fmt(trNeed)}</strong> ${plural(trNeed, 'palette', 'palettes')} de ${fmt(trPal)} (x${trFmt})`;
+        let trMsg = `${trRefBadge}<strong>${fmt(trNeed)}</strong> ${ICON_PAL} × ${fmt(trPal)} (x${trFmt})`;
         if (trNeed > 0) {
           const diffTr = trNbPal - trNeed;
           if (diffTr < 0) {
             const m = Math.abs(diffTr);
             trCls = 'cons-row err';
-            trMsg += ` • Manque ${m} ${plural(m, 'palette', 'palettes')}`;
+            trMsg += ` • ${ICON_WARN} -${m} ${ICON_PAL}`;
           } else if (diffTr > 0) {
             trCls = 'cons-row ok';
-            trMsg += ` • ${diffTr} ${plural(diffTr, 'palette', 'palettes')} en trop`;
+            trMsg += ` • +${diffTr} ${ICON_PAL}`;
           } else {
             trCls = 'cons-row ok';
-            trMsg += ` • OK (${trNbPal} ${plural(trNbPal, 'palette', 'palettes')})`;
+            trMsg += ` • ✓ (${trNbPal} ${ICON_PAL})`;
           }
         }
 
@@ -1263,13 +1263,13 @@
       refAbc.classList.remove('active');
 
       if (type === 'et') {
-        document.getElementById('cons-title').textContent = 'Paquets';
+        document.getElementById('cons-title').textContent = `${ICON_PACK} Paquets`;
         document.getElementById('cons-per-box-label').textContent = 'Nombre par paquet';
         document.getElementById('cons-nb-box-label').textContent = 'Nombre de paquets';
         document.getElementById('cons-per-box').value = l.etPerPack || 5000;
         document.getElementById('cons-nb-box').value = l.etStkPack || 0;
       } else if (type === 'cap') {
-        document.getElementById('cons-title').textContent = 'Boîtes';
+        document.getElementById('cons-title').textContent = `${ICON_BOX} Boîtes capsules`;
         refWrap.style.display = 'flex';
         document.getElementById('cons-ref-label').textContent = 'CRC';
         const curCapRef = (l.capRef || 'CRC').trim();
@@ -1283,7 +1283,7 @@
         document.getElementById('cons-per-box').value = l.capPerBox || 400;
         document.getElementById('cons-nb-box').value = l.capNbBox || 0;
       } else if (type === 'tr') {
-        document.getElementById('cons-title').textContent = 'Cartons / Palettes';
+        document.getElementById('cons-title').textContent = `${ICON_PAL} Palettes`;
         refWrap.style.display = 'flex';
         document.getElementById('cons-ref-label').textContent = 'CCT';
         const curTrRef = (l.trRef || 'CCT').trim();
@@ -1374,9 +1374,9 @@
         cardsHtml += `
           <div class="p-card">
             <strong>${fruitDisplay(l, i)}</strong> (${getVerPerApp()} × ${l.nbApp || 0} app = ${fmt(pf)})<br>
-            ${fmt(l.etPerPack || 5000)}/pqt (stk ${l.etStkPack || 0}) •
-            [${l.capRef || 'CRC'}] ${fmt(l.capPerBox || 400)}/bte (stk ${l.capNbBox || 0}) •
-            [${l.trRef || 'CCT'}] ${fmt(l.trPerPal || 3000)}/pal x${l.trFmt || 12} (stk ${l.trNbPal || 0})
+            ${fmt(l.etPerPack || 5000)} ${ICON_PACK} (stk ${l.etStkPack || 0}) •
+            [${l.capRef || 'CRC'}] ${fmt(l.capPerBox || 400)} ${ICON_BOX} (stk ${l.capNbBox || 0}) •
+            [${l.trRef || 'CCT'}] ${fmt(l.trPerPal || 3000)} ${ICON_PAL} x${l.trFmt || 12} (stk ${l.trNbPal || 0})
           </div>
         `;
       });
