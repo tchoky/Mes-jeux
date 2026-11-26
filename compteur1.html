@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Compteurs - Vue compacte</title>
+  <title>Compteurs Production</title>
   <style>
     :root {
       --primary: #2563eb;
@@ -34,7 +34,6 @@
       color: var(--text);
       padding: 8px;
       width: 100%;
-      max-width: 100%;
     }
 
     .top-bar {
@@ -61,7 +60,7 @@
       color: var(--primary);
     }
 
-    /* Bande horizontale sur toute la largeur */
+    /* Bande composants fixes/communs : Ét., Verre et récap global */
     .strip-wrap {
       display: flex;
       flex-direction: row;
@@ -78,8 +77,8 @@
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 8px;
-      min-width: 225px;
-      flex: 1 0 225px;
+      min-width: 215px;
+      flex: 1 0 215px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -87,7 +86,7 @@
     }
 
     .comp-head {
-      font-size: 0.92rem;
+      font-size: 0.9rem;
       font-weight: 800;
       padding-bottom: 4px;
       border-bottom: 1px solid #e2e8f0;
@@ -104,8 +103,8 @@
     .f-item {
       display: flex;
       flex-direction: column;
-      min-width: 52px;
-      flex: 1 1 52px;
+      min-width: 50px;
+      flex: 1 1 50px;
     }
 
     .f-item.ref-item {
@@ -118,7 +117,7 @@
     }
 
     .f-item label {
-      font-size: 0.65rem;
+      font-size: 0.64rem;
       font-weight: 700;
       color: var(--text-muted);
       margin-bottom: 2px;
@@ -136,8 +135,9 @@
       padding: 5px 6px;
       border: 1px solid #cbd5e1;
       border-radius: 5px;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       width: 100%;
+      background: #fff;
     }
 
     .abc-btn {
@@ -146,7 +146,7 @@
       border: 1px solid #94a3b8;
       background: #e2e8f0;
       color: #0f172a;
-      font-size: 0.65rem;
+      font-size: 0.64rem;
       font-weight: 800;
       cursor: pointer;
       line-height: 1;
@@ -161,7 +161,7 @@
 
     .fmt-pills {
       display: flex;
-      gap: 4px;
+      gap: 3px;
     }
 
     .fmt-pill {
@@ -170,9 +170,9 @@
       gap: 2px;
       border: 1px solid #94a3b8;
       background: #f8fafc;
-      padding: 4px 6px;
+      padding: 4px 5px;
       border-radius: 5px;
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       font-weight: 800;
       cursor: pointer;
       white-space: nowrap;
@@ -191,7 +191,7 @@
       border-radius: 6px;
       background: var(--info-bg);
       border: 1px solid var(--info-border);
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       font-weight: 700;
       line-height: 1.3;
     }
@@ -208,99 +208,54 @@
       color: var(--success);
     }
 
-    /* Zone Groupes en dessous */
-    .groups-zone {
-      margin-top: 10px;
-      width: 100%;
+    /* Bloc Lignes de production */
+    .prod-zone {
+      margin-top: 8px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px;
     }
 
-    .groups-header {
+    .prod-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 8px;
+      padding-bottom: 6px;
       margin-bottom: 8px;
+      border-bottom: 1px solid #e2e8f0;
     }
 
-    .groups-title {
+    .prod-title {
       font-size: 0.95rem;
       font-weight: 800;
     }
 
-    .grp-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
+    .line-card {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
       border-radius: 8px;
       padding: 8px;
       margin-bottom: 8px;
     }
 
-    .grp-top {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 6px;
-    }
-
-    .grp-left {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .grp-name {
-      padding: 5px 8px;
-      border: 1px solid #94a3b8;
-      border-radius: 5px;
-      font-size: 0.88rem;
-      font-weight: 700;
-      width: 120px;
-    }
-
-    .grp-tot {
-      font-size: 0.85rem;
-      font-weight: 800;
-      background: #f1f5f9;
-      border: 1px solid var(--border);
-      padding: 5px 8px;
-      border-radius: 5px;
-      white-space: nowrap;
-    }
-
-    .grp-pool {
-      font-size: 0.78rem;
-      font-weight: 700;
-      padding: 5px 8px;
-      border-radius: 5px;
-      background: var(--info-bg);
-      border: 1px solid var(--info-border);
-      margin-bottom: 6px;
-    }
-
-    .grp-pool.err {
-      background: var(--danger-bg);
-      border-color: var(--danger);
-      color: var(--danger);
-    }
-
-    .grp-pool.ok {
-      background: var(--success-bg);
-      border-color: var(--success-border);
-      color: var(--success);
-    }
-
-    .row-line {
+    .line-top {
       display: flex;
       flex-wrap: nowrap;
       align-items: flex-end;
       gap: 6px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 6px;
-      padding: 6px;
-      margin-bottom: 5px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .line-badge {
+      font-size: 0.78rem;
+      font-weight: 800;
+      background: #e2e8f0;
+      padding: 5px 7px;
+      border-radius: 5px;
+      white-space: nowrap;
     }
 
     .sub-badge {
@@ -311,6 +266,34 @@
       border: 1px solid #cbd5e1;
       border-radius: 5px;
       white-space: nowrap;
+    }
+
+    .line-needs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .tag-pill {
+      padding: 4px 7px;
+      border-radius: 5px;
+      background: var(--info-bg);
+      border: 1px solid var(--info-border);
+    }
+
+    .tag-pill.err {
+      background: var(--danger-bg);
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .tag-pill.ok {
+      background: var(--success-bg);
+      border-color: var(--success-border);
+      color: var(--success);
     }
 
     button.act-btn {
@@ -330,23 +313,77 @@
     .btn-del { background: #fee2e2; color: var(--danger); padding: 5px 8px; }
     .btn-pdf { background: var(--primary); color: #fff; padding: 8px 14px; }
     .btn-rst { background: var(--danger); color: #fff; padding: 8px 14px; }
+    .btn-sec { background: #e2e8f0; color: var(--text); }
 
     .bottom-actions {
       display: flex;
       gap: 10px;
       justify-content: center;
+      margin: 12px 0;
+    }
+
+    /* Modale Assistant "+ Ligne" */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: #fff;
+      border-radius: 10px;
+      padding: 14px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-title {
+      font-size: 1rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 6px;
+    }
+
+    .modal-step {
+      display: none;
+    }
+
+    .modal-step.active {
+      display: block;
+    }
+
+    .modal-q {
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
       margin-top: 12px;
-      margin-bottom: 12px;
     }
 
     #print-report { display: none; }
 
     @media print {
       body { background: #fff; padding: 0; }
-      .top-bar, .strip-wrap, .groups-zone, .bottom-actions { display: none !important; }
+      .top-bar, .strip-wrap, .prod-zone, .bottom-actions, .modal-backdrop { display: none !important; }
       #print-report { display: block !important; }
       .p-sec { border: 1px solid #bbb; border-radius: 6px; padding: 8px; margin-bottom: 10px; page-break-inside: avoid; }
-      .p-tbl { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 4px; }
+      .p-tbl { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-top: 4px; }
       .p-tbl th, .p-tbl td { border: 1px solid #ccc; padding: 4px 6px; text-align: left; }
       .p-err { color: #dc2626 !important; font-weight: bold; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       .p-ok { color: #16a34a !important; font-weight: bold; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -360,55 +397,144 @@
     <div class="top-total" id="top-total">0</div>
   </div>
 
-  <!-- 🏷️ Ét. | 🔘 Cap. | 📦 Trays | 🫙 Verre SUR UNE MÊME LIGNE -->
-  <div class="strip-wrap" id="comp-strip"></div>
+  <!-- COMPOSANTS GLOBAUX : 🏷️ Ét. (5000 par défaut) | 🫙 Verre (renseigné 1 fois) | Récap 🔘 Cap. & 📦 Trays -->
+  <div class="strip-wrap" id="global-strip"></div>
 
-  <!-- GROUPES EN DESSOUS (PUISENT DANS 🫙 VERRE RENSEIGNÉ UNE SEULE FOIS) -->
-  <div class="groups-zone">
-    <div class="groups-header">
-      <div class="groups-title">✅ PF par groupe</div>
-      <button class="act-btn btn-add" onclick="addGroup()">+ Groupe</button>
+  <!-- LIGNES DE PRODUCTION (SANS + GROUPE) -->
+  <div class="prod-zone">
+    <div class="prod-header">
+      <div class="prod-title">✅ PF • Lignes</div>
+      <button type="button" class="act-btn btn-add" onclick="openAddLineWizard()">+ Ligne</button>
     </div>
-    <div id="groups-container"></div>
+    <div id="lines-container"></div>
   </div>
 
   <div class="bottom-actions">
-    <button class="act-btn btn-pdf" onclick="printSummary()">🖨️ PDF</button>
-    <button class="act-btn btn-rst" onclick="resetAll()">🔄 Reset</button>
+    <button type="button" class="act-btn btn-pdf" onclick="printSummary()">🖨️ PDF</button>
+    <button type="button" class="act-btn btn-rst" onclick="resetAll()">🔄 Reset</button>
+  </div>
+
+  <!-- ASSISTANT "+ LIGNE" -->
+  <div class="modal-backdrop" id="wizard-modal">
+    <div class="modal-box">
+      <div class="modal-title" id="wiz-title">➕ Nouvelle ligne</div>
+
+      <!-- ÉTAPE 1 : APP + NB/APP REPRIS -->
+      <div class="modal-step" id="wiz-step-1">
+        <div class="modal-q">1. Combien d'App ?</div>
+        <div class="line-flex">
+          <div class="f-item">
+            <label>App</label>
+            <input type="number" inputmode="numeric" pattern="[0-9]*" id="wiz-app" placeholder="0">
+          </div>
+          <div class="f-item">
+            <label>Nb/app (repris)</label>
+            <input type="number" inputmode="numeric" pattern="[0-9]*" id="wiz-nbperapp" placeholder="0">
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="act-btn btn-sec" onclick="closeWizard()">Annuler</button>
+          <button type="button" class="act-btn btn-add" onclick="goWizardStep2()">Suivant ➔</button>
+        </div>
+      </div>
+
+      <!-- ÉTAPE 2 : MÊME TRAY ? -->
+      <div class="modal-step" id="wiz-step-2">
+        <div class="modal-q">2. Est-ce le même 📦 Tray ?</div>
+        <div id="wiz-tray-prev" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:8px;"></div>
+        <div id="wiz-tray-form" style="display:none; margin-top:8px;">
+          <div class="line-flex">
+            <div class="f-item ref-item">
+              <label>Réf cct</label>
+              <div class="ref-row">
+                <input type="text" inputmode="numeric" id="wiz-tray-ref" placeholder="cct">
+                <button type="button" class="abc-btn" onclick="toggleInputAbc('wiz-tray-ref', this)">ABC</button>
+              </div>
+            </div>
+            <div class="f-item">
+              <label>Tr/pal</label>
+              <input type="number" inputmode="numeric" pattern="[0-9]*" id="wiz-tray-pal" placeholder="0">
+            </div>
+            <div class="f-item fmt-item">
+              <label>Fmt</label>
+              <div class="fmt-pills">
+                <label class="fmt-pill"><input type="radio" name="wiz_tray_fmt" value="6" checked><span>6</span></label>
+                <label class="fmt-pill"><input type="radio" name="wiz_tray_fmt" value="8"><span>8</span></label>
+                <label class="fmt-pill"><input type="radio" name="wiz_tray_fmt" value="12"><span>12</span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-actions" id="wiz-tray-btns">
+          <button type="button" class="act-btn btn-add" onclick="chooseSameTray(true)">Oui (recopier)</button>
+          <button type="button" class="act-btn btn-pdf" onclick="chooseSameTray(false)">Non (nouveau)</button>
+        </div>
+        <div class="modal-actions" id="wiz-tray-next" style="display:none;">
+          <button type="button" class="act-btn btn-add" onclick="saveNewTrayAndGoStep3()">Suivant ➔</button>
+        </div>
+      </div>
+
+      <!-- ÉTAPE 3 : MÊME CAPSULE ? -->
+      <div class="modal-step" id="wiz-step-3">
+        <div class="modal-q">3. Est-ce la même 🔘 Capsule ?</div>
+        <div id="wiz-cap-prev" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:8px;"></div>
+        <div id="wiz-cap-form" style="display:none; margin-top:8px;">
+          <div class="line-flex">
+            <div class="f-item ref-item">
+              <label>Réf CRC</label>
+              <div class="ref-row">
+                <input type="text" inputmode="numeric" id="wiz-cap-ref" placeholder="CRC">
+                <button type="button" class="abc-btn" onclick="toggleInputAbc('wiz-cap-ref', this)">ABC</button>
+              </div>
+            </div>
+            <div class="f-item">
+              <label>Cap/bte</label>
+              <input type="number" inputmode="numeric" pattern="[0-9]*" id="wiz-cap-box" placeholder="0">
+            </div>
+            <div class="f-item">
+              <label>Bte/pal</label>
+              <input type="number" inputmode="numeric" pattern="[0-9]*" id="wiz-cap-pal" placeholder="0">
+            </div>
+          </div>
+        </div>
+        <div class="modal-actions" id="wiz-cap-btns">
+          <button type="button" class="act-btn btn-add" onclick="chooseSameCap(true)">Oui (recopier)</button>
+          <button type="button" class="act-btn btn-pdf" onclick="chooseSameCap(false)">Non (nouvelle)</button>
+        </div>
+        <div class="modal-actions" id="wiz-cap-finish" style="display:none;">
+          <button type="button" class="act-btn btn-add" onclick="saveNewCapAndFinish()">Valider ✓</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div id="print-report"></div>
 
   <script>
-    const KEY = 'compteurs_verre_iphone_v1';
+    const KEY = 'compteurs_sans_groupe_v1';
 
     let state = {
-      groups: [],
-      components: {
-        etiquettes: { ref: '', perPack: '', stockPacks: '' },
-        capsules:   { ref: '', perBox: '', boxesPerPallet: '', stockPallets: '' },
-        trays:      { ref: '', perPallet: '', packSize: 6, stockPallets: '' },
-        verre:      { ref: '', perPallet: '', stockPallets: '' }
-      }
+      etiquettes: { ref: '', perPack: 5000, stockPacks: '' },
+      verre:      { ref: '', perPallet: '', stockPallets: '' },
+      lines: []
     };
 
-    function defGroup(idx) {
+    let draftLine = null;
+
+    function defLine() {
       return {
-        id: 'g_' + Date.now() + '_' + Math.random().toString(36).slice(2, 5),
-        name: `Fruit ${idx + 1}`,
-        rows: [{ nbApp: '', nbPerApp: '' }]
+        nbApp: '',
+        nbPerApp: '',
+        tray: { ref: '', perPallet: '', packSize: 6 },
+        cap:  { ref: '', perBox: '', boxesPerPallet: '' }
       };
     }
 
     function defState() {
       return {
-        groups: [defGroup(0)],
-        components: {
-          etiquettes: { ref: '', perPack: '', stockPacks: '' },
-          capsules:   { ref: '', perBox: '', boxesPerPallet: '', stockPallets: '' },
-          trays:      { ref: '', perPallet: '', packSize: 6, stockPallets: '' },
-          verre:      { ref: '', perPallet: '', stockPallets: '' }
-        }
+        etiquettes: { ref: '', perPack: 5000, stockPacks: '' },
+        verre:      { ref: '', perPallet: '', stockPallets: '' },
+        lines: [defLine()]
       };
     }
 
@@ -418,8 +544,9 @@
         if (raw) {
           const p = JSON.parse(raw);
           state = Object.assign(defState(), p);
-          state.components = Object.assign(defState().components, p.components || {});
-          if (!Array.isArray(state.groups) || !state.groups.length) state.groups = [defGroup(0)];
+          state.etiquettes = Object.assign(defState().etiquettes, p.etiquettes || {});
+          state.verre = Object.assign(defState().verre, p.verre || {});
+          if (!Array.isArray(state.lines) || !state.lines.length) state.lines = [defLine()];
           return;
         }
       } catch (e) {}
@@ -434,162 +561,22 @@
       return Math.ceil(Number(n) || 0).toLocaleString('fr-FR');
     }
 
-    function rowPF(r) {
-      return (Number(r.nbApp) || 0) * (Number(r.nbPerApp) || 0);
-    }
-
-    function grpPF(g) {
-      return (g.rows || []).reduce((s, r) => s + rowPF(r), 0);
+    function linePF(l) {
+      return (Number(l.nbApp) || 0) * (Number(l.nbPerApp) || 0);
     }
 
     function totPF() {
-      return state.groups.reduce((s, g) => s + grpPF(g), 0);
+      return state.lines.reduce((s, l) => s + linePF(l), 0);
     }
 
-    function gName(g, i) {
-      const t = (g.name || '').trim();
-      return t ? t : `Fruit ${i + 1}`;
+    function toggleInputAbc(inputId, btn) {
+      const inp = document.getElementById(inputId);
+      if (!inp) return;
+      const isText = btn.classList.toggle('active-abc');
+      inp.inputMode = isText ? 'text' : 'numeric';
+      inp.focus();
     }
 
-    function getVerreTotalStock() {
-      const v = state.components.verre;
-      return (Number(v.perPallet) || 0) * (Number(v.stockPallets) || 0);
-    }
-
-    function calcNeed(key, pf) {
-      const c = state.components[key];
-      const tag = (c.ref || '').trim() ? ` [${(c.ref || '').trim()}]` : '';
-
-      if (key === 'etiquettes') {
-        const perP = Number(c.perPack) || 0;
-        const stkP = Number(c.stockPacks) || 0;
-        const stkU = stkP * perP;
-        const needP = perP > 0 ? Math.ceil(pf / perP) : 0;
-        const missU = Math.max(0, pf - stkU);
-        const missP = perP > 0 ? Math.max(0, needP - stkP) : 0;
-        return {
-          txt: `Besoin${tag}: ${fmt(pf)} ét.` + (perP > 0 ? ` (${fmt(needP)} pqt)` : ''),
-          hasStk: stkP > 0,
-          missU,
-          missTxt: `Manque: ${fmt(missU)} ét.` + (perP > 0 ? ` (${fmt(missP)} pqt)` : ''),
-          okTxt: `OK (+${fmt(stkU - pf)} ét.)`
-        };
-      }
-
-      if (key === 'capsules') {
-        const perB = Number(c.perBox) || 0;
-        const btePal = Number(c.boxesPerPallet) || 0;
-        const perPal = perB * btePal;
-        const stkPal = Number(c.stockPallets) || 0;
-        const stkU = stkPal * perPal;
-        const needB = perB > 0 ? Math.ceil(pf / perB) : 0;
-        const needPal = perPal > 0 ? Math.ceil(pf / perPal) : 0;
-        const missU = Math.max(0, pf - stkU);
-        const missPal = perPal > 0 ? Math.max(0, needPal - stkPal) : 0;
-        return {
-          txt: `Besoin${tag}: ${fmt(pf)} cap.` + (perB > 0 ? ` / ${fmt(needB)} bte` : '') + (perPal > 0 ? ` / ${fmt(needPal)} pal` : ''),
-          hasStk: stkPal > 0,
-          missU,
-          missTxt: `Manque: ${fmt(missU)} cap.` + (perPal > 0 ? ` (${fmt(missPal)} pal)` : ''),
-          okTxt: `OK (+${fmt(stkU - pf)} cap.)`
-        };
-      }
-
-      if (key === 'trays') {
-        const perPal = Number(c.perPallet) || 0;
-        const fmtN = Number(c.packSize) || 6;
-        const stkPal = Number(c.stockPallets) || 0;
-        const needTr = pf > 0 ? Math.ceil(pf / fmtN) : 0;
-        const needPal = perPal > 0 ? Math.ceil(needTr / perPal) : 0;
-        const stkTr = stkPal * perPal;
-        const missTr = Math.max(0, needTr - stkTr);
-        const missPal = perPal > 0 ? Math.max(0, needPal - stkPal) : 0;
-        return {
-          txt: `Besoin${tag} (x${fmtN}): ${fmt(needTr)} tr.` + (perPal > 0 ? ` / ${fmt(needPal)} pal` : ''),
-          hasStk: stkPal > 0,
-          missU: missTr,
-          missTxt: `Manque: ${fmt(missTr)} tr.` + (perPal > 0 ? ` (${fmt(missPal)} pal)` : ''),
-          okTxt: `OK (+${fmt(stkTr - needTr)} tr.)`
-        };
-      }
-
-      // verre (renseigné une seule fois, puisé par les groupes)
-      const perPal = Number(c.perPallet) || 0;
-      const stkPal = Number(c.stockPallets) || 0;
-      const stkU = stkPal * perPal;
-      const needPal = perPal > 0 ? Math.ceil(pf / perPal) : 0;
-      const missU = Math.max(0, pf - stkU);
-      const missPal = perPal > 0 ? Math.max(0, needPal - stkPal) : 0;
-      return {
-        txt: `Puisé${tag}: ${fmt(pf)} ver.` + (perPal > 0 ? ` (${fmt(needPal)} pal)` : '') + (stkU > 0 ? ` / Stk: ${fmt(stkU)}` : ''),
-        hasStk: stkPal > 0,
-        missU,
-        missTxt: `Manque: ${fmt(missU)} ver.` + (perPal > 0 ? ` (${fmt(missPal)} pal)` : ''),
-        okTxt: `Reste: ${fmt(stkU - pf)} ver.`
-      };
-    }
-
-    function refresh() {
-      const pf = totPF();
-      document.getElementById('top-total').textContent = fmt(pf);
-
-      ['etiquettes', 'capsules', 'trays', 'verre'].forEach(k => {
-        const el = document.getElementById(`nd_${k}`);
-        if (!el) return;
-        const info = calcNeed(k, pf);
-        el.className = 'need-bar';
-        if (info.hasStk) {
-          if (info.missU > 0) {
-            el.classList.add('err');
-            el.textContent = `${info.txt} • ${info.missTxt}`;
-          } else {
-            el.classList.add('ok');
-            el.textContent = `${info.txt} • ${info.okTxt}`;
-          }
-        } else {
-          el.textContent = info.txt;
-        }
-      });
-
-      // Calcul cumulé puisé dans le Verre par ordre des groupes
-      const verreTotal = getVerreTotalStock();
-      const verreRef = (state.components.verre.ref || '').trim();
-      let cumulPF = 0;
-
-      state.groups.forEach((g, gi) => {
-        const gVal = grpPF(g);
-        cumulPF += gVal;
-
-        const ge = document.getElementById(`gt_${gi}`);
-        if (ge) ge.textContent = `= ${fmt(gVal)}`;
-
-        g.rows.forEach((r, ri) => {
-          const re = document.getElementById(`rs_${gi}_${ri}`);
-          if (re) re.textContent = `= ${fmt(rowPF(r))}`;
-        });
-
-        const pe = document.getElementById(`gp_${gi}`);
-        if (pe) {
-          const tag = verreRef ? ` [${verreRef}]` : '';
-          if (verreTotal > 0) {
-            const resteApresGroupe = verreTotal - cumulPF;
-            if (resteApresGroupe < 0) {
-              const manqueIci = Math.min(gVal, Math.abs(resteApresGroupe));
-              pe.className = 'grp-pool err';
-              pe.textContent = `🫙 Verre${tag}: puise ${fmt(gVal)} (cumul ${fmt(cumulPF)} / ${fmt(verreTotal)}) — Manque ${fmt(manqueIci)} sur ce groupe !`;
-            } else {
-              pe.className = 'grp-pool ok';
-              pe.textContent = `🫙 Verre${tag}: puise ${fmt(gVal)} (cumul ${fmt(cumulPF)} / ${fmt(verreTotal)}) — Reste ${fmt(resteApresGroupe)}`;
-            }
-          } else {
-            pe.className = 'grp-pool';
-            pe.textContent = `🫙 Verre${tag}: puise ${fmt(gVal)} (cumul ${fmt(cumulPF)})`;
-          }
-        }
-      });
-    }
-
-    // Clavier numérique par défaut sur iPhone
     function numField(lbl, val, fn) {
       const d = document.createElement('div');
       d.className = 'f-item';
@@ -609,7 +596,6 @@
       return d;
     }
 
-    // Clavier numérique par défaut + petit bouton ABC pour passer en mode lettres
     function refField(lbl, val, fn) {
       const d = document.createElement('div');
       d.className = 'f-item ref-item';
@@ -630,10 +616,9 @@
       abc.type = 'button';
       abc.className = 'abc-btn';
       abc.textContent = 'ABC';
-      abc.title = 'Basculer clavier lettres / chiffres';
       abc.onclick = () => {
-        const isTextMode = abc.classList.toggle('active-abc');
-        i.inputMode = isTextMode ? 'text' : 'numeric';
+        const isText = abc.classList.toggle('active-abc');
+        i.inputMode = isText ? 'text' : 'numeric';
         i.focus();
       };
 
@@ -644,50 +629,89 @@
       return d;
     }
 
-    function render() {
-      const strip = document.getElementById('comp-strip');
+    function renderGlobalStrip() {
+      const strip = document.getElementById('global-strip');
       strip.innerHTML = '';
 
-      // Ordre : Ét. | Cap. | Trays | Verre (sans 5,3,2,4,1)
-      strip.appendChild(makeCol('etiquettes', '🏷️ Ét.',   'Réf eti'));
-      strip.appendChild(makeCol('capsules',   '🔘 Cap.',  'Réf CRC'));
-      strip.appendChild(makeCol('trays',      '📦 Trays', 'Réf cct'));
-      strip.appendChild(makeCol('verre',      '🫙 Verre', 'Réf V'));
+      // 🏷️ Ét. (5000 par défaut)
+      const cEt = document.createElement('div');
+      cEt.className = 'comp-col';
+      cEt.innerHTML = `<div class="comp-head">🏷️ Ét.</div>`;
+      const lEt = document.createElement('div');
+      lEt.className = 'line-flex';
+      lEt.appendChild(refField('Réf eti', state.etiquettes.ref, (v) => { state.etiquettes.ref = v; }));
+      lEt.appendChild(numField('Ét/pqt', state.etiquettes.perPack, (v) => { state.etiquettes.perPack = v; }));
+      lEt.appendChild(numField('Stk pqt', state.etiquettes.stockPacks, (v) => { state.etiquettes.stockPacks = v; }));
+      cEt.appendChild(lEt);
+      const nEt = document.createElement('div');
+      nEt.className = 'need-bar';
+      nEt.id = 'nd_et';
+      cEt.appendChild(nEt);
+      strip.appendChild(cEt);
 
-      renderGroups();
-      refresh();
+      // 🫙 Verre (renseigné 1 seule fois, puisé par toutes les lignes)
+      const cVer = document.createElement('div');
+      cVer.className = 'comp-col';
+      cVer.innerHTML = `<div class="comp-head">🫙 Verre</div>`;
+      const lVer = document.createElement('div');
+      lVer.className = 'line-flex';
+      lVer.appendChild(refField('Réf V', state.verre.ref, (v) => { state.verre.ref = v; }));
+      lVer.appendChild(numField('Ver/pal', state.verre.perPallet, (v) => { state.verre.perPallet = v; }));
+      lVer.appendChild(numField('Stk pal', state.verre.stockPallets, (v) => { state.verre.stockPallets = v; }));
+      cVer.appendChild(lVer);
+      const nVer = document.createElement('div');
+      nVer.className = 'need-bar';
+      nVer.id = 'nd_ver';
+      cVer.appendChild(nVer);
+      strip.appendChild(cVer);
+
+      // Récapitulatif global 🔘 Cap. et 📦 Trays cumulés
+      const cCapSum = document.createElement('div');
+      cCapSum.className = 'comp-col';
+      cCapSum.innerHTML = `<div class="comp-head">🔘 Cap. (Total)</div><div class="need-bar" id="nd_cap_tot"></div>`;
+      strip.appendChild(cCapSum);
+
+      const cTrSum = document.createElement('div');
+      cTrSum.className = 'comp-col';
+      cTrSum.innerHTML = `<div class="comp-head">📦 Trays (Total)</div><div class="need-bar" id="nd_tr_tot"></div>`;
+      strip.appendChild(cTrSum);
     }
 
-    function makeCol(key, title, refLbl) {
-      const c = state.components[key];
-      const col = document.createElement('div');
-      col.className = 'comp-col';
+    function renderLines() {
+      const box = document.getElementById('lines-container');
+      box.innerHTML = '';
 
-      const head = document.createElement('div');
-      head.className = 'comp-head';
-      head.textContent = title;
-      col.appendChild(head);
+      state.lines.forEach((l, idx) => {
+        const card = document.createElement('div');
+        card.className = 'line-card';
 
-      const line = document.createElement('div');
-      line.className = 'line-flex';
-      line.appendChild(refField(refLbl, c.ref, (v) => { state.components[key].ref = v; }));
+        const top = document.createElement('div');
+        top.className = 'line-top';
 
-      if (key === 'etiquettes') {
-        line.appendChild(numField('Ét/pqt', c.perPack, (v) => { state.components.etiquettes.perPack = v; }));
-        line.appendChild(numField('Stk', c.stockPacks, (v) => { state.components.etiquettes.stockPacks = v; }));
-      } else if (key === 'capsules') {
-        line.appendChild(numField('Cap/bte', c.perBox, (v) => { state.components.capsules.perBox = v; }));
-        line.appendChild(numField('Bte/pal', c.boxesPerPallet, (v) => { state.components.capsules.boxesPerPallet = v; }));
-        line.appendChild(numField('Stk pal', c.stockPallets, (v) => { state.components.capsules.stockPallets = v; }));
-      } else if (key === 'trays') {
-        line.appendChild(numField('Tr/pal', c.perPallet, (v) => { state.components.trays.perPallet = v; }));
+        const badge = document.createElement('span');
+        badge.className = 'line-badge';
+        badge.textContent = `L${idx + 1}`;
+        top.appendChild(badge);
+
+        // App & Nb/app
+        top.appendChild(numField('App', l.nbApp, (v) => { state.lines[idx].nbApp = v; }));
+        top.appendChild(numField('Nb/app', l.nbPerApp, (v) => { state.lines[idx].nbPerApp = v; }));
+
+        const sub = document.createElement('span');
+        sub.className = 'sub-badge';
+        sub.id = `sub_${idx}`;
+        sub.textContent = `= ${fmt(linePF(l))}`;
+        top.appendChild(sub);
+
+        // 📦 Tray de la ligne
+        top.appendChild(refField('Réf cct', l.tray.ref, (v) => { state.lines[idx].tray.ref = v; }));
+        top.appendChild(numField('Tr/pal', l.tray.perPallet, (v) => { state.lines[idx].tray.perPallet = v; }));
 
         const fd = document.createElement('div');
         fd.className = 'f-item fmt-item';
         const fl = document.createElement('label');
         fl.textContent = 'Fmt';
         fd.appendChild(fl);
-
         const fp = document.createElement('div');
         fp.className = 'fmt-pills';
         [6, 8, 12].forEach(o => {
@@ -695,10 +719,10 @@
           lb.className = 'fmt-pill';
           const rd = document.createElement('input');
           rd.type = 'radio';
-          rd.name = 'tray_fmt_rad';
+          rd.name = `fmt_line_${idx}`;
           rd.value = o;
-          rd.checked = Number(c.packSize) === o;
-          rd.onchange = () => { state.components.trays.packSize = o; save(); refresh(); };
+          rd.checked = Number(l.tray.packSize) === o;
+          rd.onchange = () => { state.lines[idx].tray.packSize = o; save(); refresh(); };
           const sp = document.createElement('span');
           sp.textContent = o;
           lb.appendChild(rd);
@@ -706,117 +730,243 @@
           fp.appendChild(lb);
         });
         fd.appendChild(fp);
-        line.appendChild(fd);
+        top.appendChild(fd);
 
-        line.appendChild(numField('Stk pal', c.stockPallets, (v) => { state.components.trays.stockPallets = v; }));
-      } else {
-        // Verre : renseigné une seule fois, puisé par les groupes
-        line.appendChild(numField('Ver/pal', c.perPallet, (v) => { state.components.verre.perPallet = v; }));
-        line.appendChild(numField('Stk pal', c.stockPallets, (v) => { state.components.verre.stockPallets = v; }));
-      }
+        // 🔘 Capsule de la ligne
+        top.appendChild(refField('Réf CRC', l.cap.ref, (v) => { state.lines[idx].cap.ref = v; }));
+        top.appendChild(numField('Cap/bte', l.cap.perBox, (v) => { state.lines[idx].cap.perBox = v; }));
+        top.appendChild(numField('Bte/pal', l.cap.boxesPerPallet, (v) => { state.lines[idx].cap.boxesPerPallet = v; }));
 
-      col.appendChild(line);
-
-      const nd = document.createElement('div');
-      nd.className = 'need-bar';
-      nd.id = `nd_${key}`;
-      col.appendChild(nd);
-
-      return col;
-    }
-
-    function renderGroups() {
-      const container = document.getElementById('groups-container');
-      container.innerHTML = '';
-
-      state.groups.forEach((g, gi) => {
-        const card = document.createElement('div');
-        card.className = 'grp-card';
-
-        const top = document.createElement('div');
-        top.className = 'grp-top';
-
-        const left = document.createElement('div');
-        left.className = 'grp-left';
-
-        const ni = document.createElement('input');
-        ni.type = 'text';
-        ni.inputMode = 'text';
-        ni.className = 'grp-name';
-        ni.placeholder = `Fruit ${gi + 1}`;
-        ni.value = g.name;
-        ni.oninput = (e) => { state.groups[gi].name = e.target.value; save(); refresh(); };
-
-        const totB = document.createElement('span');
-        totB.className = 'grp-tot';
-        totB.id = `gt_${gi}`;
-        totB.textContent = `= ${fmt(grpPF(g))}`;
-
-        left.appendChild(ni);
-        left.appendChild(totB);
-        top.appendChild(left);
-
-        const btns = document.createElement('div');
-        btns.style.display = 'flex';
-        btns.style.gap = '6px';
-
-        const addR = document.createElement('button');
-        addR.type = 'button';
-        addR.className = 'act-btn btn-add';
-        addR.textContent = '+ Ligne';
-        addR.onclick = () => { state.groups[gi].rows.push({ nbApp: '', nbPerApp: '' }); save(); renderGroups(); refresh(); };
-        btns.appendChild(addR);
-
-        if (state.groups.length > 1) {
-          const delG = document.createElement('button');
-          delG.type = 'button';
-          delG.className = 'act-btn btn-del';
-          delG.textContent = '×';
-          delG.onclick = () => { state.groups.splice(gi, 1); save(); renderGroups(); refresh(); };
-          btns.appendChild(delG);
+        if (state.lines.length > 1) {
+          const del = document.createElement('button');
+          del.type = 'button';
+          del.className = 'act-btn btn-del';
+          del.textContent = '×';
+          del.onclick = () => { state.lines.splice(idx, 1); save(); renderLines(); refresh(); };
+          top.appendChild(del);
         }
 
-        top.appendChild(btns);
         card.appendChild(top);
 
-        const pool = document.createElement('div');
-        pool.className = 'grp-pool';
-        pool.id = `gp_${gi}`;
-        card.appendChild(pool);
+        const needs = document.createElement('div');
+        needs.className = 'line-needs';
+        needs.id = `lneeds_${idx}`;
+        card.appendChild(needs);
 
-        g.rows.forEach((r, ri) => {
-          const line = document.createElement('div');
-          line.className = 'row-line';
-
-          line.appendChild(numField('App', r.nbApp, (v) => { state.groups[gi].rows[ri].nbApp = v; }));
-          line.appendChild(numField('Nb/app', r.nbPerApp, (v) => { state.groups[gi].rows[ri].nbPerApp = v; }));
-
-          const sb = document.createElement('span');
-          sb.className = 'sub-badge';
-          sb.id = `rs_${gi}_${ri}`;
-          sb.textContent = `= ${fmt(rowPF(r))}`;
-          line.appendChild(sb);
-
-          if (g.rows.length > 1) {
-            const delR = document.createElement('button');
-            delR.type = 'button';
-            delR.className = 'act-btn btn-del';
-            delR.textContent = '×';
-            delR.onclick = () => { state.groups[gi].rows.splice(ri, 1); save(); renderGroups(); refresh(); };
-            line.appendChild(delR);
-          }
-
-          card.appendChild(line);
-        });
-
-        container.appendChild(card);
+        box.appendChild(card);
       });
     }
 
-    function addGroup() {
-      state.groups.push(defGroup(state.groups.length));
+    function refresh() {
+      const pf = totPF();
+      document.getElementById('top-total').textContent = fmt(pf);
+
+      // 🏷️ Étiquettes (5000 par défaut)
+      const perP = Number(state.etiquettes.perPack) || 0;
+      const stkP = Number(state.etiquettes.stockPacks) || 0;
+      const stkEt = stkP * perP;
+      const needPqt = perP > 0 ? Math.ceil(pf / perP) : 0;
+      const etTag = (state.etiquettes.ref || '').trim() ? ` [${state.etiquettes.ref.trim()}]` : '';
+      const nEt = document.getElementById('nd_et');
+      if (nEt) {
+        nEt.className = 'need-bar';
+        let txt = `Besoin${etTag}: ${fmt(pf)} ét.` + (perP > 0 ? ` (${fmt(needPqt)} pqt)` : '');
+        if (stkP > 0) {
+          const diff = stkEt - pf;
+          if (diff < 0) {
+            nEt.classList.add('err');
+            txt += ` • Manque ${fmt(Math.abs(diff))} ét.`;
+          } else {
+            nEt.classList.add('ok');
+            txt += ` • OK (+${fmt(diff)})`;
+          }
+        }
+        nEt.textContent = txt;
+      }
+
+      // 🫙 Verre (puisé par toutes les lignes)
+      const vPal = Number(state.verre.perPallet) || 0;
+      const vStkPal = Number(state.verre.stockPallets) || 0;
+      const vStkUnits = vStkPal * vPal;
+      const vNeedPal = vPal > 0 ? Math.ceil(pf / vPal) : 0;
+      const vTag = (state.verre.ref || '').trim() ? ` [${state.verre.ref.trim()}]` : '';
+      const nVer = document.getElementById('nd_ver');
+      if (nVer) {
+        nVer.className = 'need-bar';
+        let txt = `Puisé${vTag}: ${fmt(pf)} ver.` + (vPal > 0 ? ` (${fmt(vNeedPal)} pal)` : '');
+        if (vStkPal > 0) {
+          const diff = vStkUnits - pf;
+          if (diff < 0) {
+            nVer.classList.add('err');
+            txt += ` • Manque ${fmt(Math.abs(diff))} ver.`;
+          } else {
+            nVer.classList.add('ok');
+            txt += ` • Reste ${fmt(diff)} ver.`;
+          }
+        }
+        nVer.textContent = txt;
+      }
+
+      // Détail par ligne + cumul Cap / Trays / Verre puisé
+      let totTrays = 0;
+      let totCap = 0;
+      let cumulVerre = 0;
+
+      state.lines.forEach((l, idx) => {
+        const q = linePF(l);
+        cumulVerre += q;
+
+        const subEl = document.getElementById(`sub_${idx}`);
+        if (subEl) subEl.textContent = `= ${fmt(q)}`;
+
+        // Tray ligne
+        const fmtN = Number(l.tray.packSize) || 6;
+        const trPal = Number(l.tray.perPallet) || 0;
+        const needTr = q > 0 ? Math.ceil(q / fmtN) : 0;
+        const needTrPal = trPal > 0 ? Math.ceil(needTr / trPal) : 0;
+        totTrays += needTr;
+        const trTag = (l.tray.ref || '').trim() ? ` [${l.tray.ref.trim()}]` : '';
+
+        // Cap ligne
+        const cBox = Number(l.cap.perBox) || 0;
+        const cBtePal = Number(l.cap.boxesPerPallet) || 0;
+        const cPal = cBox * cBtePal;
+        const needBte = cBox > 0 ? Math.ceil(q / cBox) : 0;
+        const needCPal = cPal > 0 ? Math.ceil(q / cPal) : 0;
+        totCap += q;
+        const cTag = (l.cap.ref || '').trim() ? ` [${l.cap.ref.trim()}]` : '';
+
+        // Verre puisé sur cette ligne
+        let verreClass = 'tag-pill';
+        let verreTxt = `🫙 Puisé: ${fmt(q)} (cumul ${fmt(cumulVerre)})`;
+        if (vStkUnits > 0) {
+          const reste = vStkUnits - cumulVerre;
+          if (reste < 0) {
+            verreClass = 'tag-pill err';
+            verreTxt = `🫙 Manque ${fmt(Math.min(q, Math.abs(reste)))} ver. (cumul ${fmt(cumulVerre)}/${fmt(vStkUnits)})`;
+          } else {
+            verreClass = 'tag-pill ok';
+            verreTxt = `🫙 Reste ${fmt(reste)} ver.`;
+          }
+        }
+
+        const lnEl = document.getElementById(`lneeds_${idx}`);
+        if (lnEl) {
+          lnEl.innerHTML = `
+            <span class="tag-pill">📦 Tray${trTag} (x${fmtN}): ${fmt(needTr)} tr.${trPal > 0 ? ` / ${fmt(needTrPal)} pal` : ''}</span>
+            <span class="tag-pill">🔘 Cap${cTag}: ${fmt(q)} cap.${cBox > 0 ? ` / ${fmt(needBte)} bte` : ''}${cPal > 0 ? ` / ${fmt(needCPal)} pal` : ''}</span>
+            <span class="${verreClass}">${verreTxt}</span>
+          `;
+        }
+      });
+
+      const capTotEl = document.getElementById('nd_cap_tot');
+      if (capTotEl) capTotEl.textContent = `Total besoin: ${fmt(totCap)} cap.`;
+
+      const trTotEl = document.getElementById('nd_tr_tot');
+      if (trTotEl) trTotEl.textContent = `Total besoin: ${fmt(totTrays)} trays`;
+    }
+
+    // --- ASSISTANT "+ LIGNE" ---
+    function showWizardStep(stepNum) {
+      [1, 2, 3].forEach(n => {
+        document.getElementById(`wiz-step-${n}`).classList.toggle('active', n === stepNum);
+      });
+    }
+
+    function openAddLineWizard() {
+      const prev = state.lines[state.lines.length - 1] || defLine();
+      draftLine = {
+        nbApp: '',
+        nbPerApp: prev.nbPerApp || '',
+        tray: { ...prev.tray },
+        cap: { ...prev.cap }
+      };
+
+      document.getElementById('wiz-title').textContent = `➕ Ligne ${state.lines.length + 1}`;
+      document.getElementById('wiz-app').value = '';
+      document.getElementById('wiz-nbperapp').value = prev.nbPerApp || '';
+
+      // Reset étape 2 (Tray)
+      document.getElementById('wiz-tray-prev').textContent =
+        `Précédent : Réf [${prev.tray.ref || '-'}] • Tr/pal: ${prev.tray.perPallet || 0} • Fmt: ${prev.tray.packSize || 6}`;
+      document.getElementById('wiz-tray-form').style.display = 'none';
+      document.getElementById('wiz-tray-btns').style.display = 'flex';
+      document.getElementById('wiz-tray-next').style.display = 'none';
+
+      // Reset étape 3 (Capsule)
+      document.getElementById('wiz-cap-prev').textContent =
+        `Précédent : Réf [${prev.cap.ref || '-'}] • Cap/bte: ${prev.cap.perBox || 0} • Bte/pal: ${prev.cap.boxesPerPallet || 0}`;
+      document.getElementById('wiz-cap-form').style.display = 'none';
+      document.getElementById('wiz-cap-btns').style.display = 'flex';
+      document.getElementById('wiz-cap-finish').style.display = 'none';
+
+      showWizardStep(1);
+      document.getElementById('wizard-modal').classList.add('open');
+      setTimeout(() => document.getElementById('wiz-app').focus(), 50);
+    }
+
+    function closeWizard() {
+      document.getElementById('wizard-modal').classList.remove('open');
+      draftLine = null;
+    }
+
+    function goWizardStep2() {
+      draftLine.nbApp = document.getElementById('wiz-app').value;
+      draftLine.nbPerApp = document.getElementById('wiz-nbperapp').value;
+      showWizardStep(2);
+    }
+
+    function chooseSameTray(isSame) {
+      if (isSame) {
+        // Garde les infos de tray du précédent
+        showWizardStep(3);
+      } else {
+        document.getElementById('wiz-tray-ref').value = '';
+        document.getElementById('wiz-tray-pal').value = '';
+        document.getElementById('wiz-tray-form').style.display = 'block';
+        document.getElementById('wiz-tray-btns').style.display = 'none';
+        document.getElementById('wiz-tray-next').style.display = 'flex';
+      }
+    }
+
+    function saveNewTrayAndGoStep3() {
+      const checkedFmt = document.querySelector('input[name="wiz_tray_fmt"]:checked');
+      draftLine.tray = {
+        ref: document.getElementById('wiz-tray-ref').value,
+        perPallet: document.getElementById('wiz-tray-pal').value,
+        packSize: checkedFmt ? Number(checkedFmt.value) : 6
+      };
+      showWizardStep(3);
+    }
+
+    function chooseSameCap(isSame) {
+      if (isSame) {
+        finishWizard();
+      } else {
+        document.getElementById('wiz-cap-ref').value = '';
+        document.getElementById('wiz-cap-box').value = '';
+        document.getElementById('wiz-cap-pal').value = '';
+        document.getElementById('wiz-cap-form').style.display = 'block';
+        document.getElementById('wiz-cap-btns').style.display = 'none';
+        document.getElementById('wiz-cap-finish').style.display = 'flex';
+      }
+    }
+
+    function saveNewCapAndFinish() {
+      draftLine.cap = {
+        ref: document.getElementById('wiz-cap-ref').value,
+        perBox: document.getElementById('wiz-cap-box').value,
+        boxesPerPallet: document.getElementById('wiz-cap-pal').value
+      };
+      finishWizard();
+    }
+
+    function finishWizard() {
+      state.lines.push(draftLine);
       save();
-      renderGroups();
+      closeWizard();
+      renderLines();
       refresh();
     }
 
@@ -824,7 +974,9 @@
       if (confirm('Reset à zéro ?')) {
         state = defState();
         save();
-        render();
+        renderGlobalStrip();
+        renderLines();
+        refresh();
       }
     }
 
@@ -834,30 +986,24 @@
       const pf = totPF();
 
       let rowsHtml = '';
-      state.groups.forEach((g, gi) => {
-        const gn = gName(g, gi);
-        g.rows.forEach((r, ri) => {
-          rowsHtml += `<tr><td>${gn}</td><td>L${ri + 1}</td><td>${r.nbApp || 0}</td><td>${r.nbPerApp || 0}</td><td><strong>${fmt(rowPF(r))}</strong></td></tr>`;
-        });
-        rowsHtml += `<tr><td colspan="4"><strong>Total ${gn}</strong></td><td><strong>${fmt(grpPF(g))}</strong></td></tr>`;
+      state.lines.forEach((l, i) => {
+        const q = linePF(l);
+        const fmtN = Number(l.tray.packSize) || 6;
+        const needTr = q > 0 ? Math.ceil(q / fmtN) : 0;
+        rowsHtml += `
+          <tr>
+            <td>L${i + 1}</td>
+            <td>${l.nbApp || 0}</td>
+            <td>${l.nbPerApp || 0}</td>
+            <td><strong>${fmt(q)}</strong></td>
+            <td>${l.tray.ref || '-'} (x${fmtN}) → ${fmt(needTr)} tr.</td>
+            <td>${l.cap.ref || '-'} → ${fmt(q)} cap.</td>
+          </tr>
+        `;
       });
 
-      const list = [
-        { k: 'etiquettes', t: '🏷️ Ét. (eti)' },
-        { k: 'capsules',   t: '🔘 Cap. (CRC)' },
-        { k: 'trays',      t: '📦 Trays (cct)' },
-        { k: 'verre',      t: '🫙 Verre (V)' }
-      ];
-
-      let cHtml = '';
-      list.forEach(item => {
-        const c = state.components[item.k];
-        const info = calcNeed(item.k, pf);
-        const extra = info.hasStk
-          ? `<div class="${info.missU > 0 ? 'p-err' : 'p-ok'}">${info.missU > 0 ? info.missTxt : info.okTxt}</div>`
-          : '';
-        cHtml += `<div class="p-sec"><strong>${item.t}</strong> — Réf: <em>${c.ref || '-'}</em><br>${info.txt}${extra}</div>`;
-      });
+      const etTxt = document.getElementById('nd_et').textContent;
+      const verTxt = document.getElementById('nd_ver').textContent;
 
       rep.innerHTML = `
         <div style="display:flex; justify-content:space-between; border-bottom:2px solid #000; padding-bottom:6px; margin-bottom:10px;">
@@ -865,19 +1011,27 @@
           <span>${now}</span>
         </div>
         <div class="p-sec">
-          <strong>✅ PF par groupe</strong>
+          <strong>🏷️ Ét. & 🫙 Verre</strong><br>
+          ${etTxt}<br>
+          ${verTxt}
+        </div>
+        <div class="p-sec">
+          <strong>✅ Lignes de production</strong>
           <table class="p-tbl">
-            <thead><tr><th>Groupe</th><th>Ligne</th><th>App</th><th>Nb/app</th><th>Total</th></tr></thead>
+            <thead>
+              <tr><th>Ligne</th><th>App</th><th>Nb/app</th><th>PF</th><th>📦 Tray</th><th>🔘 Cap.</th></tr>
+            </thead>
             <tbody>${rowsHtml}</tbody>
           </table>
         </div>
-        ${cHtml}
       `;
       window.print();
     }
 
     load();
-    render();
+    renderGlobalStrip();
+    renderLines();
+    refresh();
   </script>
 </body>
 </html>
