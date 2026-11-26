@@ -15,7 +15,6 @@
       --border: #cbd5e1;
       --danger: #dc2626;
       --danger-bg: #fef2f2;
-      --danger-border: #fca5a5;
       --success: #16a34a;
       --success-bg: #f0fdf4;
       --success-border: #bbf7d0;
@@ -78,7 +77,7 @@
       color: var(--primary);
     }
 
-    /* Verre fixe sur 2 lignes */
+    /* Deuxième bloc : Verre + case Nb verre / app */
     .glass-fixed-card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -125,7 +124,7 @@
     .field {
       display: flex;
       flex-direction: column;
-      min-width: 110px;
+      min-width: 105px;
     }
 
     .field label {
@@ -195,7 +194,7 @@
     }
 
     .step-num-inp {
-      width: 66px !important;
+      width: 64px !important;
       text-align: center;
       padding: 7px 6px !important;
     }
@@ -215,8 +214,8 @@
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 12px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
     }
 
@@ -226,8 +225,8 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 8px;
-      padding-bottom: 10px;
-      margin-bottom: 10px;
+      padding-bottom: 8px;
+      margin-bottom: 8px;
       border-bottom: 1px solid #e2e8f0;
     }
 
@@ -242,7 +241,7 @@
       background: #fef3c7;
       color: #92400e;
       border: 1px solid #fde68a;
-      font-size: 0.98rem;
+      font-size: 0.96rem;
       font-weight: 900;
       padding: 4px 12px;
       border-radius: 7px;
@@ -283,16 +282,16 @@
     }
 
     .line-meta {
-      font-size: 0.84rem;
+      font-size: 0.82rem;
       color: var(--muted);
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
-    /* Lignes consommables séparées avec +/- à droite */
+    /* Lignes compactes sans dénomination */
     .consumables-stack {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
     }
 
     .cons-row {
@@ -300,7 +299,7 @@
       justify-content: space-between;
       align-items: center;
       gap: 10px;
-      padding: 10px 12px;
+      padding: 8px 12px;
       border-radius: 8px;
       background: var(--info-bg);
       border: 1px solid var(--info-border);
@@ -327,7 +326,7 @@
     .cons-text {
       font-size: 0.86rem;
       font-weight: 700;
-      line-height: 1.35;
+      line-height: 1.3;
       flex: 1;
     }
 
@@ -476,22 +475,26 @@
     </div>
   </div>
 
-  <!-- VERRE FIXE SUR 2 LIGNES -->
+  <!-- DEUXIÈME BLOC : VERRE + CASE NB DE VERRE / APP -->
   <div class="glass-fixed-card">
     <div class="glass-line-1">
-      <div class="field" style="flex:1 1 130px;">
-        <label>🫙 Nom du verre (Réf V)</label>
+      <div class="field" style="flex:1 1 115px;">
+        <label>Nb verre / app</label>
+        <input type="number" inputmode="numeric" pattern="[0-9]*" id="g-ver-app" value="3500">
+      </div>
+      <div class="field" style="flex:1 1 120px;">
+        <label>🫙 Nom verre (Réf V)</label>
         <div class="ref-row">
           <input type="text" inputmode="numeric" id="g-ver-ref" placeholder="Nom / V">
           <button type="button" class="abc-btn" onclick="toggleAbc('g-ver-ref', this)">ABC</button>
         </div>
       </div>
-      <div class="field" style="flex:1 1 115px;">
+      <div class="field" style="flex:1 1 105px;">
         <label>Nb / palette</label>
         <input type="number" inputmode="numeric" pattern="[0-9]*" id="g-ver-pal" placeholder="0">
       </div>
       <div class="field" style="flex:0 0 auto;">
-        <label>Nb palettes (0 si rien)</label>
+        <label>Nb palettes</label>
         <div class="stepper">
           <button type="button" class="step-btn" onclick="stepGlassPallets(-1)">-</button>
           <input type="number" inputmode="numeric" pattern="[0-9]*" class="step-num-inp" id="g-ver-stk" placeholder="0">
@@ -500,7 +503,7 @@
       </div>
     </div>
     <div class="glass-line-2" id="g-ver-status">
-      <span>Stock verre : 0</span>
+      <span>Stock : 0 pal</span>
       <span>Besoin PF : 0</span>
     </div>
   </div>
@@ -514,7 +517,7 @@
     <button type="button" class="btn btn-pdf" onclick="printReport()">🖨️ PDF</button>
   </div>
 
-  <!-- MODALE AJOUT : FRUIT (PAR DÉFAUT FRUIT 1, 2...) + NB APP -->
+  <!-- MODALE AJOUT : FRUIT + NB APP -->
   <div class="modal-bg" id="add-modal">
     <div class="modal-panel">
       <div class="modal-head">
@@ -542,11 +545,11 @@
     </div>
   </div>
 
-  <!-- MODALE CLIC SUR LIGNE CONSOMMABLE : NOMBRE PAR BOÎTE & NB DE BOÎTES -->
+  <!-- MODALE CLIC SUR LIGNE : NOMBRE PAR BOÎTE & NB DE BOÎTES -->
   <div class="modal-bg" id="cons-modal">
     <div class="modal-panel">
       <div class="modal-head">
-        <span id="cons-title">Consommable</span>
+        <span id="cons-title">Détail</span>
         <button type="button" class="btn btn-sec btn-mini" onclick="closeConsModal()">✕</button>
       </div>
       <div style="display:flex; flex-direction:column; gap:10px;">
@@ -559,7 +562,7 @@
           <input type="number" inputmode="numeric" pattern="[0-9]*" id="cons-nb-box" placeholder="0">
         </div>
         <div class="field" id="cons-fmt-wrap" style="display:none;">
-          <label>Format tray</label>
+          <label>Format</label>
           <div class="fmt-group">
             <label class="fmt-btn"><input type="radio" name="cons_fmt" value="6"><span>6</span></label>
             <label class="fmt-btn"><input type="radio" name="cons_fmt" value="8"><span>8</span></label>
@@ -577,10 +580,10 @@
   <div id="print-area"></div>
 
   <script>
-    const STORAGE_KEY = 'compteurs_fruit_degrossi_v1';
+    const STORAGE_KEY = 'compteurs_epure_ecart_v1';
 
     let state = {
-      verre: { ref: '', perPal: '', stkPal: '' },
+      verre: { verPerApp: 3500, ref: '', perPal: '', stkPal: '' },
       lines: []
     };
 
@@ -590,10 +593,14 @@
       return `Fruit ${index + 1}`;
     }
 
+    function getVerPerApp() {
+      const v = Number(state.verre.verPerApp);
+      return Number.isFinite(v) && v >= 0 ? v : 3500;
+    }
+
     function createLine(fruit = 'Fruit 1', nbApp = 1) {
       return {
         fruit: fruit,
-        verPerApp: 3500,
         nbApp: nbApp,
         etPerPack: 5000,
         etStkPack: 0,
@@ -610,12 +617,12 @@
         const raw = localStorage.getItem(STORAGE_KEY);
         if (raw) {
           const parsed = JSON.parse(raw);
-          state.verre = Object.assign({ ref: '', perPal: '', stkPal: '' }, parsed.verre || {});
+          state.verre = Object.assign({ verPerApp: 3500, ref: '', perPal: '', stkPal: '' }, parsed.verre || {});
           state.lines = Array.isArray(parsed.lines) ? parsed.lines : [];
           return;
         }
       } catch (e) {}
-      state = { verre: { ref: '', perPal: '', stkPal: '' }, lines: [] };
+      state = { verre: { verPerApp: 3500, ref: '', perPal: '', stkPal: '' }, lines: [] };
     }
 
     function saveState() {
@@ -626,8 +633,12 @@
       return Math.ceil(Number(n) || 0).toLocaleString('fr-FR');
     }
 
+    function plural(count, sing, plur) {
+      return count <= 1 ? sing : plur;
+    }
+
     function lineTotal(l) {
-      return (Number(l.verPerApp) || 0) * (Number(l.nbApp) || 0);
+      return getVerPerApp() * (Number(l.nbApp) || 0);
     }
 
     function grandTotal() {
@@ -648,14 +659,21 @@
     }
 
     function bindFixedGlassInputs() {
+      const appInp = document.getElementById('g-ver-app');
       const refInp = document.getElementById('g-ver-ref');
       const palInp = document.getElementById('g-ver-pal');
       const stkInp = document.getElementById('g-ver-stk');
 
+      appInp.value = state.verre.verPerApp !== '' && state.verre.verPerApp !== undefined ? state.verre.verPerApp : 3500;
       refInp.value = state.verre.ref || '';
       palInp.value = state.verre.perPal || '';
       stkInp.value = state.verre.stkPal || '';
 
+      appInp.oninput = (e) => {
+        state.verre.verPerApp = e.target.value;
+        saveState();
+        renderLines();
+      };
       refInp.oninput = (e) => { state.verre.ref = e.target.value; saveState(); refreshGlassStatus(); };
       palInp.oninput = (e) => { state.verre.perPal = e.target.value; saveState(); refreshGlassStatus(); };
       stkInp.oninput = (e) => { state.verre.stkPal = e.target.value; saveState(); refreshGlassStatus(); };
@@ -721,22 +739,34 @@
       bar.className = 'glass-line-2';
 
       const namePart = vRef ? `<strong>${vRef}</strong> • ` : '';
-      const needPart = `Besoin PF : <strong>${fmt(pf)}</strong>` + (vPerPal > 0 ? ` (${fmt(vNeedPal)} pal)` : '');
+      const needPart = `Besoin PF : <strong>${fmt(pf)}</strong>`;
 
-      if (pf > 0 && vStockUnits < pf) {
+      if (pf > 0 && vPerPal > 0) {
+        const diffPal = vStkPal - vNeedPal;
+        if (diffPal < 0) {
+          const m = Math.abs(diffPal);
+          bar.classList.add('err');
+          bar.innerHTML = `<span>${namePart}Stock : <strong>${vStkPal}</strong> ${plural(vStkPal, 'palette', 'palettes')}</span><span>${needPart} (${vNeedPal} pal) • Manque ${m} ${plural(m, 'palette', 'palettes')}</span>`;
+        } else if (diffPal > 0) {
+          bar.classList.add('ok');
+          bar.innerHTML = `<span>${namePart}Stock : <strong>${vStkPal}</strong> ${plural(vStkPal, 'palette', 'palettes')}</span><span>${needPart} (${vNeedPal} pal) • ${diffPal} ${plural(diffPal, 'palette', 'palettes')} en trop</span>`;
+        } else {
+          bar.classList.add('ok');
+          bar.innerHTML = `<span>${namePart}Stock : <strong>${vStkPal}</strong> ${plural(vStkPal, 'palette', 'palettes')}</span><span>${needPart} (${vNeedPal} pal) • OK</span>`;
+        }
+      } else if (pf > 0 && vStockUnits < pf) {
         bar.classList.add('err');
-        bar.innerHTML = `<span>${namePart}Stock : <strong>${vStkPal} pal</strong></span><span>${needPart} • ⚠️ Manque <strong>${fmt(Math.max(0, vNeedPal - vStkPal))} pal</strong></span>`;
-      } else if (pf > 0 && vStockUnits >= pf) {
-        bar.classList.add('ok');
-        bar.innerHTML = `<span>${namePart}Stock : <strong>${vStkPal} pal</strong></span><span>${needPart} • ✔️ OK</span>`;
+        bar.innerHTML = `<span>${namePart}Stock : <strong>${vStkPal}</strong> ${plural(vStkPal, 'palette', 'palettes')}</span><span>${needPart} • Manque ${fmt(pf - vStockUnits)}</span>`;
       } else {
-        bar.innerHTML = `<span>${namePart}Stock : <strong>${vStkPal} pal</strong></span><span>${needPart}</span>`;
+        bar.innerHTML = `<span>${namePart}Stock : <strong>${vStkPal}</strong> ${plural(vStkPal, 'palette', 'palettes')}</span><span>${needPart}</span>`;
       }
     }
 
     function renderLines() {
       const container = document.getElementById('lines-list');
       const pfTotal = grandTotal();
+      const verPerApp = getVerPerApp();
+
       document.getElementById('top-total').textContent = fmt(pfTotal);
       document.getElementById('top-count').textContent =
         state.lines.length === 0 ? 'Aucune ligne' : `${state.lines.length} ligne${state.lines.length > 1 ? 's' : ''}`;
@@ -756,48 +786,69 @@
         const pf = lineTotal(l);
         const fruitName = fruitDisplay(l, idx);
 
-        // 1. Étiquettes dégrossies en paquets (ex. 3 paquets de 5 000)
+        // 1. Paquets (sans dénomination "étiquette")
         const etPack = Number(l.etPerPack) || 5000;
         const etStk = Number(l.etStkPack) || 0;
-        const etNeedPack = pf > 0 && etPack > 0 ? Math.ceil(pf / etPack) : 0;
+        const etNeed = pf > 0 && etPack > 0 ? Math.ceil(pf / etPack) : 0;
         let etCls = 'cons-row';
-        let etMsg = `🏷️ <strong>Étiquettes</strong> : ${fmt(etNeedPack)} paquet${etNeedPack > 1 ? 's' : ''} de ${fmt(etPack)}`;
-        if (etNeedPack > 0 && etStk < etNeedPack) {
-          etCls = 'cons-row err';
-          etMsg += `<br>⚠️ Manque ${fmt(etNeedPack - etStk)} paquet${etNeedPack - etStk > 1 ? 's' : ''} (stock : ${etStk} pqt)`;
-        } else if (etNeedPack > 0 && etStk >= etNeedPack) {
-          etCls = 'cons-row ok';
-          etMsg += `<br>✔️ OK (${etStk} pqt en stock)`;
+        let etMsg = `<strong>${fmt(etNeed)}</strong> ${plural(etNeed, 'paquet', 'paquets')} de ${fmt(etPack)}`;
+        if (etNeed > 0) {
+          const diffEt = etStk - etNeed;
+          if (diffEt < 0) {
+            const m = Math.abs(diffEt);
+            etCls = 'cons-row err';
+            etMsg += ` • Manque ${m} ${plural(m, 'paquet', 'paquets')}`;
+          } else if (diffEt > 0) {
+            etCls = 'cons-row ok';
+            etMsg += ` • ${diffEt} ${plural(diffEt, 'paquet', 'paquets')} en trop`;
+          } else {
+            etCls = 'cons-row ok';
+            etMsg += ` • OK (${etStk} ${plural(etStk, 'paquet', 'paquets')})`;
+          }
         }
 
-        // 2. Capsules dégrossies en boîtes (ex. 4 boîtes de 400)
+        // 2. Boîtes (sans dénomination "capsule")
         const cBox = Number(l.capPerBox) || 400;
         const cNbBox = Number(l.capNbBox) || 0;
-        const cNeedBox = pf > 0 && cBox > 0 ? Math.ceil(pf / cBox) : 0;
+        const cNeed = pf > 0 && cBox > 0 ? Math.ceil(pf / cBox) : 0;
         let cCls = 'cons-row';
-        let cMsg = `🔘 <strong>Capsules</strong> : ${fmt(cNeedBox)} boîte${cNeedBox > 1 ? 's' : ''} de ${fmt(cBox)}`;
-        if (cNeedBox > 0 && cNbBox < cNeedBox) {
-          cCls = 'cons-row err';
-          cMsg += `<br>⚠️ Manque ${fmt(cNeedBox - cNbBox)} boîte${cNeedBox - cNbBox > 1 ? 's' : ''} (stock : ${cNbBox} bte)`;
-        } else if (cNeedBox > 0 && cNbBox >= cNeedBox) {
-          cCls = 'cons-row ok';
-          cMsg += `<br>✔️ OK (${cNbBox} bte en stock)`;
+        let cMsg = `<strong>${fmt(cNeed)}</strong> ${plural(cNeed, 'boîte', 'boîtes')} de ${fmt(cBox)}`;
+        if (cNeed > 0) {
+          const diffC = cNbBox - cNeed;
+          if (diffC < 0) {
+            const m = Math.abs(diffC);
+            cCls = 'cons-row err';
+            cMsg += ` • Manque ${m} ${plural(m, 'boîte', 'boîtes')}`;
+          } else if (diffC > 0) {
+            cCls = 'cons-row ok';
+            cMsg += ` • ${diffC} ${plural(diffC, 'boîte', 'boîtes')} en trop`;
+          } else {
+            cCls = 'cons-row ok';
+            cMsg += ` • OK (${cNbBox} ${plural(cNbBox, 'boîte', 'boîtes')})`;
+          }
         }
 
-        // 3. Trays dégrossis en palettes / trays
+        // 3. Palettes / format (sans dénomination "tray")
         const trFmt = Number(l.trFmt) || 12;
         const trPal = Number(l.trPerPal) || 3000;
         const trNbPal = Number(l.trNbPal) || 0;
-        const trNeedUnits = pf > 0 ? Math.ceil(pf / trFmt) : 0;
-        const trNeedPal = trNeedUnits > 0 && trPal > 0 ? Math.ceil(trNeedUnits / trPal) : 0;
+        const trUnits = pf > 0 ? Math.ceil(pf / trFmt) : 0;
+        const trNeed = trUnits > 0 && trPal > 0 ? Math.ceil(trUnits / trPal) : 0;
         let trCls = 'cons-row';
-        let trMsg = `📦 <strong>Trays (x${trFmt})</strong> : ${fmt(trNeedPal)} palette${trNeedPal > 1 ? 's' : ''} de ${fmt(trPal)} (${fmt(trNeedUnits)} tr.)`;
-        if (trNeedPal > 0 && trNbPal < trNeedPal) {
-          trCls = 'cons-row err';
-          trMsg += `<br>⚠️ Manque ${fmt(trNeedPal - trNbPal)} palette${trNeedPal - trNbPal > 1 ? 's' : ''} (stock : ${trNbPal} pal)`;
-        } else if (trNeedPal > 0 && trNbPal >= trNeedPal) {
-          trCls = 'cons-row ok';
-          trMsg += `<br>✔️ OK (${trNbPal} pal en stock)`;
+        let trMsg = `<strong>${fmt(trNeed)}</strong> ${plural(trNeed, 'palette', 'palettes')} de ${fmt(trPal)} (x${trFmt})`;
+        if (trNeed > 0) {
+          const diffTr = trNbPal - trNeed;
+          if (diffTr < 0) {
+            const m = Math.abs(diffTr);
+            trCls = 'cons-row err';
+            trMsg += ` • Manque ${m} ${plural(m, 'palette', 'palettes')}`;
+          } else if (diffTr > 0) {
+            trCls = 'cons-row ok';
+            trMsg += ` • ${diffTr} ${plural(diffTr, 'palette', 'palettes')} en trop`;
+          } else {
+            trCls = 'cons-row ok';
+            trMsg += ` • OK (${trNbPal} ${plural(trNbPal, 'palette', 'palettes')})`;
+          }
         }
 
         const card = document.createElement('div');
@@ -818,7 +869,7 @@
             </div>
           </div>
           <div class="line-meta">
-            ${l.verPerApp || 3500} verre/app × ${l.nbApp || 0} app
+            ${verPerApp} × ${l.nbApp || 0} app = <strong>${fmt(pf)}</strong>
           </div>
           <div class="consumables-stack">
             <div class="${etCls}" onclick="openConsModal(${idx}, 'et')">
@@ -850,7 +901,7 @@
       });
     }
 
-    // --- MODALE AJOUT (FRUIT PAR DÉFAUT FRUIT 1, 2... + NB APP) ---
+    // --- MODALE AJOUT (FRUIT + NB APP) ---
     function openAddAppModal() {
       const defFruit = getDefaultFruit(state.lines.length);
       document.getElementById('add-fruit').value = defFruit;
@@ -880,7 +931,7 @@
       renderLines();
     }
 
-    // --- MODALE CLIC SUR CONSOMMABLE ---
+    // --- MODALE CLIC SUR LIGNE ---
     function openConsModal(lineIdx, type) {
       const l = state.lines[lineIdx];
       if (!l) return;
@@ -890,19 +941,19 @@
       fmtWrap.style.display = 'none';
 
       if (type === 'et') {
-        document.getElementById('cons-title').textContent = '🏷️ Étiquettes';
+        document.getElementById('cons-title').textContent = 'Paquets';
         document.getElementById('cons-per-box-label').textContent = 'Nombre par paquet';
         document.getElementById('cons-nb-box-label').textContent = 'Nombre de paquets (0 si rien)';
         document.getElementById('cons-per-box').value = l.etPerPack || 5000;
         document.getElementById('cons-nb-box').value = l.etStkPack || 0;
       } else if (type === 'cap') {
-        document.getElementById('cons-title').textContent = '🔘 Capsules';
+        document.getElementById('cons-title').textContent = 'Boîtes';
         document.getElementById('cons-per-box-label').textContent = 'Nombre par boîte';
         document.getElementById('cons-nb-box-label').textContent = 'Nombre de boîtes (0 si rien)';
         document.getElementById('cons-per-box').value = l.capPerBox || 400;
         document.getElementById('cons-nb-box').value = l.capNbBox || 0;
       } else if (type === 'tr') {
-        document.getElementById('cons-title').textContent = '📦 Trays';
+        document.getElementById('cons-title').textContent = 'Palettes';
         document.getElementById('cons-per-box-label').textContent = 'Nombre par palette';
         document.getElementById('cons-nb-box-label').textContent = 'Nombre de palettes (0 si rien)';
         document.getElementById('cons-per-box').value = l.trPerPal || 3000;
@@ -957,7 +1008,8 @@
 
     function resetAll() {
       if (confirm('Voulez-vous remettre à zéro et effacer toutes les lignes ?')) {
-        state = { verre: { ref: '', perPal: '', stkPal: '' }, lines: [] };
+        const currentApp = state.verre && state.verre.verPerApp !== '' ? state.verre.verPerApp : 3500;
+        state = { verre: { verPerApp: currentApp, ref: '', perPal: '', stkPal: '' }, lines: [] };
         saveState();
         bindFixedGlassInputs();
         renderLines();
@@ -972,17 +1024,12 @@
 
       state.lines.forEach((l, i) => {
         const pf = lineTotal(l);
-        const etNeed = pf > 0 ? Math.ceil(pf / (l.etPerPack || 5000)) : 0;
-        const capNeed = pf > 0 ? Math.ceil(pf / (l.capPerBox || 400)) : 0;
-        const trUnits = pf > 0 ? Math.ceil(pf / (l.trFmt || 12)) : 0;
-        const trPalNeed = trUnits > 0 ? Math.ceil(trUnits / (l.trPerPal || 3000)) : 0;
-
         cardsHtml += `
           <div class="p-card">
-            <strong>${fruitDisplay(l, i)}</strong> (${l.verPerApp || 3500} verre/app × ${l.nbApp || 0} app)<br>
-            Étiquettes : ${fmt(etNeed)} pqt de ${fmt(l.etPerPack || 5000)} (stock : ${l.etStkPack || 0}) •
-            Capsules : ${fmt(capNeed)} bte de ${fmt(l.capPerBox || 400)} (stock : ${l.capNbBox || 0}) •
-            Trays (x${l.trFmt || 12}) : ${fmt(trPalNeed)} pal de ${fmt(l.trPerPal || 3000)} (stock : ${l.trNbPal || 0})
+            <strong>${fruitDisplay(l, i)}</strong> (${getVerPerApp()} × ${l.nbApp || 0} app = ${fmt(pf)})<br>
+            ${fmt(l.etPerPack || 5000)}/pqt (stk ${l.etStkPack || 0}) •
+            ${fmt(l.capPerBox || 400)}/bte (stk ${l.capNbBox || 0}) •
+            ${fmt(l.trPerPal || 3000)}/pal x${l.trFmt || 12} (stk ${l.trNbPal || 0})
           </div>
         `;
       });
@@ -992,7 +1039,7 @@
           <div><strong>Total PF : ${fmt(grandTotal())}</strong></div>
           <div>${now}</div>
         </div>
-        <div class="p-card"><strong>🫙 Verre :</strong> ${vInfo}</div>
+        <div class="p-card"><strong>Verre :</strong> ${vInfo}</div>
         ${cardsHtml || '<p>Aucune ligne.</p>'}
       `;
       window.print();
