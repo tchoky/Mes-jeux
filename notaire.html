@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planning Semaine - Raph, Odile, Maman, Christ</title>
+    <style>
+        :root {
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --border-color: #dce1e7;
+            --text-color: #2c3e50;
+            
+            /* Couleurs des 4 personnes */
+            --color-raph: #3498db;     /* Bleu */
+            --color-odile: #e74c3c;    /* Rouge/Corail */
+            --color-maman: #2ecc71;    /* Vert */
+            --color-christ: #9b59b6;   /* Violet */
+            --color-empty: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            user-select: none; /* Évite de sélectionner le texte en glissant la souris */
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        /* Barre supérieure : Navigation et Semaine */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--bg-color);
+        }
+
+        .week-title {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+
+        .week-title h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .week-badge {
+            font-size: 0.85rem;
+            background: #e1e8ed;
+            color: #555;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .nav-buttons button {
+            background: #edf2f7;
+            border: 1px solid #cbd5e0;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .nav-buttons button:hover {
+            background: #e2e8f0;
+        }
+
+        /* Palette de sélection rapide (Pinceaux) */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .palette {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .brush-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border: 2px solid transparent;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+            opacity: 0.75;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+
+        .brush-btn.active {
+            opacity: 1;
+            transform: scale(1.05);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+            border-color: #2c3e50;
+        }
+
+        .btn-raph { background-color: var(--color-raph); }
+        .btn-odile { background-color: var(--color-odile); }
+        .btn-maman { background-color: var(--color-maman); }
+        .btn-christ { background-color: var(--color-christ); }
+        .btn-eraser { background-color: #95a5a6; }
+
+        /* Outils de recopiage rapide */
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+
+        .action-btn:hover {
+            background-color: #1a252f;
+        }
+
+        /* Panneau de récurrence (ex: Tous les mercredis après 16h) */
+        .recurrence-box {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            background: #eef6fc;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            border: 1px solid #cce3f6;
+        }
+
+        .recurrence-box select, .recurrence-box input {
+            padding: 6px;
+            border-radius: 4px;
+            border: 1px solid #b0c4de;
+        }
+
+        /* Grille du calendrier */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: 70px repeat(5, 1fr);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .grid-header {
+            background: #2c3e50;
+            color: white;
+            padding: 12px 5px;
+            text-align: center;
+            font-weight: bold;
+            border-right: 1px solid #3e5368;
+        }
+
+        .grid-header span {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: normal;
+            color: #bdc3c7;
+        }
+
+        .time-slot {
+            background: #f8fafc;
+            padding: 10px 5px;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #64748b;
+            border-bottom: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+        }
+
+        .cell {
+            border-bottom: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            min-height: 38px;
+            cursor: pointer;
+            transition: background-color 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .cell:hover {
+            filter: brightness(0.95);
+        }
+
+        .cell[data-person="raph"] { background-color: var(--color-raph); }
+        .cell[data-person="odile"] { background-color: var(--color-odile); }
+        .cell[data-person="maman"] { background-color: var(--color-maman); }
+        .cell[data-person="christ"] { background-color: var(--color-christ); }
+
+        .legend-tip {
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: #64748b;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- En-tête avec numéro de semaine -->
+    <div class="header">
+        <div class="week-title">
+            <h1 id="monthYearDisplay">Novembre 2026</h1>
+            <span class="week-badge" id="weekNumberDisplay">Semaine 48</span>
+        </div>
+        <div class="nav-buttons">
+            <button onclick="changeWeek(-1)">◀ Semaine préc.</button>
+            <button onclick="goToCurrentWeek()">Aujourd'hui</button>
+            <button onclick="changeWeek(1)">Semaine suiv. ▶</button>
+        </div>
+    </div>
+
+    <!-- Barre d'outils : Pinceaux et Copie -->
+    <div class="toolbar">
+        <div class="palette">
+            <button class="brush-btn btn-raph active" onclick="selectBrush('raph', this)">🖌️ Raph</button>
+            <button class="brush-btn btn-odile" onclick="selectBrush('odile', this)">🖌️ Odile</button>
+            <button class="brush-btn btn-maman" onclick="selectBrush('maman', this)">🖌️ Maman</button>
+            <button class="brush-btn btn-christ" onclick="selectBrush('christ', this)">🖌️ Christ</button>
+            <button class="brush-btn btn-eraser" onclick="selectBrush('', this)">🧽 Gomme</button>
+        </div>
+        <div class="quick-actions">
+            <button class="action-btn" onclick="copyToNextWeek()" title="Copie toute cette semaine sur la semaine suivante">📋 Copier vers sem. suivante</button>
+        </div>
+    </div>
+
+    <!-- Outil de récurrence rapide -->
+    <div class="recurrence-box">
+        <strong>⚡ Règle rapide :</strong>
+        <span>Mettre</span>
+        <select id="recPerson">
+            <option value="raph">Raph</option>
+            <option value="odile">Odile</option>
+            <option value="maman">Maman</option>
+            <option value="christ">Christ</option>
+        </select>
+        <span>tous les</span>
+        <select id="recDay">
+            <option value="0">Lundis</option>
+            <option value="1">Mardis</option>
+            <option value="2" selected>Mercredis</option>
+            <option value="3">Jeudis</option>
+            <option value="4">Vendredis</option>
+        </select>
+        <span>à partir de</span>
+        <select id="recStartHour"></select>
+        <span>jusqu'à</span>
+        <select id="recEndHour"></select>
+        <span>sur</span>
+        <input type="number" id="recWeeksCount" value="4" min="1" max="52" style="width: 45px;">
+        <span>semaines</span>
+        <button class="action-btn" style="background:#2980b9;" onclick="applyRecurrence()">Appliquer</button>
+    </div>
+
+    <!-- Grille Lundi -> Vendredi -->
+    <div class="calendar-grid" id="calendarGrid"></div>
+
+    <div class="legend-tip">
+        💡 Astuce : Cliquez ou maintenez le clic en glissant la souris pour remplir plusieurs cases d'un coup. Sauvegarde automatique.
+    </div>
+</div>
+
+<script>
+    // Configuration des horaires (de 7h à 20h)
+    const START_HOUR = 7;
+    const END_HOUR = 20;
+    const DAYS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
+    const NAMES = { raph: 'Raph', odile: 'Odile', maman: 'Maman', christ: 'Christ' };
+
+    let currentMonday = getMonday(new Date());
+    let selectedBrush = 'raph';
+    let isMouseDown = false;
+    
+    // Chargement des données sauvegardées dans le navigateur
+    let scheduleData = JSON.parse(localStorage.getItem('familySchedule')) || {};
+
+    // Initialisation des menus déroulants d'heures
+    function initHourSelects() {
+        const startSel = document.getElementById('recStartHour');
+        const endSel = document.getElementById('recEndHour');
+        for (let h = START_HOUR; h <= END_HOUR; h++) {
+            let opt1 = new Option(`${h}h00`, h);
+            let opt2 = new Option(`${h}h00`, h);
+            if (h === 16) opt1.selected = true; // Par défaut 16h
+            if (h === 19) opt2.selected = true; // Par défaut 19h
+            startSel.add(opt1);
+            endSel.add(opt2);
+        }
+    }
+
+    // Trouver le lundi de la semaine d'une date donnée
+    function getMonday(d) {
+        d = new Date(d);
+        const day = d.getDay();
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+        d.setDate(diff);
+        d.setHours(0, 0, 0, 0);
+        return d;
+    }
+
+    // Calcul du numéro de semaine ISO
+    function getWeekNumber(d) {
+        d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+        d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+        const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+        return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    }
+
+    // Clé unique pour identifier une semaine (ex: "2026-W48")
+    function getWeekKey(mondayDate) {
+        const year = mondayDate.getFullYear();
+        const week = getWeekNumber(mondayDate);
+        return `${year}-W${week}`;
+    }
+
+    // Sélectionner la couleur active
+    function selectBrush(person, btnElement) {
+        selectedBrush = person;
+        document.querySelectorAll('.brush-btn').forEach(b => b.classList.remove('active'));
+        btnElement.classList.add('active');
+    }
+
+    // Construire la grille du calendrier
+    function renderCalendar() {
+        const grid = document.getElementById('calendarGrid');
+        grid.innerHTML = '';
+
+        const weekKey = getWeekKey(currentMonday);
+        const weekNum = getWeekNumber(currentMonday);
+        
+        // Mise à jour de l'en-tête
+        const monthName = currentMonday.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+        document.getElementById('monthYearDisplay').textContent = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+        document.getElementById('weekNumberDisplay').textContent = `Semaine ${weekNum}`;
+
+        // Case vide en haut à gauche
+        const corner = document.createElement('div');
+        corner.className = 'grid-header';
+        corner.textContent = 'Heure';
+        grid.appendChild(corner);
+
+        // En-têtes des jours (Lundi à Vendredi)
+        for (let d = 0; d < 5; d++) {
+            let dayDate = new Date(currentMonday);
+            dayDate.setDate(currentMonday.getDate() + d);
+            
+            const header = document.createElement('div');
+            header.className = 'grid-header';
+            header.innerHTML = `${DAYS[d]} <span>${dayDate.getDate()}/${dayDate.getMonth() + 1}</span>`;
+            grid.appendChild(header);
+        }
+
+        // Lignes d'heures
+        for (let h = START_HOUR; h <= END_HOUR; h++) {
+            const timeCell = document.createElement('div');
+            timeCell.className = 'time-slot';
+            timeCell.textContent = `${h}h00`;
+            grid.appendChild(timeCell);
+
+            for (let d = 0; d < 5; d++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                const cellId = `${d}-${h}`;
+                const assignedPerson = scheduleData[weekKey]?.[cellId] || '';
+
+                if (assignedPerson) {
+                    cell.setAttribute('data-person', assignedPerson);
+                    cell.textContent = NAMES[assignedPerson];
+                }
+
+                // Gestion du clic et du glisser (peinture rapide)
+                cell.addEventListener('mousedown', () => {
+                    isMouseDown = true;
+                    paintCell(cell, weekKey, cellId);
+                });
+                cell.addEventListener('mouseenter', () => {
+                    if (isMouseDown) paintCell(cell, weekKey, cellId);
+                });
+
+                grid.appendChild(cell);
+            }
+        }
+    }
+
+    // Colorier une case et sauvegarder
+    function paintCell(cellElement, weekKey, cellId) {
+        if (!scheduleData[weekKey]) scheduleData[weekKey] = {};
+        
+        if (selectedBrush === '') {
+            delete scheduleData[weekKey][cellId];
+            cellElement.removeAttribute('data-person');
+            cellElement.textContent = '';
+        } else {
+            scheduleData[weekKey][cellId] = selectedBrush;
+            cellElement.setAttribute('data-person', selectedBrush);
+            cellElement.textContent = NAMES[selectedBrush];
+        }
+        saveData();
+    }
+
+    // Copier la semaine actuelle vers la suivante
+    function copyToNextWeek() {
+        const currentKey = getWeekKey(currentMonday);
+        let nextMonday = new Date(currentMonday);
+        nextMonday.setDate(currentMonday.getDate() + 7);
+        const nextKey = getWeekKey(nextMonday);
+
+        if (!scheduleData[currentKey] || Object.keys(scheduleData[currentKey]).length === 0) {
+            alert("La semaine actuelle est vide !");
+            return;
+        }
+
+        // Copie profonde des données
+        scheduleData[nextKey] = JSON.parse(JSON.stringify(scheduleData[currentKey]));
+        saveData();
+        changeWeek(1); // Bascule automatiquement sur la semaine suivante
+    }
+
+    // Appliquer une règle récurrente (ex: Tous les mercredis après 16h)
+    function applyRecurrence() {
+        const person = document.getElementById('recPerson').value;
+        const dayIndex = parseInt(document.getElementById('recDay').value);
+        const startH = parseInt(document.getElementById('recStartHour').value);
+        const endH = parseInt(document.getElementById('recEndHour').value);
+        const weeksCount = parseInt(document.getElementById('recWeeksCount').value);
+
+        if (startH > endH) {
+            alert("L'heure de début doit être avant l'heure de fin.");
+            return;
+        }
+
+        let targetMonday = new Date(currentMonday);
+
+        for (let w = 0; w < weeksCount; w++) {
+            const wKey = getWeekKey(targetMonday);
+            if (!scheduleData[wKey]) scheduleData[wKey] = {};
+
+            for (let h = startH; h <= endH; h++) {
+                scheduleData[wKey][`${dayIndex}-${h}`] = person;
+            }
+            targetMonday.setDate(targetMonday.getDate() + 7);
+        }
+
+        saveData();
+        renderCalendar();
+        alert(`Règle appliquée sur ${weeksCount} semaine(s) !`);
+    }
+
+    function changeWeek(offset) {
+        currentMonday.setDate(currentMonday.getDate() + (offset * 7));
+        renderCalendar();
+    }
+
+    function goToCurrentWeek() {
+        currentMonday = getMonday(new Date());
+        renderCalendar();
+    }
+
+    function saveData() {
+        localStorage.setItem('familySchedule', JSON.stringify(scheduleData));
+    }
+
+    // Relâcher le clic n'importe où sur la page arrête de peindre
+    window.addEventListener('mouseup', () => { isMouseDown = false; });
+
+    // Lancement
+    initHourSelects();
+    renderCalendar();
+</script>
+
+</body>
+</html>
